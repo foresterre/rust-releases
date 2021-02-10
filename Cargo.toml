@@ -1,0 +1,23 @@
+[package]
+name = "manifesta"
+version = "0.1.0"
+authors = ["Martijn Gribnau <garm@ilumeo.com>"]
+description = "Index and access all available Rust releases"
+license = "MIT OR Apache-2.0"
+edition = "2018"
+
+documentation = "https://docs.rs/manifesta"
+repository = "https://github.com/foresterre/manifesta"
+
+[dependencies]
+# error handling
+thiserror = "1.0.23"
+
+# caching, fetching, etc.
+attohttpc = "0.16.1"
+directories = "3.0.1"
+
+# parsing manifests
+semver = "0.11"
+serde = { version = "1", features = ["derive"] }
+toml = "0.5"

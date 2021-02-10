@@ -136,7 +136,7 @@ fn manifest_file_name(source: &ManifestSource) -> String {
 }
 
 fn cache_dir() -> TResult<PathBuf> {
-    let cache = directories::ProjectDirs::from("com", "ilumeo", "manifesta")
+    let cache = directories_next::ProjectDirs::from("com", "ilumeo", "manifesta")
         .ok_or(ManifestaError::DlCache)?;
     let cache = cache.cache_dir();
     let cache = cache.join("index");

@@ -25,8 +25,32 @@ impl<'a> From<Channel> for &'a str {
     fn from(channel: Channel) -> Self {
         match channel {
             Channel::Beta => "beta",
-            Channel::Stable => "stable",
             Channel::Nightly => "nightly",
+            Channel::Stable => "stable",
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use yare::parameterized;
+
+    #[parameterized(
+        beta = { "beta", Channel::Beta },
+        nightly = { "nightly", Channel::Nightly },
+        stable = { "stable", Channel::Stable },
+    )]
+    fn channel_from_str(input: &str, expected: Channel) {
+        assert_eq!(Channel::try_from(input).unwrap(), expected);
+    }
+
+    #[parameterized(
+        beta = { Channel::Beta, "beta" },
+        nightly = { Channel::Nightly, "nightly" },
+        stable = { Channel::Stable, "stable" },
+    )]
+    fn channel_into_str(input: Channel, expected: &str) {
+        assert_eq!(Into::<&str>::into(input), expected);
     }
 }

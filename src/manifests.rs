@@ -84,11 +84,13 @@ impl ManifestSource {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::dl::fetch_meta_manifest;
+    use crate::DocumentSource;
 
     #[test]
     fn test_parse_meta_manifest() {
-        let meta_file = fetch_meta_manifest().unwrap();
+        let path = [env!("CARGO_MANIFEST_DIR"), "/resources/manifests.txt"].join("");
+        let meta_file = DocumentSource::LocalPath(path.into());
+
         let buffer = meta_file.load().unwrap();
         let meta_manifest = MetaManifest::try_from_str(String::from_utf8(buffer).unwrap());
         assert!(meta_manifest.is_ok());

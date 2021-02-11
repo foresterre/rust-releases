@@ -71,18 +71,20 @@ impl ReleaseIndex {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::dl::{fetch_meta_manifest, fetch_release_manifests};
-    use crate::manifests::MetaManifest;
-    use crate::release_channel::Channel;
+    use yare::parameterized;
 
-    #[test]
-    fn test_parse_meta_manifest() {
-        let meta_file = fetch_meta_manifest().unwrap();
-        let buffer = meta_file.load().unwrap();
-        let meta_manifest = MetaManifest::try_from_str(String::from_utf8(buffer).unwrap()).unwrap();
-        let documents = fetch_release_manifests(&meta_manifest, Channel::Stable).unwrap();
-        let index = ReleaseIndex::try_from_documents(&documents);
+    #[parameterized(
+        stable = { "/resources/stable_2016-04-12.toml", "1.8.0" },
+        beta = { "/resources/beta_2016-03-23.toml", "1.8.0-beta.2" },
+        nightly = { "/resources/nightly_2016-03-08.toml", "1.9.0-nightly" },
+    )]
+    fn release_index(resource: &str, expected_version: &str) {
+        let expected_version = semver::Version::parse(expected_version).unwrap();
 
-        assert!(index.is_ok());
+        let path = [env!("CARGO_MANIFEST_DIR"), resource].join("");
+        let index = ReleaseIndex::try_from_documents(&vec![DocumentSource::LocalPath(path.into())])
+            .unwrap();
+
+        assert_eq!(index.releases()[0].version(), &expected_version);
     }
 }

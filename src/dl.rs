@@ -148,20 +148,34 @@ fn cache_dir() -> TResult<PathBuf> {
 mod tests {
     use super::*;
 
+    #[cfg(test)]
+    macro_rules! dl_test {
+        ($expr:expr) => {{
+            if option_env!("MANIFESTA_RUN_DL_TEST").is_some() {
+                $expr
+            }
+        }};
+    }
+
     #[test]
     fn test_fetch_meta_manifest() {
-        let meta = fetch_meta_manifest();
-        assert!(meta.is_ok());
+        dl_test!({
+            let meta = fetch_meta_manifest();
+            assert!(meta.is_ok());
+        })
     }
 
     #[test]
     fn test_fetch_release_manifest_stable() {
-        let meta = fetch_meta_manifest().unwrap();
-        let meta_manifest =
-            MetaManifest::try_from_str(String::from_utf8(meta.load().unwrap()).unwrap()).unwrap();
+        dl_test!({
+            let meta = fetch_meta_manifest().unwrap();
+            let meta_manifest =
+                MetaManifest::try_from_str(String::from_utf8(meta.load().unwrap()).unwrap())
+                    .unwrap();
 
-        let result = fetch_release_manifests(&meta_manifest, Channel::Stable);
+            let result = fetch_release_manifests(&meta_manifest, Channel::Stable);
 
-        assert!(result.is_ok());
+            assert!(result.is_ok());
+        })
     }
 }

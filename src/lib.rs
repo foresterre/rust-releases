@@ -28,7 +28,7 @@ mod tests {
         beta = { "/resources/beta_2016-03-23.toml", "1.8.0-beta.2" },
         nightly = { "/resources/nightly_2016-03-08.toml", "1.9.0-nightly" },
     )]
-    fn pass(resource: &str, expected_version: &str) {
+    fn example_usage(resource: &str, expected_version: &str) {
         let expected_version = semver::Version::parse(expected_version).unwrap();
 
         let path = [env!("CARGO_MANIFEST_DIR"), resource].join("");

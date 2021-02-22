@@ -6,8 +6,8 @@ description = "Index and access all available Rust releases"
 license = "MIT OR Apache-2.0"
 edition = "2018"
 
-documentation = "https://docs.rs/manifesta"
-repository = "https://github.com/foresterre/manifesta"
+documentation = "https://docs.rs/rust-releases"
+repository = "https://github.com/foresterre/rust-releases"
 
 [features]
 # internal feature: enable download test, which is heavily rate limitted

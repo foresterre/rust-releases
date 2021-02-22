@@ -1,4 +1,4 @@
-# Manifesta
+# rust-releases
 
 
 ## Introduction
@@ -34,9 +34,4 @@ It will eventually support all three options, but initially, only the second one
 ## Technical options
 
 * Bring your own download tool (planned, will be a cfg option in the future)
-* Optionally, use built in download tool 
-
-## Crate name
-
-Portmanteau of "manifest", referring to the Rust release manifests this crate pulls its (meta)data from and "festa",
-Portuguese for party. 
+* Optionally, use built in download tool

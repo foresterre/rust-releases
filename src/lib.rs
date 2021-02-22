@@ -1,4 +1,4 @@
-pub use errors::{ManifestaError, TResult};
+pub use errors::{RustReleasesError, TResult};
 
 // public API
 

@@ -1,11 +1,11 @@
-pub type TResult<T> = Result<T, ManifestaError>;
+pub type TResult<T> = Result<T, RustReleasesError>;
 
 #[derive(Debug, thiserror::Error)]
-pub enum ManifestaError {
+pub enum RustReleasesError {
     #[error("{0}")]
     DeserializeToml(#[from] toml::de::Error),
 
-    #[error("Unable to create or access Manifesta cache")]
+    #[error("Unable to create or access RustReleases cache")]
     DlCache,
 
     #[error("{0}")]

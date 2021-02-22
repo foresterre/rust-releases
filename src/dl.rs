@@ -1,6 +1,6 @@
 use crate::manifests::{ManifestSource, MetaManifest};
 use crate::release_channel::Channel;
-use crate::{ManifestaError, TResult};
+use crate::{RustReleasesError, TResult};
 use std::fs::File;
 use std::io::{BufReader, BufWriter, Read, Write};
 use std::path::Path;
@@ -103,7 +103,7 @@ fn download_if_not_stale<P: AsRef<Path>>(
     let response = attohttpc::get(url)
         .header(
             "User-Agent",
-            "Manifesta (github.com/foresterre/manifesta/issues)",
+            "rust-releases (github.com/foresterre/rust-releases/issues)",
         )
         .send()?;
 
@@ -136,8 +136,8 @@ fn manifest_file_name(source: &ManifestSource) -> String {
 }
 
 fn cache_dir() -> TResult<PathBuf> {
-    let cache = directories_next::ProjectDirs::from("com", "ilumeo", "manifesta")
-        .ok_or(ManifestaError::DlCache)?;
+    let cache = directories_next::ProjectDirs::from("com", "ilumeo", "rust-releases")
+        .ok_or(RustReleasesError::DlCache)?;
     let cache = cache.cache_dir();
     let cache = cache.join("index");
 
@@ -151,7 +151,7 @@ mod tests {
     #[cfg(test)]
     macro_rules! dl_test {
         ($expr:expr) => {{
-            if cfg!(feature = "dl_test") || option_env!("MANIFESTA_RUN_DL_TEST").is_some() {
+            if cfg!(feature = "dl_test") || option_env!("RUST_RELEASES_RUN_DL_TEST").is_some() {
                 $expr
             }
         }};

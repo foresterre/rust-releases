@@ -1,4 +1,4 @@
-use crate::{ManifestaError, TResult};
+use crate::{RustReleasesError, TResult};
 use serde::Deserialize;
 
 #[derive(Deserialize)]
@@ -24,7 +24,7 @@ pub(crate) fn parse_release_manifest(manifest_contents: &[u8]) -> TResult<semver
         .version
         .split_ascii_whitespace()
         .next()
-        .ok_or(ManifestaError::RustVersionNotFoundInManifest)?;
+        .ok_or(RustReleasesError::RustVersionNotFoundInManifest)?;
 
     Ok(semver::Version::parse(version)?)
 }

@@ -1,4 +1,4 @@
-use crate::ManifestaError;
+use crate::RustReleasesError;
 use std::convert::TryFrom;
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -9,14 +9,14 @@ pub enum Channel {
 }
 
 impl<'a> TryFrom<&'a str> for Channel {
-    type Error = ManifestaError;
+    type Error = RustReleasesError;
 
     fn try_from(item: &'a str) -> Result<Self, Self::Error> {
         Ok(match item {
             "beta" => Self::Beta,
             "nightly" => Self::Nightly,
             "stable" => Self::Stable,
-            unsupported => return Err(ManifestaError::NoSuchChannel(unsupported.to_string())),
+            unsupported => return Err(RustReleasesError::NoSuchChannel(unsupported.to_string())),
         })
     }
 }

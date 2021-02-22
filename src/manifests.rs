@@ -1,5 +1,5 @@
 use crate::release_channel::Channel;
-use crate::{ManifestaError, TResult};
+use crate::{RustReleasesError, TResult};
 
 #[derive(Debug)]
 pub struct MetaManifest {
@@ -64,7 +64,9 @@ impl ManifestSource {
         //   and DD      is the day,
         //   and CHANNEL is one of 'stable' | 'beta' | 'nightly'
 
-        let date = input.get(26..36).ok_or(ManifestaError::ParseManifestDate)?;
+        let date = input
+            .get(26..36)
+            .ok_or(RustReleasesError::ParseManifestDate)?;
         Ok(date.to_string())
     }
 
@@ -76,7 +78,7 @@ impl ManifestSource {
         } else if input.contains("stable") {
             Channel::Stable
         } else {
-            return Err(ManifestaError::ParseManifestSource);
+            return Err(RustReleasesError::ParseManifestSource);
         })
     }
 }

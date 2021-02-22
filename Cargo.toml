@@ -9,6 +9,10 @@ edition = "2018"
 documentation = "https://docs.rs/manifesta"
 repository = "https://github.com/foresterre/manifesta"
 
+[features]
+# internal feature: enable download test, which is heavily rate limitted
+dl_test = []
+
 [dependencies]
 # error handling
 thiserror = "1.0.23"

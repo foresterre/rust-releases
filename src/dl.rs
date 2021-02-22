@@ -151,7 +151,7 @@ mod tests {
     #[cfg(test)]
     macro_rules! dl_test {
         ($expr:expr) => {{
-            if option_env!("MANIFESTA_RUN_DL_TEST").is_some() {
+            if cfg!(feature = "dl_test") || option_env!("MANIFESTA_RUN_DL_TEST").is_some() {
                 $expr
             }
         }};

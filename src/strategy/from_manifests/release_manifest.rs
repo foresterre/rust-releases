@@ -32,7 +32,7 @@ pub(crate) fn parse_release_manifest(manifest_contents: &[u8]) -> TResult<semver
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::DocumentSource;
+    use crate::strategy::from_manifests::DocumentSource;
 
     #[test]
     fn test_parse_meta_manifest() {

@@ -1,4 +1,4 @@
-use crate::strategy::release_manifests::release_channel::Channel;
+use crate::channel::Channel;
 use crate::{RustReleasesError, TResult};
 
 #[derive(Debug)]
@@ -86,7 +86,7 @@ impl ManifestSource {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::DocumentSource;
+    use crate::strategy::from_manifests::DocumentSource;
 
     #[test]
     fn test_parse_meta_manifest() {

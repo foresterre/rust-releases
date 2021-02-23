@@ -1,8 +1,6 @@
-use crate::dl::DocumentSource;
-use crate::strategy::release_manifests::release_manifest::parse_release_manifest;
 use crate::TResult;
-use std::io::Write;
 
+use crate::strategy::Strategy;
 pub use semver;
 
 /// A Rust version release of any channel (stable, beta, nightly)
@@ -12,6 +10,10 @@ pub struct Release {
 }
 
 impl Release {
+    pub fn new(version: semver::Version) -> Self {
+        Self { version }
+    }
+
     /// Whether this is a minor release
     pub fn is_minor(&self) -> bool {
         self.version.major != 0 && self.version.minor == 0 && self.version.patch == 0
@@ -35,31 +37,15 @@ pub struct ReleaseIndex {
 }
 
 impl ReleaseIndex {
+    pub(crate) fn new<I: IntoIterator<Item = Release>>(releases: I) -> Self {
+        Self {
+            releases: releases.into_iter().collect(),
+        }
+    }
+
     /// Attempt to build an index by parsing release manifests
-    pub fn try_from_documents(documents: &[DocumentSource]) -> TResult<Self> {
-        let releases = documents
-            .iter()
-            .map(|document| {
-                document.load().and_then(|content| {
-                    parse_release_manifest(&content).map(|version| Release { version })
-                })
-            })
-            .collect::<TResult<Vec<_>>>()?;
-
-        Ok(Self { releases })
-    }
-
-    // TODO
-    #[allow(unused)]
-    pub(crate) fn try_from_index(_buffer: &[u8]) -> TResult<Self> {
-        unimplemented!()
-    }
-
-    // TODO
-    #[allow(unused)]
-    pub(crate) fn write_index<W: Write>(&self, _writer: &mut W) -> TResult<()> {
-        //writer.write_all(&vec![]).map_err(From::from)
-        unimplemented!()
+    pub fn with_strategy<S: Strategy>(strategy: S) -> TResult<Self> {
+        strategy.build_index()
     }
 
     /// Access all releases for this release index bundle
@@ -71,6 +57,8 @@ impl ReleaseIndex {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::source::DocumentSource;
+    use crate::strategy::from_manifests::FromManifests;
     use yare::parameterized;
 
     #[parameterized(
@@ -82,8 +70,8 @@ mod tests {
         let expected_version = semver::Version::parse(expected_version).unwrap();
 
         let path = [env!("CARGO_MANIFEST_DIR"), resource].join("");
-        let index = ReleaseIndex::try_from_documents(&vec![DocumentSource::LocalPath(path.into())])
-            .unwrap();
+        let strategy = FromManifests::from_documents(vec![DocumentSource::LocalPath(path.into())]);
+        let index = ReleaseIndex::with_strategy(strategy).unwrap();
 
         assert_eq!(index.releases()[0].version(), &expected_version);
     }

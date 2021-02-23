@@ -1,5 +1,5 @@
-use crate::manifests::{ManifestSource, MetaManifest};
-use crate::release_channel::Channel;
+use crate::strategy::release_manifests::manifests::{ManifestSource, MetaManifest};
+use crate::strategy::release_manifests::release_channel::Channel;
 use crate::{RustReleasesError, TResult};
 use std::fs::File;
 use std::io::{BufReader, BufWriter, Read, Write};

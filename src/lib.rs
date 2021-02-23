@@ -1,27 +1,25 @@
-pub use errors::{RustReleasesError, TResult};
-
-// public API
-
 pub use dl::fetch_meta_manifest;
 pub use dl::fetch_release_manifests;
 pub use dl::DocumentSource;
+pub use errors::{RustReleasesError, TResult};
 pub use index::Release;
 pub use index::ReleaseIndex;
-pub use manifests::ManifestSource;
-pub use manifests::MetaManifest;
-pub use release_channel::Channel;
+pub use strategy::release_manifests::manifests::ManifestSource;
+pub use strategy::release_manifests::manifests::MetaManifest;
+pub use strategy::release_manifests::release_channel::Channel;
+
+// public API
 
 mod dl;
 mod errors;
 mod index;
-mod manifests;
-mod release_channel;
-mod release_manifest;
+mod strategy;
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use yare::parameterized;
+
+    use super::*;
 
     #[parameterized(
         stable = { "/resources/stable_2016-04-12.toml", "1.8.0" },

@@ -1,4 +1,4 @@
-use crate::release_channel::Channel;
+use crate::strategy::release_manifests::release_channel::Channel;
 use crate::{RustReleasesError, TResult};
 
 #[derive(Debug)]

@@ -1,3 +1,5 @@
+use crate::strategy::dist_index::DistIndexError;
+
 pub type TResult<T> = Result<T, RustReleasesError>;
 
 #[derive(Debug, thiserror::Error)]
@@ -34,4 +36,7 @@ pub enum RustReleasesError {
 
     #[error("Unable to find Rust version in release manifest")]
     RustVersionNotFoundInManifest,
+
+    #[error("{0}")]
+    DistIndexStrategyError(#[from] DistIndexError),
 }

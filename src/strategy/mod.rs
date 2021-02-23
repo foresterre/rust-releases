@@ -1,5 +1,6 @@
 use crate::{Channel, ReleaseIndex, TResult};
 
+pub mod dist_index;
 pub mod from_manifests;
 
 pub trait Strategy {

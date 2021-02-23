@@ -4,7 +4,7 @@ use crate::strategy::Strategy;
 pub use semver;
 
 /// A Rust version release of any channel (stable, beta, nightly)
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Ord)]
 pub struct Release {
     version: semver::Version,
 }

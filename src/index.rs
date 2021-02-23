@@ -1,5 +1,5 @@
 use crate::dl::DocumentSource;
-use crate::release_manifest::parse_release_manifest;
+use crate::strategy::release_manifests::release_manifest::parse_release_manifest;
 use crate::TResult;
 use std::io::Write;
 

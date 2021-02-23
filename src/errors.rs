@@ -1,4 +1,5 @@
 use crate::strategy::dist_index::DistIndexError;
+use crate::strategy::releases_md::ReleasesMdError;
 
 pub type TResult<T> = Result<T, RustReleasesError>;
 
@@ -39,4 +40,7 @@ pub enum RustReleasesError {
 
     #[error("{0}")]
     DistIndexStrategyError(#[from] DistIndexError),
+
+    #[error("{0}")]
+    ReleasesMdStrategyError(#[from] ReleasesMdError),
 }

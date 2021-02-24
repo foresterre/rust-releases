@@ -6,5 +6,6 @@ pub use index::ReleaseIndex;
 pub mod channel;
 pub mod errors;
 pub mod index;
+pub mod io;
 pub mod source;
 pub mod strategy;

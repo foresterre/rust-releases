@@ -1,5 +1,6 @@
 use crate::channel::Channel;
-use crate::{RustReleasesError, TResult};
+use crate::strategy::from_manifests::FromManifestsError;
+use crate::TResult;
 
 #[derive(Debug)]
 pub(in crate::strategy::from_manifests) struct MetaManifest {
@@ -70,7 +71,7 @@ impl ManifestSource {
 
         let date = input
             .get(26..36)
-            .ok_or(RustReleasesError::ParseManifestDate)?;
+            .ok_or(FromManifestsError::ParseManifestDate)?;
         Ok(date.to_string())
     }
 
@@ -82,7 +83,7 @@ impl ManifestSource {
         } else if input.contains("stable") {
             Channel::Stable
         } else {
-            return Err(RustReleasesError::ParseManifestSource);
+            return Err(FromManifestsError::ParseManifestSource.into());
         })
     }
 }

@@ -25,11 +25,9 @@ impl Strategy for ReleasesMd {
             .lines()
             .filter(|s| s.starts_with("Version"))
             .filter_map(|s| {
-                s.split_ascii_whitespace().skip(1).next().and_then(|s| {
-                    semver::Version::parse(s)
-                        .map(|version| Release::new(version))
-                        .ok()
-                })
+                s.split_ascii_whitespace()
+                    .nth(1)
+                    .and_then(|s| semver::Version::parse(s).map(Release::new).ok())
             });
 
         Ok(ReleaseIndex::new(releases))

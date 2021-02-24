@@ -1,4 +1,5 @@
-use crate::{RustReleasesError, TResult};
+use crate::strategy::from_manifests::FromManifestsError;
+use crate::TResult;
 use serde::Deserialize;
 
 #[derive(Deserialize)]
@@ -18,7 +19,8 @@ struct Rust {
 pub(in crate::strategy::from_manifests) fn parse_release_manifest(
     manifest_contents: &[u8],
 ) -> TResult<semver::Version> {
-    let parsed: Manifest = toml::from_slice(manifest_contents)?;
+    let parsed: Manifest =
+        toml::from_slice(manifest_contents).map_err(FromManifestsError::DeserializeToml)?;
 
     let version = parsed
         .pkg
@@ -26,9 +28,9 @@ pub(in crate::strategy::from_manifests) fn parse_release_manifest(
         .version
         .split_ascii_whitespace()
         .next()
-        .ok_or(RustReleasesError::RustVersionNotFoundInManifest)?;
+        .ok_or(FromManifestsError::RustVersionNotFoundInManifest)?;
 
-    Ok(semver::Version::parse(version)?)
+    Ok(semver::Version::parse(version).map_err(FromManifestsError::ParseRustVersion)?)
 }
 
 #[cfg(test)]

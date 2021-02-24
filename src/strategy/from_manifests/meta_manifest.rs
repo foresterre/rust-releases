@@ -2,12 +2,14 @@ use crate::channel::Channel;
 use crate::{RustReleasesError, TResult};
 
 #[derive(Debug)]
-pub struct MetaManifest {
+pub(in crate::strategy::from_manifests) struct MetaManifest {
     manifests: Vec<ManifestSource>,
 }
 
 impl MetaManifest {
-    pub(crate) fn try_from_str<T: AsRef<str>>(item: T) -> TResult<Self> {
+    pub(in crate::strategy::from_manifests) fn try_from_str<T: AsRef<str>>(
+        item: T,
+    ) -> TResult<Self> {
         let item = item.as_ref();
 
         let manifests = item
@@ -18,20 +20,22 @@ impl MetaManifest {
         Ok(Self { manifests })
     }
 
-    pub fn manifests(&self) -> &[ManifestSource] {
+    pub(in crate::strategy::from_manifests) fn manifests(&self) -> &[ManifestSource] {
         &self.manifests
     }
 }
 
 #[derive(Debug)]
-pub struct ManifestSource {
+pub(in crate::strategy::from_manifests) struct ManifestSource {
     url: String,
     channel: Channel,
     date: String,
 }
 
 impl ManifestSource {
-    pub(crate) fn try_from_str<T: AsRef<str>>(item: T) -> TResult<Self> {
+    pub(in crate::strategy::from_manifests) fn try_from_str<T: AsRef<str>>(
+        item: T,
+    ) -> TResult<Self> {
         let item = item.as_ref();
 
         let channel = Self::parse_channel(item)?;
@@ -44,15 +48,15 @@ impl ManifestSource {
         })
     }
 
-    pub(crate) fn url(&self) -> &str {
+    pub(in crate::strategy::from_manifests) fn url(&self) -> &str {
         &self.url
     }
 
-    pub(crate) fn channel(&self) -> Channel {
+    pub(in crate::strategy::from_manifests) fn channel(&self) -> Channel {
         self.channel
     }
 
-    pub(crate) fn date(&self) -> &str {
+    pub(in crate::strategy::from_manifests) fn date(&self) -> &str {
         &self.date
     }
 

@@ -1,7 +1,5 @@
-use crate::TResult;
-
 use crate::strategy::Strategy;
-pub use semver;
+use crate::TResult;
 
 /// A Rust version release of any channel (stable, beta, nightly)
 #[derive(Debug, Eq, PartialEq, PartialOrd, Ord)]

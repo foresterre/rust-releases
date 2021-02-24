@@ -13,7 +13,7 @@ const META_MANIFEST_STALENESS_TIMEOUT: Duration = Duration::from_secs(86_400);
 const RELEASE_MANIFEST_STALENESS_TIMEOUT: Duration = Duration::from_secs(31_557_600);
 
 /// Download the meta manifest, unless it exists in the cache and is not stale
-pub(crate) fn fetch_meta_manifest() -> TResult<DocumentSource> {
+pub(in crate::strategy::from_manifests) fn fetch_meta_manifest() -> TResult<DocumentSource> {
     let cache = from_manifests_cache_dir()?;
     let manifest = download_if_not_stale(
         META_MANIFEST,
@@ -27,7 +27,7 @@ pub(crate) fn fetch_meta_manifest() -> TResult<DocumentSource> {
 
 /// Download the the release manifests for a certain channel, unless they exists in the cache and
 /// are not stale
-pub(crate) fn fetch_release_manifests(
+pub(in crate::strategy::from_manifests) fn fetch_release_manifests(
     meta_manifest: &MetaManifest,
     channel: Channel,
 ) -> TResult<Vec<DocumentSource>> {

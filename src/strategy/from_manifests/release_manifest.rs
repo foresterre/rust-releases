@@ -15,7 +15,9 @@ struct Rust {
     version: String,
 }
 
-pub(crate) fn parse_release_manifest(manifest_contents: &[u8]) -> TResult<semver::Version> {
+pub(in crate::strategy::from_manifests) fn parse_release_manifest(
+    manifest_contents: &[u8],
+) -> TResult<semver::Version> {
     let parsed: Manifest = toml::from_slice(manifest_contents)?;
 
     let version = parsed

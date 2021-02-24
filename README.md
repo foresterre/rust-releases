@@ -1,5 +1,9 @@
 # rust-releases
 
+[![GitHub Actions: CI](https://github.com/foresterre/rust-releases/actions/workflows/ci.yml/badge.svg)](https://github.com/foresterre/rust-releases/actions/workflows/ci.yml)
+[![Crates.io version shield](https://img.shields.io/crates/v/rust-releases.svg)](https://crates.io/crates/rust-releases)
+[![Docs](https://docs.rs/rust-releases/badge.svg)](https://docs.rs/rust-releases)
+[![Crates.io license shield](https://img.shields.io/crates/l/rust-releases.svg)](https://crates.io/crates/rust-releases)
 
 ## Introduction
 

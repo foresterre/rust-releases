@@ -3,7 +3,7 @@ use crate::strategy::releases_md::dl::fetch_releases_md;
 use crate::strategy::{FetchResources, Strategy};
 use crate::{Channel, Release, ReleaseIndex, TResult};
 
-pub(crate) mod dl;
+pub(in crate::strategy::releases_md) mod dl;
 
 pub struct ReleasesMd {
     source: DocumentSource,

@@ -1,9 +1,8 @@
 use crate::channel::Channel;
-use crate::source::{DocumentSource, DEFAULT_MEMORY_SIZE};
+use crate::io::{base_cache_dir, download_if_not_stale};
+use crate::source::DocumentSource;
 use crate::strategy::from_manifests::meta_manifest::{ManifestSource, MetaManifest};
-use crate::{RustReleasesError, TResult};
-use std::io::{BufWriter, Write};
-use std::path::Path;
+use crate::TResult;
 use std::path::PathBuf;
 use std::time::Duration;
 
@@ -14,8 +13,8 @@ const META_MANIFEST_STALENESS_TIMEOUT: Duration = Duration::from_secs(86_400);
 const RELEASE_MANIFEST_STALENESS_TIMEOUT: Duration = Duration::from_secs(31_557_600);
 
 /// Download the meta manifest, unless it exists in the cache and is not stale
-pub fn fetch_meta_manifest() -> TResult<DocumentSource> {
-    let cache = cache_dir()?;
+pub(crate) fn fetch_meta_manifest() -> TResult<DocumentSource> {
+    let cache = from_manifests_cache_dir()?;
     let manifest = download_if_not_stale(
         META_MANIFEST,
         &cache,
@@ -28,12 +27,12 @@ pub fn fetch_meta_manifest() -> TResult<DocumentSource> {
 
 /// Download the the release manifests for a certain channel, unless they exists in the cache and
 /// are not stale
-pub fn fetch_release_manifests(
+pub(crate) fn fetch_release_manifests(
     meta_manifest: &MetaManifest,
     channel: Channel,
 ) -> TResult<Vec<DocumentSource>> {
     let sources = meta_manifest.manifests();
-    let cache = cache_dir()?;
+    let cache = from_manifests_cache_dir()?;
 
     let manifests = sources
         .iter()
@@ -53,45 +52,9 @@ pub fn fetch_release_manifests(
     Ok(manifests)
 }
 
-fn download_if_not_stale<P: AsRef<Path>>(
-    url: &str,
-    cache_dir: &Path,
-    manifest: P,
-    timeout: Duration,
-) -> TResult<DocumentSource> {
-    let manifest_path = cache_dir.join(manifest);
-
-    if manifest_path.exists() && !is_stale(&manifest_path, timeout)? {
-        return Ok(DocumentSource::LocalPath(manifest_path));
-    } else {
-        std::fs::create_dir_all(cache_dir)?;
-    }
-
-    let response = attohttpc::get(url)
-        .header(
-            "User-Agent",
-            "rust-releases (github.com/foresterre/rust-releases/issues)",
-        )
-        .send()?;
-
-    // write to memory
-    let mut memory = Vec::with_capacity(DEFAULT_MEMORY_SIZE);
-    response.write_to(&mut memory)?;
-
-    // write memory to disk
-    let mut file = std::fs::File::create(&manifest_path)?;
-    let mut writer = BufWriter::new(&mut file);
-    writer.write_all(&memory)?;
-
-    Ok(DocumentSource::RemoteCached(manifest_path, memory))
-}
-
-fn is_stale<P: AsRef<Path>>(manifest: P, timeout: Duration) -> TResult<bool> {
-    let metadata = std::fs::metadata(manifest)?;
-    let modification = metadata.modified()?;
-    let duration = modification.elapsed()?;
-
-    Ok(timeout < duration)
+fn from_manifests_cache_dir() -> TResult<PathBuf> {
+    let cache = base_cache_dir()?;
+    Ok(cache.join("index"))
 }
 
 fn manifest_file_name(source: &ManifestSource) -> String {
@@ -102,27 +65,10 @@ fn manifest_file_name(source: &ManifestSource) -> String {
     )
 }
 
-fn cache_dir() -> TResult<PathBuf> {
-    let cache = directories_next::ProjectDirs::from("com", "ilumeo", "rust-releases")
-        .ok_or(RustReleasesError::DlCache)?;
-    let cache = cache.cache_dir();
-    let cache = cache.join("index");
-
-    Ok(cache)
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[cfg(test)]
-    macro_rules! dl_test {
-        ($expr:expr) => {{
-            if cfg!(feature = "dl_test") || option_env!("RUST_RELEASES_RUN_DL_TEST").is_some() {
-                $expr
-            }
-        }};
-    }
+    use crate::dl_test;
 
     #[test]
     fn test_fetch_meta_manifest() {

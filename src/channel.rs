@@ -1,5 +1,6 @@
 use crate::RustReleasesError;
 use std::convert::TryFrom;
+use std::fmt::{Display, Formatter};
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum Channel {
@@ -28,6 +29,13 @@ impl<'a> From<Channel> for &'a str {
             Channel::Nightly => "nightly",
             Channel::Stable => "stable",
         }
+    }
+}
+
+impl Display for Channel {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        let channel: Channel = *self;
+        f.write_str(channel.into())
     }
 }
 

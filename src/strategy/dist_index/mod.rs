@@ -25,12 +25,11 @@ impl Strategy for DistIndex {
             .filter(|s| !s.trim().starts_with("PRE"))
             .filter_map(|line| {
                 line.split_ascii_whitespace()
-                    .skip(3)
-                    .next()
+                    .nth(3)
                     .filter(|s| s.starts_with("rust-1"))
             })
-            .filter_map(|s| s.split('-').skip(1).next())
-            .flat_map(|s| semver::Version::parse(s).map(|version| Release::new(version)))
+            .filter_map(|s| s.split('-').nth(1))
+            .flat_map(|s| semver::Version::parse(s).map(Release::new))
             .collect::<BTreeSet<_>>();
 
         Ok(ReleaseIndex::new(versions))

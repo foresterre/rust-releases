@@ -2,6 +2,7 @@ use crate::RustReleasesError;
 use std::convert::TryFrom;
 use std::fmt::{Display, Formatter};
 
+/// Enumerates the Rust release channels
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum Channel {
     Beta,

@@ -3,18 +3,18 @@ use crate::strategy::{FetchResources, Strategy};
 use crate::{Channel, Release, ReleaseIndex, TResult};
 use std::collections::BTreeSet;
 
-pub struct S3DistIndex {
+pub struct DistIndex {
     source: DocumentSource,
 }
 
-impl S3DistIndex {
+impl DistIndex {
     #[cfg(test)]
     pub(crate) fn from_document(source: DocumentSource) -> Self {
         Self { source }
     }
 }
 
-impl Strategy for S3DistIndex {
+impl Strategy for DistIndex {
     fn build_index(&self) -> TResult<ReleaseIndex> {
         let contents = self.source.load()?;
         let content = String::from_utf8(contents).map_err(DistIndexError::UnrecognizedText)?;
@@ -37,7 +37,7 @@ impl Strategy for S3DistIndex {
     }
 }
 
-impl FetchResources for S3DistIndex {
+impl FetchResources for DistIndex {
     fn fetch_channel(_channel: Channel) -> TResult<Self> {
         unimplemented!()
     }
@@ -52,7 +52,7 @@ pub enum DistIndexError {
 #[cfg(test)]
 mod tests {
     use crate::source::DocumentSource;
-    use crate::strategy::dist_index::S3DistIndex;
+    use crate::strategy::dist_index::DistIndex;
     use crate::ReleaseIndex;
 
     #[test]
@@ -60,7 +60,7 @@ mod tests {
         let expected_version = semver::Version::parse("1.0.0").unwrap();
 
         let path = [env!("CARGO_MANIFEST_DIR"), "/resources/dist_index/dist.txt"].join("");
-        let strategy = S3DistIndex::from_document(DocumentSource::LocalPath(path.into()));
+        let strategy = DistIndex::from_document(DocumentSource::LocalPath(path.into()));
         let index = ReleaseIndex::with_strategy(strategy).unwrap();
 
         assert!(index.releases().len() > 50);

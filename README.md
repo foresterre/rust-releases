@@ -28,10 +28,62 @@ the following options:
   3) Parse Rust in-repo [RELEASES.md](https://raw.githubusercontent.com/rust-lang/rust/master/RELEASES.md)
       * Note: stable only
 
-Each of these options requires additional parsing, which is where this crate comes in: this crate provides an index of all Rust releases.
-It will eventually support all three options, but initially, only the second one will be supported.
+Each of these options requires additional parsing, which is where this crate comes in: this crate parses
+resources which provide an index, and then builds the index from the parsed resource(s).
 
-## Technical options
+Each option implements the `Strategy` trait which has a method `build_index` which returns a `ReleaseIndex`. 
+The input themselves can resources can be obtained by calling the `fetch_channel` method available through the
+`FetchResources` trait. 
+
+## Implemented options
+
+<table>
+<thead>
+  <tr>
+    <th>strategy name</th>
+    <th>trait</th>
+    <th>implemented</th>
+    <th>notes</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td rowspan="2">DistIndex</td>
+    <td>Strategy</td>
+    <td>✅</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>FetchResources</td>
+    <td>❌</td>
+    <td>slow (~1 minute)</td>
+  </tr>
+  <tr>
+    <td rowspan="2">FromManifests</td>
+    <td>Strategy</td>
+    <td>✅</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>FetchResources</td>
+    <td>✅ </td>
+    <td>very slow</td>
+  </tr>
+  <tr>
+    <td rowspan="2">ReleasesMd</td>
+    <td>Strategy</td>
+    <td>✅</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>FetchResources</td>
+    <td>✅</td>
+    <td>stable channel only</td>
+  </tr>
+</tbody>
+</table>
+
+## Technical options (eventually)
 
 * Bring your own download tool (planned, will be a cfg option in the future)
 * Optionally, use built in download tool

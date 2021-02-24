@@ -29,7 +29,7 @@ pub enum RustReleasesError {
     DistIndexStrategyError(#[from] DistIndexError),
 
     #[error("{0}")]
-    FromManifestsError(#[from] FromManifestsError),
+    FromManifestsStrategyError(#[from] FromManifestsError),
 
     #[error("{0}")]
     ReleasesMdStrategyError(#[from] ReleasesMdError),

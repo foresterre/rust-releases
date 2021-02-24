@@ -69,6 +69,25 @@ jobs:
       - name: Test all workspace crates
         run: cargo test --verbose --all
 
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+          profile: minimal
+          components: clippy
+      - name: Lint with Clippy
+        uses: actions-rs/clippy-check@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          args:  --tests -- -Dclippy::all
+
   rustfmt:
     name: rustfmt
     runs-on: ubuntu-latest

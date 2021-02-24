@@ -8,7 +8,7 @@ pub struct Release {
 }
 
 impl Release {
-    pub fn new(version: semver::Version) -> Self {
+    pub(crate) fn new(version: semver::Version) -> Self {
         Self { version }
     }
 
@@ -41,7 +41,7 @@ impl ReleaseIndex {
         }
     }
 
-    /// Attempt to build an index by parsing release manifests
+    /// Attempt to build an index using a certain given strategy
     pub fn with_strategy<S: Strategy>(strategy: S) -> TResult<Self> {
         strategy.build_index()
     }

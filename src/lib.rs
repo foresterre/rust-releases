@@ -31,7 +31,7 @@
 //! let strategy = ReleasesMd::fetch_channel(Channel::Stable).unwrap();
 //!
 //! // Build a release index using our strategy
-//! let index = ReleaseIndex::with_strategy(strategy).unwrap();
+//! let index = ReleaseIndex::from_strategy(strategy).unwrap();
 //!
 //! // Do something with the release information
 //! index.releases()

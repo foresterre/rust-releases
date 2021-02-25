@@ -42,7 +42,7 @@ impl ReleaseIndex {
     }
 
     /// Attempt to build an index using a certain given strategy
-    pub fn with_strategy<S: Strategy>(strategy: S) -> TResult<Self> {
+    pub fn from_strategy<S: Strategy>(strategy: S) -> TResult<Self> {
         strategy.build_index()
     }
 
@@ -69,7 +69,7 @@ mod tests {
 
         let path = [env!("CARGO_MANIFEST_DIR"), resource].join("");
         let strategy = FromManifests::from_documents(vec![DocumentSource::LocalPath(path.into())]);
-        let index = ReleaseIndex::with_strategy(strategy).unwrap();
+        let index = ReleaseIndex::from_strategy(strategy).unwrap();
 
         assert_eq!(index.releases()[0].version(), &expected_version);
     }

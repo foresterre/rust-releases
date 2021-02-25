@@ -71,7 +71,7 @@ mod tests {
         ]
         .join("");
         let strategy = ReleasesMd::from_document(DocumentSource::LocalPath(path.into()));
-        let index = ReleaseIndex::with_strategy(strategy).unwrap();
+        let index = ReleaseIndex::from_strategy(strategy).unwrap();
 
         assert!(index.releases().len() > 50);
     }

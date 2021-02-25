@@ -60,7 +60,7 @@ mod tests {
 
         let path = [env!("CARGO_MANIFEST_DIR"), "/resources/dist_index/dist.txt"].join("");
         let strategy = DistIndex::from_document(DocumentSource::LocalPath(path.into()));
-        let index = ReleaseIndex::with_strategy(strategy).unwrap();
+        let index = ReleaseIndex::from_strategy(strategy).unwrap();
 
         assert!(index.releases().len() > 50);
         assert_eq!(index.releases()[0].version(), &expected_version);

@@ -1,4 +1,4 @@
-use crate::strategy::from_manifests::FromManifestsError;
+use crate::source::from_manifests::FromManifestsError;
 use crate::TResult;
 use serde::Deserialize;
 
@@ -16,7 +16,7 @@ struct Rust {
     version: String,
 }
 
-pub(in crate::strategy::from_manifests) fn parse_release_manifest(
+pub(in crate::source::from_manifests) fn parse_release_manifest(
     manifest_contents: &[u8],
 ) -> TResult<semver::Version> {
     let parsed: Manifest =
@@ -36,7 +36,7 @@ pub(in crate::strategy::from_manifests) fn parse_release_manifest(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::strategy::from_manifests::DocumentSource;
+    use crate::source::from_manifests::Document;
 
     #[test]
     fn test_parse_meta_manifest() {
@@ -45,7 +45,7 @@ mod tests {
             "/resources/stable_2016-04-12.toml",
         ]
         .join("");
-        let release_manifest = DocumentSource::LocalPath(path.into());
+        let release_manifest = Document::LocalPath(path.into());
 
         let buffer = release_manifest.load().unwrap();
         let version = parse_release_manifest(&buffer);

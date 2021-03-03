@@ -1,5 +1,6 @@
-use crate::strategy::Strategy;
+use crate::source::Source;
 use crate::TResult;
+use std::iter::FromIterator;
 
 /// A Rust version release of any channel (stable, beta, nightly)
 #[derive(Debug, Eq, PartialEq, PartialOrd, Ord)]
@@ -28,35 +29,41 @@ impl Release {
     }
 }
 
-/// A release index is a data structure holding known Rust releases
+/// A release index is a data structure holding known Rust releases.
+/// Releases are indexed from the newest to the oldest known release.
 #[derive(Debug)]
 pub struct ReleaseIndex {
-    releases: Vec<Release>,
+    index: Vec<Release>,
 }
 
 impl ReleaseIndex {
-    pub(crate) fn new<I: IntoIterator<Item = Release>>(releases: I) -> Self {
+    /// Create a new `ReleaseIndex` from a given source.
+    /// Releases available in the index may vary based on the type of `Source`.
+    pub fn from_source<S: Source>(source: S) -> TResult<Self> {
+        source.build_index()
+    }
+
+    pub fn releases(&self) -> Vec<&Release> {
+        self.index.iter().collect()
+    }
+}
+
+impl FromIterator<Release> for ReleaseIndex {
+    /// Create a new `ReleaseIndex` from a given iterable.
+    ///
+    /// NB: Releases should already be sorted from the newest to the oldest known release.
+    fn from_iter<T: IntoIterator<Item = Release>>(iter: T) -> Self {
         Self {
-            releases: releases.into_iter().collect(),
+            index: iter.into_iter().collect(),
         }
-    }
-
-    /// Attempt to build an index using a certain given strategy
-    pub fn from_strategy<S: Strategy>(strategy: S) -> TResult<Self> {
-        strategy.build_index()
-    }
-
-    /// Access all releases for this release index bundle
-    pub fn releases(&self) -> &[Release] {
-        &self.releases
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::source::DocumentSource;
-    use crate::strategy::from_manifests::FromManifests;
+    use crate::source::from_manifests::FromManifests;
+    use crate::source::Document;
     use yare::parameterized;
 
     #[parameterized(
@@ -68,8 +75,8 @@ mod tests {
         let expected_version = semver::Version::parse(expected_version).unwrap();
 
         let path = [env!("CARGO_MANIFEST_DIR"), resource].join("");
-        let strategy = FromManifests::from_documents(vec![DocumentSource::LocalPath(path.into())]);
-        let index = ReleaseIndex::from_strategy(strategy).unwrap();
+        let strategy = FromManifests::from_documents(vec![Document::LocalPath(path.into())]);
+        let index = ReleaseIndex::from_source(strategy).unwrap();
 
         assert_eq!(index.releases()[0].version(), &expected_version);
     }

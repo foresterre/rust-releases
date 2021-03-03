@@ -1,28 +1,29 @@
-use crate::source::DocumentSource;
-use crate::strategy::from_manifests::dl::{fetch_meta_manifest, fetch_release_manifests};
-use crate::strategy::from_manifests::meta_manifest::MetaManifest;
-use crate::strategy::from_manifests::release_manifest::parse_release_manifest;
-use crate::strategy::{FetchResources, Strategy};
+use crate::source::from_manifests::dl::{fetch_meta_manifest, fetch_release_manifests};
+use crate::source::from_manifests::meta_manifest::MetaManifest;
+use crate::source::from_manifests::release_manifest::parse_release_manifest;
+use crate::source::Document;
+use crate::source::{FetchResources, Source};
 use crate::{Channel, Release, ReleaseIndex, TResult};
+use std::iter::FromIterator;
 
 mod dl;
 mod meta_manifest;
 mod release_manifest;
 
 pub struct FromManifests {
-    documents: Vec<DocumentSource>,
+    documents: Vec<Document>,
 }
 
 impl FromManifests {
     #[cfg(test)]
-    pub(crate) fn from_documents<I: IntoIterator<Item = DocumentSource>>(iter: I) -> Self {
+    pub(crate) fn from_documents<I: IntoIterator<Item = Document>>(iter: I) -> Self {
         Self {
             documents: iter.into_iter().collect(),
         }
     }
 }
 
-impl Strategy for FromManifests {
+impl Source for FromManifests {
     fn build_index(&self) -> TResult<ReleaseIndex> {
         let releases = self
             .documents
@@ -34,7 +35,7 @@ impl Strategy for FromManifests {
             })
             .collect::<TResult<Vec<_>>>()?;
 
-        Ok(ReleaseIndex::new(releases))
+        Ok(ReleaseIndex::from_iter(releases))
     }
 }
 

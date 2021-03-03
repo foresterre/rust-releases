@@ -11,27 +11,27 @@
 //!
 //! This process consists of two parts: 1) obtaining the data sources, and 2) building the index
 //! from these data sources. For the first part this crate provides the [`FetchResources`] trait, and
-//! for the second part the crate provides the [`Strategy`] trait.
+//! for the second part the crate provides the [`Source`] trait.
 //!
 //! These traits are implemented for certain index strategies:
 //! 1) [`DistIndex`]: Build an index from the AWS S3 Rust distribution index
 //! 2) [`FromManifests`]: Build an index from Rust [release manifests](https://static.rust-lang.org/manifests.txt)
 //! 3) [`ReleasesMd`]: Build an index from the [RELEASES.md](https://raw.githubusercontent.com/rust-lang/rust/master/RELEASES.md) found in the root of the Rust source code repository
 //!
-//! In the below example, we chose the third strategy, and we'll use it to show you how you can
+//! In the below example, we chose the third source type, and we'll use it to show you how you can
 //! use this library.
 //!
 //! ## Example
 //!
 //! ```rust
-//! use rust_releases::{FetchResources, Strategy, Channel, ReleaseIndex};
-//! use rust_releases::strategy::ReleasesMd;
+//! use rust_releases::{FetchResources, Source, Channel, ReleaseIndex};
+//! use rust_releases::source::ReleasesMd;
 //!
-//! // We choose the ReleasesMd strategy for this example; alternatives are DistIndex and FromManifests
-//! let strategy = ReleasesMd::fetch_channel(Channel::Stable).unwrap();
+//! // We choose the ReleasesMd source for this example; alternatives are DistIndex and FromManifests
+//! let source = ReleasesMd::fetch_channel(Channel::Stable).unwrap();
 //!
-//! // Build a release index using our strategy
-//! let index = ReleaseIndex::from_strategy(strategy).unwrap();
+//! // Build a release index using our source of choice
+//! let index = ReleaseIndex::from_source(source).unwrap();
 //!
 //! // Do something with the release information
 //! index.releases()
@@ -46,7 +46,7 @@
 //! <table>
 //! <thead>
 //!   <tr>
-//!     <th>strategy name</th>
+//!     <th>Source name</th>
 //!     <th>trait</th>
 //!     <th>implemented</th>
 //!     <th>notes</th>
@@ -55,29 +55,29 @@
 //! <tbody>
 //!   <tr>
 //!     <td rowspan="2">DistIndex</td>
-//!     <td>Strategy</td>
+//!     <td>Source</td>
 //!     <td>✅</td>
 //!     <td></td>
 //!   </tr>
 //!   <tr>
 //!     <td>FetchResources</td>
 //!     <td>❌</td>
-//!     <td>slow (~1 minute)</td>
+//!     <td>slow to fetch (~1 minute)</td>
 //!   </tr>
 //!   <tr>
 //!     <td rowspan="2">FromManifests</td>
-//!     <td>Strategy</td>
+//!     <td>Source</td>
 //!     <td>✅</td>
 //!     <td></td>
 //!   </tr>
 //!   <tr>
 //!     <td>FetchResources</td>
 //!     <td>✅ </td>
-//!     <td>very slow</td>
+//!     <td>very slow to fetch (~1 hour), but most complete</td>
 //!   </tr>
 //!   <tr>
 //!     <td rowspan="2">ReleasesMd</td>
-//!     <td>Strategy</td>
+//!     <td>Source</td>
 //!     <td>✅</td>
 //!     <td></td>
 //!   </tr>
@@ -96,15 +96,15 @@
 //! for questions, feature requests, bug fixes, or other points of feedback 🤗.
 //!
 //! [`FetchResources`]: crate::FetchResources
-//! [`Strategy`]: crate::Strategy
-//! [`DistIndex`]: crate::strategy::DistIndex
-//! [`FromManifests`]: crate::strategy::FromManifests
-//! [`ReleasesMd`]: crate::strategy::ReleasesMd
+//! [`Source`]: crate::Source
+//! [`DistIndex`]: crate::source::DistIndex
+//! [`FromManifests`]: crate::source::FromManifests
+//! [`ReleasesMd`]: crate::source::ReleasesMd
 
 pub use crate::channel::Channel;
 pub use crate::errors::{RustReleasesError, TResult};
 pub use crate::index::{Release, ReleaseIndex};
-pub use crate::strategy::{FetchResources, Strategy};
+pub use crate::source::{FetchResources, Source};
 
 pub use semver;
 
@@ -122,10 +122,13 @@ pub mod errors;
 /// [`ReleaseIndex`]: crate::index::ReleaseIndex
 /// [`Release`]: crate::index::Release
 pub mod index;
+
+/// i/o related methods used internally.
 pub(crate) mod io;
 
-/// Module which describes input resource files from which the index is built.
+/// Module which contains multiple types of _sources_ and the methods necessary to transform those
+/// sources into a `ReleaseIndex`.
 pub mod source;
 
-/// Module which contains indexing strategies.
-pub mod strategy;
+/// Module which contains search strategies, which can be used to go over an index in a certain order
+pub mod search;

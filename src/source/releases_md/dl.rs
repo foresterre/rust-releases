@@ -1,12 +1,12 @@
 use crate::io::{base_cache_dir, download_if_not_stale};
-use crate::source::DocumentSource;
+use crate::source::Document;
 use crate::TResult;
 use std::time::Duration;
 
 const URL: &str = "https://raw.githubusercontent.com/rust-lang/rust/master/RELEASES.md";
 const TIMEOUT: Duration = Duration::from_secs(86_400);
 
-pub(in crate::strategy::releases_md) fn fetch_releases_md() -> TResult<DocumentSource> {
+pub(in crate::source::releases_md) fn fetch_releases_md() -> TResult<Document> {
     let cache = base_cache_dir()?;
     let source = download_if_not_stale(URL, &cache, "RELEASES.md", TIMEOUT)?;
 

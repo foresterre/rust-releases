@@ -1,4 +1,4 @@
-use crate::source::{DocumentSource, DEFAULT_MEMORY_SIZE};
+use crate::source::{Document, DEFAULT_MEMORY_SIZE};
 use crate::{RustReleasesError, TResult};
 use std::io::{BufWriter, Write};
 use std::path::{Path, PathBuf};
@@ -19,11 +19,11 @@ pub(crate) fn download_if_not_stale<P: AsRef<Path>>(
     cache_dir: &Path,
     resource: P,
     timeout: Duration,
-) -> TResult<DocumentSource> {
+) -> TResult<Document> {
     let manifest_path = cache_dir.join(resource);
 
     if manifest_path.exists() && !is_stale(&manifest_path, timeout)? {
-        return Ok(DocumentSource::LocalPath(manifest_path));
+        return Ok(Document::LocalPath(manifest_path));
     } else {
         std::fs::create_dir_all(cache_dir)?;
     }
@@ -44,7 +44,7 @@ pub(crate) fn download_if_not_stale<P: AsRef<Path>>(
     let mut writer = BufWriter::new(&mut file);
     writer.write_all(&memory)?;
 
-    Ok(DocumentSource::RemoteCached(manifest_path, memory))
+    Ok(Document::RemoteCached(manifest_path, memory))
 }
 
 pub(crate) fn is_stale<P: AsRef<Path>>(manifest: P, timeout: Duration) -> TResult<bool> {

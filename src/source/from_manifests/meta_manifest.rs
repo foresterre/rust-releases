@@ -1,16 +1,14 @@
 use crate::channel::Channel;
-use crate::strategy::from_manifests::FromManifestsError;
+use crate::source::from_manifests::FromManifestsError;
 use crate::TResult;
 
 #[derive(Debug)]
-pub(in crate::strategy::from_manifests) struct MetaManifest {
+pub(in crate::source::from_manifests) struct MetaManifest {
     manifests: Vec<ManifestSource>,
 }
 
 impl MetaManifest {
-    pub(in crate::strategy::from_manifests) fn try_from_str<T: AsRef<str>>(
-        item: T,
-    ) -> TResult<Self> {
+    pub(in crate::source::from_manifests) fn try_from_str<T: AsRef<str>>(item: T) -> TResult<Self> {
         let item = item.as_ref();
 
         let manifests = item
@@ -21,22 +19,20 @@ impl MetaManifest {
         Ok(Self { manifests })
     }
 
-    pub(in crate::strategy::from_manifests) fn manifests(&self) -> &[ManifestSource] {
+    pub(in crate::source::from_manifests) fn manifests(&self) -> &[ManifestSource] {
         &self.manifests
     }
 }
 
 #[derive(Debug)]
-pub(in crate::strategy::from_manifests) struct ManifestSource {
+pub(in crate::source::from_manifests) struct ManifestSource {
     url: String,
     channel: Channel,
     date: String,
 }
 
 impl ManifestSource {
-    pub(in crate::strategy::from_manifests) fn try_from_str<T: AsRef<str>>(
-        item: T,
-    ) -> TResult<Self> {
+    pub(in crate::source::from_manifests) fn try_from_str<T: AsRef<str>>(item: T) -> TResult<Self> {
         let item = item.as_ref();
 
         let channel = Self::parse_channel(item)?;
@@ -49,15 +45,15 @@ impl ManifestSource {
         })
     }
 
-    pub(in crate::strategy::from_manifests) fn url(&self) -> &str {
+    pub(in crate::source::from_manifests) fn url(&self) -> &str {
         &self.url
     }
 
-    pub(in crate::strategy::from_manifests) fn channel(&self) -> Channel {
+    pub(in crate::source::from_manifests) fn channel(&self) -> Channel {
         self.channel
     }
 
-    pub(in crate::strategy::from_manifests) fn date(&self) -> &str {
+    pub(in crate::source::from_manifests) fn date(&self) -> &str {
         &self.date
     }
 
@@ -91,12 +87,12 @@ impl ManifestSource {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::strategy::from_manifests::DocumentSource;
+    use crate::source::from_manifests::Document;
 
     #[test]
     fn test_parse_meta_manifest() {
         let path = [env!("CARGO_MANIFEST_DIR"), "/resources/manifests.txt"].join("");
-        let meta_file = DocumentSource::LocalPath(path.into());
+        let meta_file = Document::LocalPath(path.into());
 
         let buffer = meta_file.load().unwrap();
         let meta_manifest = MetaManifest::try_from_str(String::from_utf8(buffer).unwrap());

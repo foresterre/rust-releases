@@ -1,6 +1,6 @@
-use crate::strategy::dist_index::DistIndexError;
-use crate::strategy::from_manifests::FromManifestsError;
-use crate::strategy::releases_md::ReleasesMdError;
+use crate::source::dist_index::DistIndexError;
+use crate::source::from_manifests::FromManifestsError;
+use crate::source::releases_md::ReleasesMdError;
 
 pub type TResult<T> = Result<T, RustReleasesError>;
 
@@ -23,14 +23,14 @@ pub enum RustReleasesError {
     SystemTime(#[from] std::time::SystemTimeError),
 
     // ---------------
-    // strategy errors
+    // Source errors
     // ---------------
     #[error("{0}")]
-    DistIndexStrategyError(#[from] DistIndexError),
+    DistIndexError(#[from] DistIndexError),
 
     #[error("{0}")]
-    FromManifestsStrategyError(#[from] FromManifestsError),
+    FromManifestsError(#[from] FromManifestsError),
 
     #[error("{0}")]
-    ReleasesMdStrategyError(#[from] ReleasesMdError),
+    ReleasesMdError(#[from] ReleasesMdError),
 }

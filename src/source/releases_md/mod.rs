@@ -1,22 +1,22 @@
-use crate::source::DocumentSource;
-use crate::strategy::releases_md::dl::fetch_releases_md;
-use crate::strategy::{FetchResources, Strategy};
+use crate::source::releases_md::dl::fetch_releases_md;
+use crate::source::Document;
+use crate::source::{FetchResources, Source};
 use crate::{Channel, Release, ReleaseIndex, TResult};
 
-pub(in crate::strategy::releases_md) mod dl;
+pub(in crate::source::releases_md) mod dl;
 
 pub struct ReleasesMd {
-    source: DocumentSource,
+    source: Document,
 }
 
 impl ReleasesMd {
     #[cfg(test)]
-    pub(crate) fn from_document(source: DocumentSource) -> Self {
+    pub(crate) fn from_document(source: Document) -> Self {
         Self { source }
     }
 }
 
-impl Strategy for ReleasesMd {
+impl Source for ReleasesMd {
     fn build_index(&self) -> TResult<ReleaseIndex> {
         let contents = self.source.load()?;
         let content = String::from_utf8(contents).map_err(ReleasesMdError::UnrecognizedText)?;
@@ -30,7 +30,7 @@ impl Strategy for ReleasesMd {
                     .and_then(|s| semver::Version::parse(s).map(Release::new).ok())
             });
 
-        Ok(ReleaseIndex::new(releases))
+        Ok(releases.collect())
     }
 }
 
@@ -47,7 +47,7 @@ impl FetchResources for ReleasesMd {
 
 #[derive(Debug, thiserror::Error)]
 pub enum ReleasesMdError {
-    #[error("Channel {0} is not available for the releases-md strategy")]
+    #[error("Channel {0} is not available for the releases-md source type")]
     ChannelNotAvailable(Channel),
 
     #[error("{0}")]
@@ -57,9 +57,9 @@ pub enum ReleasesMdError {
 #[cfg(test)]
 mod tests {
     use crate::dl_test;
-    use crate::source::DocumentSource;
-    use crate::strategy::releases_md::ReleasesMd;
-    use crate::strategy::FetchResources;
+    use crate::source::releases_md::ReleasesMd;
+    use crate::source::Document;
+    use crate::source::FetchResources;
     use crate::{Channel, ReleaseIndex};
     use yare::parameterized;
 
@@ -70,8 +70,8 @@ mod tests {
             "/resources/releases_md/RELEASES.md",
         ]
         .join("");
-        let strategy = ReleasesMd::from_document(DocumentSource::LocalPath(path.into()));
-        let index = ReleaseIndex::from_strategy(strategy).unwrap();
+        let strategy = ReleasesMd::from_document(Document::LocalPath(path.into()));
+        let index = ReleaseIndex::from_source(strategy).unwrap();
 
         assert!(index.releases().len() > 50);
     }

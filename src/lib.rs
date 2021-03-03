@@ -27,7 +27,7 @@
 //! use rust_releases::{FetchResources, Source, Channel, ReleaseIndex};
 //! use rust_releases::source::RustChangelog;
 //!
-//! // We choose the ReleasesMd source for this example; alternatives are DistIndex and FromManifests
+//! // We choose the RustChangelog source for this example; alternatives are DistIndex and ChannelManifests
 //! let source = RustChangelog::fetch_channel(Channel::Stable).unwrap();
 //!
 //! // Build a release index using our source of choice
@@ -118,8 +118,8 @@
 //! [`FetchResources`]: crate::FetchResources
 //! [`Source`]: crate::Source
 //! [`DistIndex`]: crate::source::DistIndex
-//! [`FromManifests`]: crate::source::FromManifests
-//! [`ReleasesMd`]: crate::source::ReleasesMd
+//! [`ChannelManifests`]: crate::source::ChannelManifests
+//! [`RustChangelog`]: crate::source::RustChangelog
 
 pub use crate::channel::Channel;
 pub use crate::errors::{RustReleasesError, TResult};

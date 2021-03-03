@@ -15,8 +15,8 @@
 //!
 //! These traits are implemented for certain index strategies:
 //! 1) [`DistIndex`]: Build an index from the AWS S3 Rust distribution index
-//! 2) [`FromManifests`]: Build an index from Rust [release manifests](https://static.rust-lang.org/manifests.txt)
-//! 3) [`ReleasesMd`]: Build an index from the [RELEASES.md](https://raw.githubusercontent.com/rust-lang/rust/master/RELEASES.md) found in the root of the Rust source code repository
+//! 2) [`ChannelManifests`]: Build an index from Rust [release manifests](https://static.rust-lang.org/manifests.txt)
+//! 3) [`RustChangelog`]: Build an index from the [RELEASES.md](https://raw.githubusercontent.com/rust-lang/rust/master/RELEASES.md) found in the root of the Rust source code repository
 //!
 //! In the below example, we chose the third source type, and we'll use it to show you how you can
 //! use this library.
@@ -45,49 +45,69 @@
 //!
 //! <table>
 //! <thead>
-//!   <tr>
-//!     <th>Source name</th>
-//!     <th>trait</th>
-//!     <th>implemented</th>
-//!     <th>notes</th>
-//!   </tr>
+//!      <tr>
+//!           <th>Type of data source</th>
+//!           <th>Trait</th>
+//!           <th>Implemented</th>
+//!           <th>Channels<sup>1</sup></th>
+//!           <th>Speed<sup>2, 3</sup></th>
+//!           <th>On disk cache size<sup>4</sup></th>
+//!           <th>Notes</th>
+//!      </tr>
 //! </thead>
 //! <tbody>
-//!   <tr>
-//!     <td rowspan="2">DistIndex</td>
-//!     <td>Source</td>
-//!     <td>✅</td>
-//!     <td></td>
-//!   </tr>
-//!   <tr>
-//!     <td>FetchResources</td>
-//!     <td>❌</td>
-//!     <td>slow to fetch (~1 minute)</td>
-//!   </tr>
-//!   <tr>
-//!     <td rowspan="2">FromManifests</td>
-//!     <td>Source</td>
-//!     <td>✅</td>
-//!     <td></td>
-//!   </tr>
-//!   <tr>
-//!     <td>FetchResources</td>
-//!     <td>✅ </td>
-//!     <td>very slow to fetch (~1 hour), but most complete</td>
-//!   </tr>
-//!   <tr>
-//!     <td rowspan="2">ReleasesMd</td>
-//!     <td>Source</td>
-//!     <td>✅</td>
-//!     <td></td>
-//!   </tr>
-//!   <tr>
-//!     <td>FetchResources</td>
-//!     <td>✅</td>
-//!     <td>stable channel only</td>
-//!   </tr>
+//!      <tr>
+//!           <td rowspan="2"><code>DistIndex</code></td>
+//!           <td>Source</td>
+//!           <td>✅</td>
+//!           <td rowspan="2">Stable, Beta & Nightly</td>
+//!           <td>Fast</td>
+//!           <td>-</td>
+//!           <td rowspan="2"></td>
+//!      </tr>
+//!      <tr>
+//!           <td>FetchResources</td>
+//!           <td>❌</td>
+//!           <td>Slow (~1 minute)</td>
+//!           <td>~8 MB</td>
+//!      </tr>
+//!      <tr>
+//!           <td rowspan="2"><code>ChannelManifests</code></td>
+//!           <td>Source</td>
+//!           <td>✅</td>
+//!           <td rowspan="2">Stable, Beta & Nightly</td>
+//!           <td>Medium</td>
+//!           <td>-</td>
+//!           <td rowspan="2">Once cached, much faster</td>
+//!      </tr>
+//!      <tr>
+//!           <td>FetchResources</td>
+//!           <td>✅</td>
+//!           <td>Extremely slow (~1 hour)</td>
+//!           <td>~418 MB</td>
+//!      </tr>
+//!      <tr>
+//!           <td rowspan="2"><code>RustChangelog</code></td>
+//!           <td>Source</td>
+//!           <td>✅</td>
+//!           <td rowspan="2">Stable</td>
+//!           <td>Fast</td>
+//!           <td>-</td>
+//!           <td rowspan="2"></td>
+//!      </tr>
+//!      <tr>
+//!           <td>FetchResources</td>
+//!           <td>✅</td>
+//!           <td>Instant (<1 second)</td>
+//!           <td>~491 KB</td>
+//!      </tr>
 //! </tbody>
 //! </table>
+//!
+//! <sup>1</sup>: Currently most of the `rust-releases` public API supports only stable. Support for the beta and nightly channel is work-in-progress, and the table currently lists whether there is theoretical support for these channels.<br>
+//! <sup>2</sup>: Speed for the `Source` trait primarily consist of parsing speed<br>
+//! <sup>3</sup>: Speed for the `FetchResources` trait is primarily limited by your own download speed, and the rate limiting of the server from which the resources are fetched<br>
+//! <sup>4</sup>: Approximate as of 2020-03-03 <br>
 //!
 //!
 //! ## Issues

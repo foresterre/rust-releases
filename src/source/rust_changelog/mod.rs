@@ -1,22 +1,22 @@
-use crate::source::releases_md::dl::fetch_releases_md;
+use crate::source::rust_changelog::dl::fetch_releases_md;
 use crate::source::Document;
 use crate::source::{FetchResources, Source};
 use crate::{Channel, Release, ReleaseIndex, TResult};
 
-pub(in crate::source::releases_md) mod dl;
+pub(in crate::source::rust_changelog) mod dl;
 
-pub struct ReleasesMd {
+pub struct RustChangelog {
     source: Document,
 }
 
-impl ReleasesMd {
+impl RustChangelog {
     #[cfg(test)]
     pub(crate) fn from_document(source: Document) -> Self {
         Self { source }
     }
 }
 
-impl Source for ReleasesMd {
+impl Source for RustChangelog {
     fn build_index(&self) -> TResult<ReleaseIndex> {
         let contents = self.source.load()?;
         let content = String::from_utf8(contents).map_err(ReleasesMdError::UnrecognizedText)?;
@@ -34,7 +34,7 @@ impl Source for ReleasesMd {
     }
 }
 
-impl FetchResources for ReleasesMd {
+impl FetchResources for RustChangelog {
     fn fetch_channel(channel: Channel) -> TResult<Self> {
         if let Channel::Stable = channel {
             let source = fetch_releases_md()?;
@@ -57,7 +57,7 @@ pub enum ReleasesMdError {
 #[cfg(test)]
 mod tests {
     use crate::dl_test;
-    use crate::source::releases_md::ReleasesMd;
+    use crate::source::rust_changelog::RustChangelog;
     use crate::source::Document;
     use crate::source::FetchResources;
     use crate::{Channel, ReleaseIndex};
@@ -67,10 +67,10 @@ mod tests {
     fn strategy_dist_index() {
         let path = [
             env!("CARGO_MANIFEST_DIR"),
-            "/resources/releases_md/RELEASES.md",
+            "/resources/rust_changelog/RELEASES.md",
         ]
         .join("");
-        let strategy = ReleasesMd::from_document(Document::LocalPath(path.into()));
+        let strategy = RustChangelog::from_document(Document::LocalPath(path.into()));
         let index = ReleaseIndex::from_source(strategy).unwrap();
 
         assert!(index.releases().len() > 50);
@@ -82,7 +82,7 @@ mod tests {
     )]
     fn fetch_unsupported_channel(channel: Channel) {
         dl_test!({
-            let file = ReleasesMd::fetch_channel(channel);
+            let file = RustChangelog::fetch_channel(channel);
             assert!(file.is_err());
         })
     }
@@ -90,7 +90,7 @@ mod tests {
     #[test]
     fn fetch_supported_channel() {
         dl_test!({
-            let file = ReleasesMd::fetch_channel(Channel::Stable);
+            let file = RustChangelog::fetch_channel(Channel::Stable);
             assert!(file.is_ok());
         })
     }

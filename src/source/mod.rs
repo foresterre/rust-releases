@@ -2,7 +2,7 @@ use crate::{Channel, ReleaseIndex, TResult};
 
 pub use dist_index::{DistIndex, DistIndexError};
 pub use from_manifests::{FromManifests, FromManifestsError};
-pub use releases_md::{ReleasesMd, ReleasesMdError};
+pub use rust_changelog::{ReleasesMdError, RustChangelog};
 
 use std::fs::File;
 use std::io::{BufReader, Read};
@@ -10,7 +10,7 @@ use std::path::{Path, PathBuf};
 
 pub mod dist_index;
 pub mod from_manifests;
-pub mod releases_md;
+pub mod rust_changelog;
 
 pub trait Source {
     fn build_index(&self) -> TResult<ReleaseIndex>;

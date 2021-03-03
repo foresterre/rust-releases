@@ -25,10 +25,10 @@
 //!
 //! ```rust
 //! use rust_releases::{FetchResources, Source, Channel, ReleaseIndex};
-//! use rust_releases::source::ReleasesMd;
+//! use rust_releases::source::RustChangelog;
 //!
 //! // We choose the ReleasesMd source for this example; alternatives are DistIndex and FromManifests
-//! let source = ReleasesMd::fetch_channel(Channel::Stable).unwrap();
+//! let source = RustChangelog::fetch_channel(Channel::Stable).unwrap();
 //!
 //! // Build a release index using our source of choice
 //! let index = ReleaseIndex::from_source(source).unwrap();

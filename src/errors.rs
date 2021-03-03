@@ -1,6 +1,6 @@
 use crate::source::dist_index::DistIndexError;
 use crate::source::from_manifests::FromManifestsError;
-use crate::source::releases_md::ReleasesMdError;
+use crate::source::rust_changelog::ReleasesMdError;
 
 pub type TResult<T> = Result<T, RustReleasesError>;
 

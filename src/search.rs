@@ -116,17 +116,17 @@ impl<'r, T> Bisect<'r, T> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::source::{Document, ReleasesMd};
+    use crate::source::{Document, RustChangelog};
     use crate::{Release, ReleaseIndex};
 
     #[test]
     fn linear_search() {
         let path = [
             env!("CARGO_MANIFEST_DIR"),
-            "/resources/releases_md/RELEASES.md",
+            "/resources/rust_changelog/RELEASES.md",
         ]
         .join("");
-        let strategy = ReleasesMd::from_document(Document::LocalPath(path.into()));
+        let strategy = RustChangelog::from_document(Document::LocalPath(path.into()));
         let index = ReleaseIndex::from_source(strategy).unwrap();
         let releases = index.releases();
 

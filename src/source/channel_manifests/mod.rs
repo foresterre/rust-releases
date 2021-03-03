@@ -1,6 +1,6 @@
-use crate::source::from_manifests::dl::{fetch_meta_manifest, fetch_release_manifests};
-use crate::source::from_manifests::meta_manifest::MetaManifest;
-use crate::source::from_manifests::release_manifest::parse_release_manifest;
+use crate::source::channel_manifests::dl::{fetch_meta_manifest, fetch_release_manifests};
+use crate::source::channel_manifests::meta_manifest::MetaManifest;
+use crate::source::channel_manifests::release_manifest::parse_release_manifest;
 use crate::source::Document;
 use crate::source::{FetchResources, Source};
 use crate::{Channel, Release, ReleaseIndex, TResult};
@@ -10,11 +10,11 @@ mod dl;
 mod meta_manifest;
 mod release_manifest;
 
-pub struct FromManifests {
+pub struct ChannelManifests {
     documents: Vec<Document>,
 }
 
-impl FromManifests {
+impl ChannelManifests {
     #[cfg(test)]
     pub(crate) fn from_documents<I: IntoIterator<Item = Document>>(iter: I) -> Self {
         Self {
@@ -23,7 +23,7 @@ impl FromManifests {
     }
 }
 
-impl Source for FromManifests {
+impl Source for ChannelManifests {
     fn build_index(&self) -> TResult<ReleaseIndex> {
         let releases = self
             .documents
@@ -39,7 +39,7 @@ impl Source for FromManifests {
     }
 }
 
-impl FetchResources for FromManifests {
+impl FetchResources for ChannelManifests {
     fn fetch_channel(channel: Channel) -> TResult<Self> {
         let source = fetch_meta_manifest()?;
         let content = source.load()?;

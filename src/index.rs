@@ -62,20 +62,20 @@ impl FromIterator<Release> for ReleaseIndex {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::source::from_manifests::FromManifests;
+    use crate::source::channel_manifests::ChannelManifests;
     use crate::source::Document;
     use yare::parameterized;
 
     #[parameterized(
-        stable = { "/resources/from_manifests/stable_2016-04-12.toml", "1.8.0" },
-        beta = { "/resources/from_manifests/beta_2016-03-23.toml", "1.8.0-beta.2" },
-        nightly = { "/resources/from_manifests/nightly_2016-03-08.toml", "1.9.0-nightly" },
+        stable = { "/resources/channel_manifests/stable_2016-04-12.toml", "1.8.0" },
+        beta = { "/resources/channel_manifests/beta_2016-03-23.toml", "1.8.0-beta.2" },
+        nightly = { "/resources/channel_manifests/nightly_2016-03-08.toml", "1.9.0-nightly" },
     )]
     fn release_index(resource: &str, expected_version: &str) {
         let expected_version = semver::Version::parse(expected_version).unwrap();
 
         let path = [env!("CARGO_MANIFEST_DIR"), resource].join("");
-        let strategy = FromManifests::from_documents(vec![Document::LocalPath(path.into())]);
+        let strategy = ChannelManifests::from_documents(vec![Document::LocalPath(path.into())]);
         let index = ReleaseIndex::from_source(strategy).unwrap();
 
         assert_eq!(index.releases()[0].version(), &expected_version);

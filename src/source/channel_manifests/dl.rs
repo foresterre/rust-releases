@@ -1,6 +1,6 @@
 use crate::channel::Channel;
 use crate::io::{base_cache_dir, download_if_not_stale};
-use crate::source::from_manifests::meta_manifest::{ManifestSource, MetaManifest};
+use crate::source::channel_manifests::meta_manifest::{ManifestSource, MetaManifest};
 use crate::source::Document;
 use crate::TResult;
 use std::path::PathBuf;
@@ -13,7 +13,7 @@ const META_MANIFEST_STALENESS_TIMEOUT: Duration = Duration::from_secs(86_400);
 const RELEASE_MANIFEST_STALENESS_TIMEOUT: Duration = Duration::from_secs(31_557_600);
 
 /// Download the meta manifest, unless it exists in the cache and is not stale
-pub(in crate::source::from_manifests) fn fetch_meta_manifest() -> TResult<Document> {
+pub(in crate::source::channel_manifests) fn fetch_meta_manifest() -> TResult<Document> {
     let cache = from_manifests_cache_dir()?;
     let manifest = download_if_not_stale(
         META_MANIFEST,
@@ -27,7 +27,7 @@ pub(in crate::source::from_manifests) fn fetch_meta_manifest() -> TResult<Docume
 
 /// Download the the release manifests for a certain channel, unless they exists in the cache and
 /// are not stale
-pub(in crate::source::from_manifests) fn fetch_release_manifests(
+pub(in crate::source::channel_manifests) fn fetch_release_manifests(
     meta_manifest: &MetaManifest,
     channel: Channel,
 ) -> TResult<Vec<Document>> {

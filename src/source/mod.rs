@@ -1,15 +1,15 @@
 use crate::{Channel, ReleaseIndex, TResult};
 
+pub use channel_manifests::{ChannelManifests, FromManifestsError};
 pub use dist_index::{DistIndex, DistIndexError};
-pub use from_manifests::{FromManifests, FromManifestsError};
 pub use rust_changelog::{ReleasesMdError, RustChangelog};
 
 use std::fs::File;
 use std::io::{BufReader, Read};
 use std::path::{Path, PathBuf};
 
+pub mod channel_manifests;
 pub mod dist_index;
-pub mod from_manifests;
 pub mod rust_changelog;
 
 pub trait Source {

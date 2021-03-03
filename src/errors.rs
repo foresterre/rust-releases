@@ -1,6 +1,6 @@
-use crate::source::channel_manifests::FromManifestsError;
+use crate::source::channel_manifests::ChannelManifestsError;
 use crate::source::dist_index::DistIndexError;
-use crate::source::rust_changelog::ReleasesMdError;
+use crate::source::rust_changelog::RustChangelogError;
 
 pub type TResult<T> = Result<T, RustReleasesError>;
 
@@ -29,8 +29,8 @@ pub enum RustReleasesError {
     DistIndexError(#[from] DistIndexError),
 
     #[error("{0}")]
-    FromManifestsError(#[from] FromManifestsError),
+    ChannelManifestsError(#[from] ChannelManifestsError),
 
     #[error("{0}")]
-    ReleasesMdError(#[from] ReleasesMdError),
+    RustChangelogError(#[from] RustChangelogError),
 }

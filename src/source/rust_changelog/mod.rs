@@ -19,7 +19,7 @@ impl RustChangelog {
 impl Source for RustChangelog {
     fn build_index(&self) -> TResult<ReleaseIndex> {
         let contents = self.source.load()?;
-        let content = String::from_utf8(contents).map_err(ReleasesMdError::UnrecognizedText)?;
+        let content = String::from_utf8(contents).map_err(RustChangelogError::UnrecognizedText)?;
 
         let releases = content
             .lines()
@@ -40,13 +40,13 @@ impl FetchResources for RustChangelog {
             let source = fetch_releases_md()?;
             Ok(Self { source })
         } else {
-            Err(ReleasesMdError::ChannelNotAvailable(channel).into())
+            Err(RustChangelogError::ChannelNotAvailable(channel).into())
         }
     }
 }
 
 #[derive(Debug, thiserror::Error)]
-pub enum ReleasesMdError {
+pub enum RustChangelogError {
     #[error("Channel {0} is not available for the releases-md source type")]
     ChannelNotAvailable(Channel),
 

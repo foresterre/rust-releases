@@ -1,4 +1,4 @@
-use crate::source::channel_manifests::FromManifestsError;
+use crate::source::channel_manifests::ChannelManifestsError;
 use crate::TResult;
 use serde::Deserialize;
 
@@ -20,7 +20,7 @@ pub(in crate::source::channel_manifests) fn parse_release_manifest(
     manifest_contents: &[u8],
 ) -> TResult<semver::Version> {
     let parsed: Manifest =
-        toml::from_slice(manifest_contents).map_err(FromManifestsError::DeserializeToml)?;
+        toml::from_slice(manifest_contents).map_err(ChannelManifestsError::DeserializeToml)?;
 
     let version = parsed
         .pkg
@@ -28,9 +28,9 @@ pub(in crate::source::channel_manifests) fn parse_release_manifest(
         .version
         .split_ascii_whitespace()
         .next()
-        .ok_or(FromManifestsError::RustVersionNotFoundInManifest)?;
+        .ok_or(ChannelManifestsError::RustVersionNotFoundInManifest)?;
 
-    Ok(semver::Version::parse(version).map_err(FromManifestsError::ParseRustVersion)?)
+    Ok(semver::Version::parse(version).map_err(ChannelManifestsError::ParseRustVersion)?)
 }
 
 #[cfg(test)]

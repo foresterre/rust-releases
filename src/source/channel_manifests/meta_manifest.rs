@@ -1,5 +1,5 @@
 use crate::channel::Channel;
-use crate::source::channel_manifests::FromManifestsError;
+use crate::source::channel_manifests::ChannelManifestsError;
 use crate::TResult;
 
 #[derive(Debug)]
@@ -71,7 +71,7 @@ impl ManifestSource {
 
         let date = input
             .get(26..36)
-            .ok_or(FromManifestsError::ParseManifestDate)?;
+            .ok_or(ChannelManifestsError::ParseManifestDate)?;
         Ok(date.to_string())
     }
 
@@ -83,7 +83,7 @@ impl ManifestSource {
         } else if input.contains("stable") {
             Channel::Stable
         } else {
-            return Err(FromManifestsError::ParseManifestSource.into());
+            return Err(ChannelManifestsError::ParseManifestSource.into());
         })
     }
 }

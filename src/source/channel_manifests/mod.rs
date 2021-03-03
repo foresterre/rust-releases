@@ -44,7 +44,7 @@ impl FetchResources for ChannelManifests {
         let source = fetch_meta_manifest()?;
         let content = source.load()?;
         let content =
-            String::from_utf8(content).map_err(|_| FromManifestsError::ParseMetaManifest)?;
+            String::from_utf8(content).map_err(|_| ChannelManifestsError::ParseMetaManifest)?;
 
         let meta_manifest = MetaManifest::try_from_str(&content)?;
 
@@ -57,7 +57,7 @@ impl FetchResources for ChannelManifests {
 }
 
 #[derive(Debug, thiserror::Error)]
-pub enum FromManifestsError {
+pub enum ChannelManifestsError {
     #[error("{0}")]
     DeserializeToml(#[from] toml::de::Error),
 

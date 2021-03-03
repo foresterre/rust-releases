@@ -1,8 +1,8 @@
 use crate::{Channel, ReleaseIndex, TResult};
 
-pub use channel_manifests::{ChannelManifests, FromManifestsError};
+pub use channel_manifests::{ChannelManifests, ChannelManifestsError};
 pub use dist_index::{DistIndex, DistIndexError};
-pub use rust_changelog::{ReleasesMdError, RustChangelog};
+pub use rust_changelog::{RustChangelog, RustChangelogError};
 
 use std::fs::File;
 use std::io::{BufReader, Read};

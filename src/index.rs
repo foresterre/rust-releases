@@ -67,9 +67,9 @@ mod tests {
     use yare::parameterized;
 
     #[parameterized(
-        stable = { "/resources/stable_2016-04-12.toml", "1.8.0" },
-        beta = { "/resources/beta_2016-03-23.toml", "1.8.0-beta.2" },
-        nightly = { "/resources/nightly_2016-03-08.toml", "1.9.0-nightly" },
+        stable = { "/resources/from_manifests/stable_2016-04-12.toml", "1.8.0" },
+        beta = { "/resources/from_manifests/beta_2016-03-23.toml", "1.8.0-beta.2" },
+        nightly = { "/resources/from_manifests/nightly_2016-03-08.toml", "1.9.0-nightly" },
     )]
     fn release_index(resource: &str, expected_version: &str) {
         let expected_version = semver::Version::parse(expected_version).unwrap();

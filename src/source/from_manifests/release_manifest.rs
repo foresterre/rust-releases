@@ -42,7 +42,7 @@ mod tests {
     fn test_parse_meta_manifest() {
         let path = [
             env!("CARGO_MANIFEST_DIR"),
-            "/resources/stable_2016-04-12.toml",
+            "/resources/from_manifests/stable_2016-04-12.toml",
         ]
         .join("");
         let release_manifest = Document::LocalPath(path.into());

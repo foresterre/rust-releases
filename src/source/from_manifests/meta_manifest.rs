@@ -91,7 +91,11 @@ mod tests {
 
     #[test]
     fn test_parse_meta_manifest() {
-        let path = [env!("CARGO_MANIFEST_DIR"), "/resources/manifests.txt"].join("");
+        let path = [
+            env!("CARGO_MANIFEST_DIR"),
+            "/resources/from_manifests/manifests.txt",
+        ]
+        .join("");
         let meta_file = Document::LocalPath(path.into());
 
         let buffer = meta_file.load().unwrap();

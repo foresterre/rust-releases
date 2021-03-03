@@ -9,7 +9,7 @@ pub struct Release {
 }
 
 impl Release {
-    pub(crate) fn new(version: semver::Version) -> Self {
+    pub fn new(version: semver::Version) -> Self {
         Self { version }
     }
 

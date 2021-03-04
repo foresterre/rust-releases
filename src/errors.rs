@@ -6,6 +6,7 @@ pub type TResult<T> = Result<T, RustReleasesError>;
 
 /// Top level failure cases for rust-releases
 #[derive(Debug, thiserror::Error)]
+#[non_exhaustive]
 pub enum RustReleasesError {
     #[error("Unable to create or access RustReleases cache")]
     DlCache,

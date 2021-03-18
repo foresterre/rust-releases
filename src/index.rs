@@ -66,15 +66,30 @@ impl ReleaseIndex {
     /// Returns an iterator over the latest stable releases, where only the latest
     /// patch release is returned.
     ///
-    /// If, for example, there are three patch releases for a minor release with version `1.5.x`
-    /// (`1.5.0`, `1.5.1` and `1.5.2`), this iterator will only return `1.5.2` and skip over the other
-    /// two patch releases.
-    pub fn stable_releases_iterator<'release>(
-        &'release self,
-    ) -> StableReleaseIterator<impl Iterator<Item = &'release Release>> {
+    /// # Example
+    ///
+    /// If the index is aware of the following releases: `["0.9.0", "1.0.0", "1.0.1", "1.1.0"]`,
+    /// the iterator will return, in order, releases for the following versions:
+    /// 1) `"1.1.0"`, 2) `"1.0.1"`, 3) `"0.9.0"`
+    ///
+    /// Version `"1.0.0"` is skipped, since this iterator only returns the latest patch release for
+    /// a version.
+    pub fn stable_releases_iterator(&self) -> impl Iterator<Item = &Release> {
         StableReleaseIterator {
             iter: self.index.iter().peekable(),
         }
+    }
+
+    /// Returns an iterator over the latest stable releases, where only the latest
+    /// patch release is returned.
+    ///
+    /// # Example
+    ///
+    /// If the index is aware of the following releases: `["0.9.0", "1.0.0", "1.0.1", "1.1.0"]`,
+    /// the iterator will return, in order, releases for the following versions:
+    /// 1) `"1.1.0"`, 2) `"1.0.1"`, 3) `"1.0.0"`, 4) `"0.9.0"`.
+    pub fn all_releases_iterator(&self) -> impl Iterator<Item = &Release> {
+        self.index.iter()
     }
 }
 
@@ -89,9 +104,7 @@ impl FromIterator<Release> for ReleaseIndex {
     }
 }
 
-/// An iterator over the latest regular releases.
-///
-/// Here, a regular release is the latest patch version for a certain minor release version.
+/// An iterator over the latest stable releases, with only the latest patch version included.
 pub struct StableReleaseIterator<'release, I: Iterator<Item = &'release Release>> {
     iter: iter::Peekable<I>,
 }
@@ -153,6 +166,22 @@ mod tests {
     }
 
     #[test]
+    fn most_recent() {
+        let index = setup_index();
+
+        let recent = index.most_recent();
+        assert_eq!(recent.unwrap().version(), &semver::Version::new(1, 50, 0));
+    }
+
+    #[test]
+    fn least_recent() {
+        let index = setup_index();
+
+        let recent = index.least_recent();
+        assert_eq!(recent.unwrap().version(), &semver::Version::new(0, 11, 0));
+    }
+
+    #[test]
     fn stable_releases_iterator() {
         let index = setup_index();
 
@@ -168,18 +197,17 @@ mod tests {
     }
 
     #[test]
-    fn most_recent() {
+    fn all_releases_iterator() {
         let index = setup_index();
 
-        let recent = index.most_recent();
-        assert_eq!(recent.unwrap().version(), &semver::Version::new(1, 50, 0));
-    }
+        let releases = index.all_releases_iterator().collect::<Vec<_>>();
 
-    #[test]
-    fn least_recent() {
-        let index = setup_index();
-
-        let recent = index.least_recent();
-        assert_eq!(recent.unwrap().version(), &semver::Version::new(0, 11, 0));
+        assert_eq!(releases.len(), 74);
+        assert_eq!(releases[0].version(), &semver::Version::new(1, 50, 0));
+        assert_eq!(releases[5].version(), &semver::Version::new(1, 45, 2));
+        assert_eq!(releases[10].version(), &semver::Version::new(1, 43, 1));
+        assert_eq!(releases[20].version(), &semver::Version::new(1, 35, 0));
+        assert_eq!(releases[50].version(), &semver::Version::new(1, 17, 0));
+        assert_eq!(releases[73].version(), &semver::Version::new(0, 11, 0));
     }
 }

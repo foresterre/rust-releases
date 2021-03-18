@@ -49,6 +49,20 @@ impl ReleaseIndex {
         self.index.iter().collect()
     }
 
+    /// Returns the most recent release.
+    ///
+    /// Returns `None` if the index has not registered any release.
+    pub fn most_recent(&self) -> Option<&Release> {
+        self.index.first()
+    }
+
+    /// Returns the least recent (oldest) registered release.
+    ///
+    /// Returns `None` if the index has not registered any release.
+    pub fn least_recent(&self) -> Option<&Release> {
+        self.index.last()
+    }
+
     /// Returns an iterator over the latest stable releases, where only the latest
     /// patch release is returned.
     ///
@@ -113,6 +127,16 @@ mod tests {
     use crate::source::{Document, RustChangelog};
     use yare::parameterized;
 
+    fn setup_index() -> ReleaseIndex {
+        let path = [
+            env!("CARGO_MANIFEST_DIR"),
+            "/resources/rust_changelog/RELEASES.md",
+        ]
+        .join("");
+        let source = RustChangelog::from_document(Document::LocalPath(path.into()));
+        ReleaseIndex::from_source(source).unwrap()
+    }
+
     #[parameterized(
         stable = { "/resources/channel_manifests/stable_2016-04-12.toml", "1.8.0" },
         beta = { "/resources/channel_manifests/beta_2016-03-23.toml", "1.8.0-beta.2" },
@@ -130,13 +154,7 @@ mod tests {
 
     #[test]
     fn stable_releases_iterator() {
-        let path = [
-            env!("CARGO_MANIFEST_DIR"),
-            "/resources/rust_changelog/RELEASES.md",
-        ]
-        .join("");
-        let source = RustChangelog::from_document(Document::LocalPath(path.into()));
-        let index = ReleaseIndex::from_source(source).unwrap();
+        let index = setup_index();
 
         let releases = index.stable_releases_iterator().collect::<Vec<_>>();
 
@@ -147,5 +165,21 @@ mod tests {
         assert_eq!(releases[20].version(), &semver::Version::new(1, 30, 1));
         assert_eq!(releases[50].version(), &semver::Version::new(1, 0, 0));
         assert_eq!(releases[52].version(), &semver::Version::new(0, 11, 0));
+    }
+
+    #[test]
+    fn most_recent() {
+        let index = setup_index();
+
+        let recent = index.most_recent();
+        assert_eq!(recent.unwrap().version(), &semver::Version::new(1, 50, 0));
+    }
+
+    #[test]
+    fn least_recent() {
+        let index = setup_index();
+
+        let recent = index.least_recent();
+        assert_eq!(recent.unwrap().version(), &semver::Version::new(0, 11, 0));
     }
 }

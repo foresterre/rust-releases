@@ -1,5 +1,6 @@
 use crate::source::Source;
 use crate::TResult;
+use std::iter;
 use std::iter::FromIterator;
 
 /// A Rust version release of any channel (stable, beta, nightly)
@@ -15,12 +16,12 @@ impl Release {
 
     /// Whether this is a minor release
     pub fn is_minor(&self) -> bool {
-        self.version.major != 0 && self.version.minor == 0 && self.version.patch == 0
+        self.version.major != 0 && self.version.patch == 0 && self.version.build.is_empty()
     }
 
     /// Whether this is a patch release
     pub fn is_patch(&self) -> bool {
-        self.version.patch != 0
+        self.version.patch != 0 && self.version.build.is_empty()
     }
 
     /// Get the Rust version for this release
@@ -43,8 +44,23 @@ impl ReleaseIndex {
         source.build_index()
     }
 
+    /// Returns a vector with releases.
     pub fn releases(&self) -> Vec<&Release> {
         self.index.iter().collect()
+    }
+
+    /// Returns an iterator over the latest stable releases, where only the latest
+    /// patch release is returned.
+    ///
+    /// If, for example, there are three patch releases for a minor release with version `1.5.x`
+    /// (`1.5.0`, `1.5.1` and `1.5.2`), this iterator will only return `1.5.2` and skip over the other
+    /// two patch releases.
+    pub fn stable_releases_iterator<'release>(
+        &'release self,
+    ) -> StableReleaseIterator<impl Iterator<Item = &'release Release>> {
+        StableReleaseIterator {
+            iter: self.index.iter().peekable(),
+        }
     }
 }
 
@@ -59,11 +75,42 @@ impl FromIterator<Release> for ReleaseIndex {
     }
 }
 
+/// An iterator over the latest regular releases.
+///
+/// Here, a regular release is the latest patch version for a certain minor release version.
+pub struct StableReleaseIterator<'release, I: Iterator<Item = &'release Release>> {
+    iter: iter::Peekable<I>,
+}
+
+impl<'release, I: Iterator<Item = &'release Release>> Iterator
+    for StableReleaseIterator<'release, I>
+{
+    type Item = I::Item;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let current = self.iter.next();
+
+        current.map(|it| {
+            let minor = it.version().minor;
+
+            while let Some(release) = self.iter.peek() {
+                if release.version().minor == minor {
+                    self.iter.next();
+                } else {
+                    break;
+                }
+            }
+
+            it
+        })
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::source::channel_manifests::ChannelManifests;
-    use crate::source::Document;
+    use crate::source::{Document, RustChangelog};
     use yare::parameterized;
 
     #[parameterized(
@@ -79,5 +126,26 @@ mod tests {
         let index = ReleaseIndex::from_source(strategy).unwrap();
 
         assert_eq!(index.releases()[0].version(), &expected_version);
+    }
+
+    #[test]
+    fn stable_releases_iterator() {
+        let path = [
+            env!("CARGO_MANIFEST_DIR"),
+            "/resources/rust_changelog/RELEASES.md",
+        ]
+        .join("");
+        let source = RustChangelog::from_document(Document::LocalPath(path.into()));
+        let index = ReleaseIndex::from_source(source).unwrap();
+
+        let releases = index.stable_releases_iterator().collect::<Vec<_>>();
+
+        assert_eq!(releases.len(), 53);
+        assert_eq!(releases[0].version(), &semver::Version::new(1, 50, 0));
+        assert_eq!(releases[5].version(), &semver::Version::new(1, 45, 2));
+        assert_eq!(releases[10].version(), &semver::Version::new(1, 40, 0));
+        assert_eq!(releases[20].version(), &semver::Version::new(1, 30, 1));
+        assert_eq!(releases[50].version(), &semver::Version::new(1, 0, 0));
+        assert_eq!(releases[52].version(), &semver::Version::new(0, 11, 0));
     }
 }

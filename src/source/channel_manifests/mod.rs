@@ -25,7 +25,7 @@ impl ChannelManifests {
 
 impl Source for ChannelManifests {
     fn build_index(&self) -> TResult<ReleaseIndex> {
-        let releases = self
+        let mut releases = self
             .documents
             .iter()
             .map(|document| {
@@ -34,6 +34,8 @@ impl Source for ChannelManifests {
                     .and_then(|content| parse_release_manifest(&content).map(Release::new))
             })
             .collect::<TResult<Vec<_>>>()?;
+
+        releases.sort_by(|a, b| b.cmp(a));
 
         Ok(ReleaseIndex::from_iter(releases))
     }

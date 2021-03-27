@@ -25,7 +25,7 @@ impl<'r, T> LinearSearch<'r, T> {
 /// With `Bisect`, one can perform a binary search over a slice of `Releases`.
 /// This can for example be used to more quickly find a `MSRV` or the latest working `nightly` build.
 #[derive(Clone, Debug)]
-pub struct Bisect<'r, T> {
+pub struct BisectionSearch<'r, T> {
     // All known releases, sorted by their version from high to low
     releases: &'r [T],
 
@@ -42,7 +42,7 @@ pub struct Bisect<'r, T> {
     done: bool,
 }
 
-impl<'r, T> Bisect<'r, T> {
+impl<'r, T> BisectionSearch<'r, T> {
     /// Iterate over the element by performing a binary search.
     ///
     /// # Panics
@@ -111,6 +111,10 @@ impl<'r, T> Bisect<'r, T> {
 
         Some(ret)
     }
+
+    pub fn is_done(&self) -> bool {
+        self.done
+    }
 }
 
 #[cfg(test)]
@@ -144,7 +148,7 @@ mod tests {
     fn bisection_search_only_left() {
         let releases = (0usize..10).into_iter().collect::<Vec<_>>();
 
-        let mut search = Bisect::new(&releases);
+        let mut search = BisectionSearch::new(&releases);
 
         let check = search.search_left();
         assert_eq!(*check.unwrap(), 4);
@@ -165,7 +169,7 @@ mod tests {
     fn bisection_search_only_right() {
         let releases = (0usize..10).into_iter().collect::<Vec<_>>();
 
-        let mut search = Bisect::new(&releases);
+        let mut search = BisectionSearch::new(&releases);
 
         let check = search.search_right();
         assert_eq!(*check.unwrap(), 4);
@@ -191,7 +195,7 @@ mod tests {
 
         let releases = (0usize..100).into_iter().collect::<Vec<_>>();
 
-        let mut search = Bisect::new(&releases);
+        let mut search = BisectionSearch::new(&releases);
 
         let check = search.search_right();
         assert_eq!(*check.unwrap(), 49);

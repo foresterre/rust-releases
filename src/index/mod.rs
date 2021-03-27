@@ -1,7 +1,10 @@
+pub use crate::index::linear::StableReleaseIterator;
 use crate::source::Source;
 use crate::TResult;
-use std::iter;
 use std::iter::FromIterator;
+
+/// Module for a linear iterator.
+pub(crate) mod linear;
 
 /// A Rust version release of any channel (stable, beta, nightly)
 #[derive(Debug, Eq, PartialEq, PartialOrd, Ord)]
@@ -101,35 +104,6 @@ impl FromIterator<Release> for ReleaseIndex {
         Self {
             index: iter.into_iter().collect(),
         }
-    }
-}
-
-/// An iterator over the latest stable releases, with only the latest patch version included.
-pub struct StableReleaseIterator<'release, I: Iterator<Item = &'release Release>> {
-    iter: iter::Peekable<I>,
-}
-
-impl<'release, I: Iterator<Item = &'release Release>> Iterator
-    for StableReleaseIterator<'release, I>
-{
-    type Item = I::Item;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        let current = self.iter.next();
-
-        current.map(|it| {
-            let minor = it.version().minor;
-
-            while let Some(release) = self.iter.peek() {
-                if release.version().minor == minor {
-                    self.iter.next();
-                } else {
-                    break;
-                }
-            }
-
-            it
-        })
     }
 }
 

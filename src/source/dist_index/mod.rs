@@ -4,6 +4,8 @@ use crate::{Channel, Release, ReleaseIndex, TResult};
 use std::collections::BTreeSet;
 use std::iter::FromIterator;
 
+pub(in crate::source::dist_index) mod dl;
+
 pub struct DistIndex {
     source: Document,
 }
@@ -38,13 +40,24 @@ impl Source for DistIndex {
 }
 
 impl FetchResources for DistIndex {
-    fn fetch_channel(_channel: Channel) -> TResult<Self> {
-        unimplemented!()
+    fn fetch_channel(channel: Channel) -> TResult<Self> {
+        if let Channel::Stable = channel {
+            let source = dl::fetch()?;
+            Ok(Self { source })
+        } else {
+            Err(DistIndexError::ChannelNotAvailable(channel).into())
+        }
     }
 }
 
 #[derive(Debug, thiserror::Error)]
 pub enum DistIndexError {
+    #[error("Channel {0} is not yet available for the 'DistIndex' source type")]
+    ChannelNotAvailable(Channel),
+
+    #[error("{0}")]
+    RusotoTlsError(#[from] rusoto_core::request::TlsError),
+
     #[error("{0}")]
     UnrecognizedText(#[from] std::string::FromUtf8Error),
 }

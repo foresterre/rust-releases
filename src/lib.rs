@@ -149,6 +149,3 @@ pub(crate) mod io;
 /// Module which contains multiple types of _sources_ and the methods necessary to transform those
 /// sources into a `ReleaseIndex`.
 pub mod source;
-
-/// Module which contains search strategies, which can be used to go over an index in a certain order
-pub mod search;

@@ -14,9 +14,10 @@
 //! for the second part the crate provides the [`Source`] trait.
 //!
 //! These traits are implemented for certain index strategies:
-//! 1) [`DistIndex`]: Build an index from the AWS S3 Rust distribution index
-//! 2) [`ChannelManifests`]: Build an index from Rust [release manifests](https://static.rust-lang.org/manifests.txt)
-//! 3) [`RustChangelog`]: Build an index from the [RELEASES.md](https://raw.githubusercontent.com/rust-lang/rust/master/RELEASES.md) found in the root of the Rust source code repository
+//! 1) [`DistIndex`]: Build an index from the AWS S3 Rust distribution bucket; obtain the input data yourself using the `aws` cli.
+//! 2) [`ChannelManifests`]: Build an index from Rust [release manifests](https://static.rust-lang.org/manifests.txt).
+//! 3) [`RustChangelog`]: Build an index from the [RELEASES.md](https://raw.githubusercontent.com/rust-lang/rust/master/RELEASES.md) found in the root of the Rust source code repository.
+//! 4) [`RustDist`]: Build an index from the AWS S3 Rust distribution bucket; input data can be obtained using the [`FetchResources`] trait.  
 //!
 //! In the below example, we chose the third source type, and we'll use it to show you how you can
 //! use this library.
@@ -60,7 +61,7 @@
 //!           <td rowspan="2"><code>DistIndex</code></td>
 //!           <td>Source</td>
 //!           <td>✅</td>
-//!           <td rowspan="2">Stable, Beta & Nightly</td>
+//!           <td rowspan="2">Stable, <strike>Beta & Nightly</strike><sup>To be implemented</sup></td>
 //!           <td>Fast</td>
 //!           <td>-</td>
 //!           <td rowspan="2"></td>
@@ -75,7 +76,7 @@
 //!           <td rowspan="2"><code>ChannelManifests</code></td>
 //!           <td>Source</td>
 //!           <td>✅</td>
-//!           <td rowspan="2">Stable, Beta & Nightly</td>
+//!           <td rowspan="2">Stable, <strike>Beta & Nightly</strike><sup>To be implemented</sup></td>
 //!           <td>Medium</td>
 //!           <td>-</td>
 //!           <td rowspan="2">Once cached, much faster</td>
@@ -101,6 +102,21 @@
 //!           <td>Instant (<1 second)</td>
 //!           <td>~491 KB</td>
 //!      </tr>
+//!      <tr>
+//!           <td rowspan="2"><code>RustDist</code></td>
+//!           <td>Source</td>
+//!          <td>✅</td>
+//!           <td rowspan="2">Stable, <strike>Beta & Nightly</strike><sup>To be implemented</sup></td>
+//!           <td>Fast</td>
+//!           <td>-</td>
+//!           <td rowspan="2"></td>
+//!      </tr>
+//!      <tr>
+//!           <td>FetchResources</td>
+//!           <td>✅</td>
+//!           <td>Medium fast (~20 seconds)</td>
+//!           <td>~1 MB</td>
+//!      </tr>
 //! </tbody>
 //! </table>
 //!
@@ -120,6 +136,7 @@
 //! [`DistIndex`]: crate::source::DistIndex
 //! [`ChannelManifests`]: crate::source::ChannelManifests
 //! [`RustChangelog`]: crate::source::RustChangelog
+//! [`RustDist`]: crate::source::RustDist
 
 pub use crate::channel::Channel;
 pub use crate::errors::{RustReleasesError, TResult};

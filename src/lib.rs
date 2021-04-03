@@ -61,7 +61,7 @@
 //!           <td rowspan="2"><code>DistIndex</code></td>
 //!           <td>Source</td>
 //!           <td>✅</td>
-//!           <td rowspan="2">Stable, <strike>Beta & Nightly</strike><sup>To be implemented</sup></td>
+//!           <td rowspan="2">Stable, <strike>Beta & Nightly</strike></td>
 //!           <td>Fast</td>
 //!           <td>-</td>
 //!           <td rowspan="2"></td>
@@ -79,7 +79,7 @@
 //!           <td rowspan="2">Stable, <strike>Beta & Nightly</strike><sup>To be implemented</sup></td>
 //!           <td>Medium</td>
 //!           <td>-</td>
-//!           <td rowspan="2">Once cached, much faster</td>
+//!           <td rowspan="2">Input data has not been updated since 2020-02-23 <sup>(<a href="https://github.com/foresterre/rust-releases/issues/9">#9</a>)</sup>. Use <code>RustDist</code> instead.</td>
 //!      </tr>
 //!      <tr>
 //!           <td>FetchResources</td>

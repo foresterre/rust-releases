@@ -1,13 +1,14 @@
 pub use crate::index::linear::StableReleaseIterator;
 use crate::source::Source;
 use crate::TResult;
+use std::cmp::Ordering;
 use std::iter::FromIterator;
 
 /// Module for a linear iterator.
 pub(crate) mod linear;
 
 /// A Rust version release of any channel (stable, beta, nightly)
-#[derive(Debug, Eq, PartialEq, PartialOrd, Ord)]
+#[derive(Debug, Eq, PartialEq, PartialOrd)]
 pub struct Release {
     version: semver::Version,
 }
@@ -30,6 +31,12 @@ impl Release {
     /// Get the Rust version for this release
     pub fn version(&self) -> &semver::Version {
         &self.version
+    }
+}
+
+impl Ord for Release {
+    fn cmp(&self, other: &Self) -> Ordering {
+        other.version().cmp(self.version())
     }
 }
 

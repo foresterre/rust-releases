@@ -13,7 +13,7 @@ use std::path::Path;
 /// You may then load the source by creating the [`DistIndex`] and calling the `build_index` method
 /// from the `Source` trait.
 ///
-/// ```rust
+/// ```rust,no_run
 /// use rust_releases::source::DistIndex;
 /// use rust_releases::Source;
 ///
@@ -81,7 +81,7 @@ mod tests {
 
     #[test]
     fn strategy_dist_index() {
-        let expected_version = semver::Version::parse("1.0.0").unwrap();
+        let expected_version = semver::Version::parse("1.50.0").unwrap();
 
         let path = [env!("CARGO_MANIFEST_DIR"), "/resources/dist_index/dist.txt"].join("");
         let strategy = DistIndex::from_document(Document::LocalPath(path.into()));

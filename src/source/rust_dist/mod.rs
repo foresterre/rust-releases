@@ -1,10 +1,13 @@
 use crate::source::Document;
-use crate::source::{FetchResources, Source};
+#[cfg(feature = "aws_index")]
+use crate::source::FetchResources;
+use crate::source::Source;
 use crate::{Channel, Release, ReleaseIndex, TResult};
 use regex::{Captures, Regex};
 use std::collections::BTreeSet;
 use std::iter::FromIterator;
 
+#[cfg(feature = "aws_index")]
 pub(in crate::source::rust_dist) mod dl;
 
 pub struct RustDist {
@@ -51,6 +54,7 @@ fn parse_release(capture: Captures) -> TResult<Release> {
     Ok(Release::new(semver::Version::new(major, minor, patch)))
 }
 
+#[cfg(feature = "aws_index")]
 impl FetchResources for RustDist {
     fn fetch_channel(channel: Channel) -> TResult<Self> {
         if let Channel::Stable = channel {
@@ -67,6 +71,7 @@ pub enum RustDistError {
     #[error("Channel {0} is not yet available for the 'DistIndex' source type")]
     ChannelNotAvailable(Channel),
 
+    #[cfg(feature = "aws_index")]
     #[error("{0}")]
     RusotoTlsError(#[from] rusoto_core::request::TlsError),
 

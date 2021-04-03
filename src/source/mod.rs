@@ -11,6 +11,7 @@ use std::path::{Path, PathBuf};
 pub mod channel_manifests;
 pub mod dist_index;
 pub mod rust_changelog;
+pub mod rust_dist;
 
 pub trait Source {
     fn build_index(&self) -> TResult<ReleaseIndex>;

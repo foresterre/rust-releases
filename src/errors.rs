@@ -1,6 +1,7 @@
 use crate::source::channel_manifests::ChannelManifestsError;
 use crate::source::dist_index::DistIndexError;
 use crate::source::rust_changelog::RustChangelogError;
+use crate::source::rust_dist::RustDistError;
 
 pub type TResult<T> = Result<T, RustReleasesError>;
 
@@ -34,4 +35,7 @@ pub enum RustReleasesError {
 
     #[error("{0}")]
     RustChangelogError(#[from] RustChangelogError),
+
+    #[error("{0}")]
+    RustDistError(#[from] RustDistError),
 }

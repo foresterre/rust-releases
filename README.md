@@ -44,7 +44,7 @@ build a catalog of released Rust versions. In addition, for all solution except 
           <td rowspan="2"><code>DistIndex</code></td>
           <td>Source</td>
           <td>✅</td>
-          <td rowspan="2">Stable, Beta & Nightly</td>
+          <td rowspan="2">Stable, <strike>Beta & Nightly</strike><sup>To be implemented</sup></td>
           <td>Fast</td>
           <td>-</td>
           <td rowspan="2"></td>
@@ -59,7 +59,7 @@ build a catalog of released Rust versions. In addition, for all solution except 
           <td rowspan="2"><code>ChannelManifests</code></td>
           <td>Source</td>
           <td>✅</td>
-          <td rowspan="2">Stable, Beta & Nightly</td>
+          <td rowspan="2">Stable, <strike>Beta & Nightly</strike><sup>To be implemented</sup></td>
           <td>Medium</td>
           <td>-</td>
           <td rowspan="2">Once cached, much faster</td>
@@ -85,6 +85,21 @@ build a catalog of released Rust versions. In addition, for all solution except 
           <td>Instant (<1 second)</td>
           <td>~491 KB</td>
      </tr>
+     <tr>
+          <td rowspan="2"><code>RustDist</code></td>
+          <td>Source</td>
+          <td>✅</td>
+          <td rowspan="2">Stable, <strike>Beta & Nightly</strike><sup>To be implemented</sup></td>
+          <td>Fast</td>
+          <td>-</td>
+          <td rowspan="2"></td>
+     </tr>
+     <tr>
+          <td>FetchResources</td>
+          <td>✅</td>
+          <td>Medium fast (~20 seconds)</td>
+          <td>~1 MB</td>
+     </tr>
 </tbody>
 </table>
 
@@ -98,19 +113,16 @@ build a catalog of released Rust versions. In addition, for all solution except 
 Since support for the beta and nightly channels is work-in-progress, I would advise to use the `RustChangelog` data source as it's
 a small download, immediately up-to-date on release and fast to parse. It only supports stable channel releases.
 
-The `DistIndex`data source can be useful when eventually support for the beta and nightly channel is completed. For now, this source
-also has not integration for fetching the resource files. One way to obtain the input file for this data source is by using the `aws` CLI:
-`aws --no-sign-request s3 ls static-rust-lang-org/dist/ > dist.txt`<sup>(<a href="https://github.com/rust-lang/rust/issues/56971#issuecomment-527199391">source</a>)</sup> this input resource by using the aws.
+Alternatively, the `RustDist` or `DistIndex` data sources can be useful, especially when support for the beta and nightly channel are added.
+They both get their input data from the Rust AWS S3 distribution bucket. When using `RustDist`, the input data can be obtained
+with the `FetchResources` trait implementation. For `DistIndex`, you have to obtain the input data yourself (by running the
+`aws` cli with the following options `aws --no-sign-request s3 ls static-rust-lang-org/dist/ > dist.txt`<sup>(<a href="https://github.com/rust-lang/rust/issues/56971#issuecomment-527199391">source</a>)</sup>).
 
-The `ChannelManifests` source is the most complete, and we can most easily extend information about releases beyond the version
-for this source. Once downloaded once, it's quite fast since each release manifest is cached as a separate file. 
+The `ChannelManifests` source has the most potential, as the input data is the most complete. 
+We can most easily extend information about releases beyond the version for this source. Once downloaded, it's quite fast since each release manifest is cached as a separate file. 
 However, the initial download is quite large and frankly, because of rate limiting, also quite slow. In addition,
 the resource is approximately one-week out of date since the root manifest is only updated one week after a release <sup>(<a href="https://github.com/rust-lang/rust/issues/56971#issuecomment-527199391">source</a>)</sup>.
-
-## Technical options (eventually)
-
-* Bring your own download tool (planned, will be a cfg option in the future)
-* Optionally, use built in download tool
+_NB: The input data has not been updated since 2020-02-23_<sup>(<a href="https://github.com/foresterre/rust-releases/issues/9">#9</a>)</sup>.
 
 ## Applications
 

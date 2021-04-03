@@ -8,7 +8,7 @@ use std::iter::FromIterator;
 pub(crate) mod linear;
 
 /// A Rust version release of any channel (stable, beta, nightly)
-#[derive(Debug, Eq, PartialEq, PartialOrd)]
+#[derive(Debug, Eq, PartialEq)]
 pub struct Release {
     version: semver::Version,
 }
@@ -31,6 +31,12 @@ impl Release {
     /// Get the Rust version for this release
     pub fn version(&self) -> &semver::Version {
         &self.version
+    }
+}
+
+impl PartialOrd for Release {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
     }
 }
 

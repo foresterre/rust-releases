@@ -3,6 +3,7 @@ use crate::{Channel, ReleaseIndex, TResult};
 pub use channel_manifests::{ChannelManifests, ChannelManifestsError};
 pub use dist_index::{DistIndex, DistIndexError};
 pub use rust_changelog::{RustChangelog, RustChangelogError};
+pub use rust_dist::{RustDist, RustDistError};
 
 use std::fs::File;
 use std::io::{BufReader, Read};

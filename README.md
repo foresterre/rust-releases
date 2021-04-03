@@ -97,7 +97,7 @@ build a catalog of released Rust versions. In addition, for all solution except 
      <tr>
           <td>FetchResources</td>
           <td>✅</td>
-          <td>Medium fast (~20 seconds)</td>
+          <td>Medium fast (~10 seconds)</td>
           <td>~1 MB</td>
      </tr>
 </tbody>

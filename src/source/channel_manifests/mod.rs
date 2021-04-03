@@ -4,6 +4,7 @@ use crate::source::channel_manifests::release_manifest::parse_release_manifest;
 use crate::source::Document;
 use crate::source::{FetchResources, Source};
 use crate::{Channel, Release, ReleaseIndex, TResult};
+use std::collections::BTreeSet;
 use std::iter::FromIterator;
 
 mod dl;
@@ -25,7 +26,7 @@ impl ChannelManifests {
 
 impl Source for ChannelManifests {
     fn build_index(&self) -> TResult<ReleaseIndex> {
-        let mut releases = self
+        let releases = self
             .documents
             .iter()
             .map(|document| {
@@ -33,9 +34,7 @@ impl Source for ChannelManifests {
                     .load()
                     .and_then(|content| parse_release_manifest(&content).map(Release::new))
             })
-            .collect::<TResult<Vec<_>>>()?;
-
-        releases.sort_by(|a, b| b.cmp(a));
+            .collect::<TResult<BTreeSet<_>>>()?;
 
         Ok(ReleaseIndex::from_iter(releases))
     }

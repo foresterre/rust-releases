@@ -56,15 +56,15 @@ pub enum RustChangelogError {
 
 #[cfg(test)]
 mod tests {
-    use crate::dl_test;
     use crate::source::rust_changelog::RustChangelog;
     use crate::source::Document;
     use crate::source::FetchResources;
+    use crate::{dl_test, Release};
     use crate::{Channel, ReleaseIndex};
     use yare::parameterized;
 
     #[test]
-    fn strategy_dist_index() {
+    fn source_dist_index() {
         let path = [
             env!("CARGO_MANIFEST_DIR"),
             "/resources/rust_changelog/RELEASES.md",
@@ -74,6 +74,10 @@ mod tests {
         let index = ReleaseIndex::from_source(strategy).unwrap();
 
         assert!(index.releases().len() > 50);
+        assert_eq!(
+            index.releases()[0],
+            &Release::new(semver::Version::new(1, 50, 0))
+        );
     }
 
     #[parameterized(

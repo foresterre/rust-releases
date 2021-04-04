@@ -11,6 +11,8 @@ const META_MANIFEST: &str = "https://static.rust-lang.org/manifests.txt";
 const META_MANIFEST_STALENESS_TIMEOUT: Duration = Duration::from_secs(86_400);
 // 1 year timeout for the individual release manifests (these manifests should not get outdated)
 const RELEASE_MANIFEST_STALENESS_TIMEOUT: Duration = Duration::from_secs(31_557_600);
+// Directory where cached files reside for this source
+const SOURCE_CACHE_DIR: &str = "source_channel_manifests";
 
 /// Download the meta manifest, unless it exists in the cache and is not stale
 pub(in crate::source::channel_manifests) fn fetch_meta_manifest() -> TResult<Document> {
@@ -54,7 +56,7 @@ pub(in crate::source::channel_manifests) fn fetch_release_manifests(
 
 fn from_manifests_cache_dir() -> TResult<PathBuf> {
     let cache = base_cache_dir()?;
-    Ok(cache.join("index"))
+    Ok(cache.join(SOURCE_CACHE_DIR))
 }
 
 fn manifest_file_name(source: &ManifestSource) -> String {

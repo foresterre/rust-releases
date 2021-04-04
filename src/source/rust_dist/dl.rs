@@ -25,8 +25,11 @@ const OUTPUT_PATH: &str = "dist_static-rust-lang-org.txt";
 // Use the filtered index cache for up to 1 day
 const TIMEOUT: Duration = Duration::from_secs(86_400);
 
+// Directory where cached files reside for this source
+const SOURCE_CACHE_DIR: &str = "source_dist_index";
+
 pub(in crate::source::rust_dist) fn fetch() -> TResult<Document> {
-    let cache_dir = base_cache_dir()?.join("source_dist_index");
+    let cache_dir = base_cache_dir()?.join(SOURCE_CACHE_DIR);
     let output_path = cache_dir.join(OUTPUT_PATH);
 
     // Use the locally cached version if it exists, and is not stale

@@ -5,9 +5,10 @@ use std::time::Duration;
 
 const URL: &str = "https://raw.githubusercontent.com/rust-lang/rust/master/RELEASES.md";
 const TIMEOUT: Duration = Duration::from_secs(86_400);
+const SOURCE_CACHE_DIR: &str = "source_rust_changelog";
 
 pub(in crate::source::rust_changelog) fn fetch_releases_md() -> TResult<Document> {
-    let cache = base_cache_dir()?;
+    let cache = base_cache_dir()?.join(SOURCE_CACHE_DIR);
     let source = download_if_not_stale(URL, &cache, "RELEASES.md", TIMEOUT)?;
 
     Ok(source)

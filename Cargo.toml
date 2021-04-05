@@ -22,7 +22,7 @@ dl_test = []
 thiserror = "1.0.23"
 
 # caching, fetching, etc.
-attohttpc = "0.16.1"
+attohttpc = "0.17.0"
 directories-next = "2.0.0"
 
 rusoto_core = { version = "0.46.0", optional = true }

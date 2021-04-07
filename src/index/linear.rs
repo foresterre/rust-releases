@@ -2,6 +2,7 @@ use crate::Release;
 use std::iter;
 
 /// An iterator over the latest stable releases, with only the latest patch version included.
+/// NB: Assumes releases are ordered from most to least recent on iterator initialisation.
 pub struct StableReleaseIterator<'release, I: Iterator<Item = &'release Release>> {
     pub(crate) iter: iter::Peekable<I>,
 }

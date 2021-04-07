@@ -1,9 +1,12 @@
+pub use crate::index::bisect::{Bisect, Narrow};
 pub use crate::index::linear::StableReleaseIterator;
 use crate::source::Source;
 use crate::TResult;
 use std::cmp::Ordering;
 use std::iter::FromIterator;
 
+/// Module for binary search
+pub(crate) mod bisect;
 /// Module for a linear iterator.
 pub(crate) mod linear;
 

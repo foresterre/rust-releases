@@ -150,7 +150,7 @@ impl<'slice> Bisect<'slice> {
     ///     Ok(if release.version().minor >= 33 { Narrow::ToRight } else { Narrow::ToLeft })
     /// });
     ///
-    /// assert_eq!(items[output.unwrap().unwrap()].version().minor, 43)
+    /// assert_eq!(items[output.unwrap().unwrap()].version().minor, 33)
     ///
     /// ```
     ///

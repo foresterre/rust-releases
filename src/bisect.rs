@@ -1,5 +1,8 @@
-use crate::Release;
+use rust_releases_core::Release;
 
+/// A data structure used to perform a binary search on [`Releases`].
+///
+/// [`Releases`]: rust_releases_core::Release
 #[derive(Clone, Debug)]
 pub struct Bisect<'slice> {
     view: &'slice [Release],
@@ -18,19 +21,19 @@ impl<'slice> Bisect<'slice> {
     /// # Example
     ///
     /// ```
-    /// use rust_releases::Release;
-    /// use rust_releases::index::{Bisect, Narrow};
+    /// use rust_releases_core::{Release, semver};
+    /// use rust_releases::bisect::{Bisect, Narrow};
     ///
     /// let items = vec![
-    ///     Release::new(semver::Version::new(1, 47, 0)),
-    ///     Release::new(semver::Version::new(1, 46, 0)),
-    ///     Release::new(semver::Version::new(1, 45, 2)),
-    ///     Release::new(semver::Version::new(1, 45, 1)),
-    ///     Release::new(semver::Version::new(1, 45, 0)),
-    ///     Release::new(semver::Version::new(1, 44, 0)),
-    ///     Release::new(semver::Version::new(1, 43, 0)),
-    ///     Release::new(semver::Version::new(1, 42, 0)),
-    ///     Release::new(semver::Version::new(1, 41, 0)),
+    ///     Release::new_stable(semver::Version::new(1, 47, 0)),
+    ///     Release::new_stable(semver::Version::new(1, 46, 0)),
+    ///     Release::new_stable(semver::Version::new(1, 45, 2)),
+    ///     Release::new_stable(semver::Version::new(1, 45, 1)),
+    ///     Release::new_stable(semver::Version::new(1, 45, 0)),
+    ///     Release::new_stable(semver::Version::new(1, 44, 0)),
+    ///     Release::new_stable(semver::Version::new(1, 43, 0)),
+    ///     Release::new_stable(semver::Version::new(1, 42, 0)),
+    ///     Release::new_stable(semver::Version::new(1, 41, 0)),
     /// ];
     ///
     /// let mut binary_search = Bisect::from_slice(items.as_slice());
@@ -73,22 +76,22 @@ impl<'slice> Bisect<'slice> {
     /// # Example
     ///
     /// ```
-    /// use rust_releases::Release;
-    /// use rust_releases::index::{Bisect, Narrow};
+    /// use rust_releases_core::{Release, semver};
+    /// use rust_releases::bisect::{Bisect, Narrow};
     ///
     /// #[derive(Debug)]
     /// struct RequiresRust2018;
     ///
     /// let items = vec![
-    ///     Release::new(semver::Version::new(1, 47, 0)),
-    ///     Release::new(semver::Version::new(1, 46, 0)),
-    ///     Release::new(semver::Version::new(1, 45, 2)),
-    ///     Release::new(semver::Version::new(1, 45, 1)),
-    ///     Release::new(semver::Version::new(1, 45, 0)),
-    ///     Release::new(semver::Version::new(1, 44, 0)),
-    ///     Release::new(semver::Version::new(1, 43, 0)),
-    ///     Release::new(semver::Version::new(1, 42, 0)),
-    ///     Release::new(semver::Version::new(1, 41, 0)),
+    ///     Release::new_stable(semver::Version::new(1, 47, 0)),
+    ///     Release::new_stable(semver::Version::new(1, 46, 0)),
+    ///     Release::new_stable(semver::Version::new(1, 45, 2)),
+    ///     Release::new_stable(semver::Version::new(1, 45, 1)),
+    ///     Release::new_stable(semver::Version::new(1, 45, 0)),
+    ///     Release::new_stable(semver::Version::new(1, 44, 0)),
+    ///     Release::new_stable(semver::Version::new(1, 43, 0)),
+    ///     Release::new_stable(semver::Version::new(1, 42, 0)),
+    ///     Release::new_stable(semver::Version::new(1, 41, 0)),
     /// ];
     ///
     /// let mut binary_search = Bisect::from_slice(items.as_slice());
@@ -124,18 +127,18 @@ impl<'slice> Bisect<'slice> {
     /// # Example
     ///
     /// ```
-    /// use rust_releases::Release;
-    /// use rust_releases::index::{Bisect, Narrow};
+    /// use rust_releases_core::{Release, semver};
+    /// use rust_releases::bisect::{Bisect, Narrow};
     ///
     /// #[derive(Debug)]
     /// struct RequiresRust2018;
     ///
     /// let items = vec![
-    ///     Release::new(semver::Version::new(1, 34, 0)),
-    ///     Release::new(semver::Version::new(1, 33, 0)),
-    ///     Release::new(semver::Version::new(1, 32, 0)),
-    ///     Release::new(semver::Version::new(1, 31, 0)),
-    ///     Release::new(semver::Version::new(1, 30, 0)),
+    ///     Release::new_stable(semver::Version::new(1, 34, 0)),
+    ///     Release::new_stable(semver::Version::new(1, 33, 0)),
+    ///     Release::new_stable(semver::Version::new(1, 32, 0)),
+    ///     Release::new_stable(semver::Version::new(1, 31, 0)),
+    ///     Release::new_stable(semver::Version::new(1, 30, 0)),
     /// ];
     ///
     /// let mut binary_search = Bisect::from_slice(items.as_slice());
@@ -154,7 +157,7 @@ impl<'slice> Bisect<'slice> {
     ///
     /// ```
     ///
-    /// [`search_with_result`]: crate::index::bisect::Bisect::search_with_result
+    /// [`search_with_result`]: crate::bisect::Bisect::search_with_result
     pub fn search_with_result_and_remainder<E>(
         &mut self,
         f: impl Fn(&Release, usize) -> Result<Narrow, E>,
@@ -190,7 +193,7 @@ impl<'slice> Bisect<'slice> {
     }
 }
 
-/// The `SearchResult` is used by narrowing function `f` in [`BinarySearch::search`] as the
+/// The `SearchResult` is used by narrowing function `f` in [`Bisect::search`] as the
 /// determining value which side of the slice of releases, the binary search should be narrowed to.
 ///
 /// For example, if we have a slice of releases, sorted from most recent (high) to least recent (low),
@@ -198,16 +201,19 @@ impl<'slice> Bisect<'slice> {
 /// to the left, while if we want to find a less recent version, we should narrow the slice to the
 /// right. Note that ordering matters here, as well as what the narrowing function `f` exactly computes.
 ///
-/// [`BinarySearch::search`]: crate::index::bisect::BinarySearch::search;
+/// [`Bisect::search`]: crate::bisect::Bisect::search
 #[derive(Clone, Copy, Debug)]
 pub enum Narrow {
+    /// Narrows the remaining search space to the left of the mid point
     ToLeft,
+    /// Narrows the remaining search space to the right of the mid point
     ToRight,
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use rust_releases_core::{semver, Release};
 
     yare::ide!();
 
@@ -222,13 +228,13 @@ mod tests {
     #[yare::parameterized(v50 = { 50 }, v30 = { 30 }, v10 = { 10 })]
     fn in_the_middle_tests(exp: u64) {
         let items = vec![
-            Release::new(semver::Version::new(2, 100, 0)),
-            Release::new(semver::Version::new(1, 50, 0)),
-            Release::new(semver::Version::new(1, exp, 0)),
-            Release::new(semver::Version::new(1, 10, 0)),
-            Release::new(semver::Version::new(1, 9, 0)),
-            Release::new(semver::Version::new(1, 8, 0)),
-            Release::new(semver::Version::new(0, 0, 0)),
+            Release::new_stable(semver::Version::new(2, 100, 0)),
+            Release::new_stable(semver::Version::new(1, 50, 0)),
+            Release::new_stable(semver::Version::new(1, exp, 0)),
+            Release::new_stable(semver::Version::new(1, 10, 0)),
+            Release::new_stable(semver::Version::new(1, 9, 0)),
+            Release::new_stable(semver::Version::new(1, 8, 0)),
+            Release::new_stable(semver::Version::new(0, 0, 0)),
         ];
 
         let mut searcher = Bisect {
@@ -245,12 +251,12 @@ mod tests {
     #[test]
     fn most_recent_release() {
         let items = vec![
-            Release::new(semver::Version::new(1, 10, 0)),
-            Release::new(semver::Version::new(1, 9, 0)),
-            Release::new(semver::Version::new(1, 8, 0)),
-            Release::new(semver::Version::new(1, 7, 0)),
-            Release::new(semver::Version::new(1, 6, 0)),
-            Release::new(semver::Version::new(1, 5, 0)),
+            Release::new_stable(semver::Version::new(1, 10, 0)),
+            Release::new_stable(semver::Version::new(1, 9, 0)),
+            Release::new_stable(semver::Version::new(1, 8, 0)),
+            Release::new_stable(semver::Version::new(1, 7, 0)),
+            Release::new_stable(semver::Version::new(1, 6, 0)),
+            Release::new_stable(semver::Version::new(1, 5, 0)),
         ];
 
         let mut searcher = Bisect {
@@ -270,12 +276,12 @@ mod tests {
     )]
     fn least_recent_release(at_least: u64) {
         let items = vec![
-            Release::new(semver::Version::new(1, 10, 0)),
-            Release::new(semver::Version::new(1, 9, 0)),
-            Release::new(semver::Version::new(1, 8, 0)),
-            Release::new(semver::Version::new(1, 7, 0)),
-            Release::new(semver::Version::new(1, 6, 0)),
-            Release::new(semver::Version::new(1, 5, 0)),
+            Release::new_stable(semver::Version::new(1, 10, 0)),
+            Release::new_stable(semver::Version::new(1, 9, 0)),
+            Release::new_stable(semver::Version::new(1, 8, 0)),
+            Release::new_stable(semver::Version::new(1, 7, 0)),
+            Release::new_stable(semver::Version::new(1, 6, 0)),
+            Release::new_stable(semver::Version::new(1, 5, 0)),
         ];
 
         let mut searcher = Bisect {
@@ -292,12 +298,12 @@ mod tests {
     #[test]
     fn not_found() {
         let items = vec![
-            Release::new(semver::Version::new(1, 10, 0)),
-            Release::new(semver::Version::new(1, 9, 0)),
-            Release::new(semver::Version::new(1, 8, 0)),
-            Release::new(semver::Version::new(1, 7, 0)),
-            Release::new(semver::Version::new(1, 6, 0)),
-            Release::new(semver::Version::new(1, 5, 0)),
+            Release::new_stable(semver::Version::new(1, 10, 0)),
+            Release::new_stable(semver::Version::new(1, 9, 0)),
+            Release::new_stable(semver::Version::new(1, 8, 0)),
+            Release::new_stable(semver::Version::new(1, 7, 0)),
+            Release::new_stable(semver::Version::new(1, 6, 0)),
+            Release::new_stable(semver::Version::new(1, 5, 0)),
         ];
 
         let mut searcher = Bisect {
@@ -311,7 +317,7 @@ mod tests {
 
     #[test]
     fn with_result_to_error() {
-        let items = vec![Release::new(semver::Version::new(1, 10, 0))];
+        let items = vec![Release::new_stable(semver::Version::new(1, 10, 0))];
 
         let mut searcher = Bisect {
             view: items.as_ref(),
@@ -327,7 +333,7 @@ mod tests {
 
     #[test]
     fn with_result_and_remainder_to_error() {
-        let items = vec![Release::new(semver::Version::new(1, 10, 0))];
+        let items = vec![Release::new_stable(semver::Version::new(1, 10, 0))];
 
         let mut searcher = Bisect {
             view: items.as_ref(),
@@ -343,16 +349,16 @@ mod tests {
     #[test]
     fn with_result_and_remainder() {
         let items = vec![
-            Release::new(semver::Version::new(1, 10, 0)),
-            Release::new(semver::Version::new(1, 9, 0)),
-            Release::new(semver::Version::new(1, 8, 0)),
-            Release::new(semver::Version::new(1, 7, 0)),
-            Release::new(semver::Version::new(1, 6, 0)),
-            Release::new(semver::Version::new(1, 5, 0)),
-            Release::new(semver::Version::new(1, 4, 0)),
-            Release::new(semver::Version::new(1, 3, 0)),
-            Release::new(semver::Version::new(1, 2, 0)),
-            Release::new(semver::Version::new(1, 1, 0)),
+            Release::new_stable(semver::Version::new(1, 10, 0)),
+            Release::new_stable(semver::Version::new(1, 9, 0)),
+            Release::new_stable(semver::Version::new(1, 8, 0)),
+            Release::new_stable(semver::Version::new(1, 7, 0)),
+            Release::new_stable(semver::Version::new(1, 6, 0)),
+            Release::new_stable(semver::Version::new(1, 5, 0)),
+            Release::new_stable(semver::Version::new(1, 4, 0)),
+            Release::new_stable(semver::Version::new(1, 3, 0)),
+            Release::new_stable(semver::Version::new(1, 2, 0)),
+            Release::new_stable(semver::Version::new(1, 1, 0)),
         ];
 
         let mut searcher = Bisect {

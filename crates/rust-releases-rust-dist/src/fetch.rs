@@ -1,10 +1,8 @@
-use crate::io::{base_cache_dir, is_stale};
-use crate::source::rust_dist::RustDistError;
-use crate::source::Document;
-use crate::TResult;
+use crate::errors::{RustDistError, RustDistResult};
 use rusoto_core::credential::{AwsCredentials, StaticProvider};
 use rusoto_core::{HttpClient, Region};
 use rusoto_s3::{ListObjectsV2Request, S3Client, S3};
+use rust_releases_io::{base_cache_dir, is_stale, Document};
 use std::fs::OpenOptions;
 use std::io::BufWriter;
 use std::time::Duration;
@@ -19,16 +17,16 @@ const RUST_DIST_BUCKET: &str = "static-rust-lang-org";
 // releases
 const OBJECT_PREFIX: &str = "dist/rustc-";
 
+// Directory where cached files reside for this source
+const SOURCE_CACHE_DIR: &str = "source_dist_index";
+
 // The output file path
 const OUTPUT_PATH: &str = "dist_static-rust-lang-org.txt";
 
 // Use the filtered index cache for up to 1 day
 const TIMEOUT: Duration = Duration::from_secs(86_400);
 
-// Directory where cached files reside for this source
-const SOURCE_CACHE_DIR: &str = "source_dist_index";
-
-pub(in crate::source::rust_dist) fn fetch() -> TResult<Document> {
+pub(in crate) fn fetch() -> RustDistResult<Document> {
     let cache_dir = base_cache_dir()?.join(SOURCE_CACHE_DIR);
     let output_path = cache_dir.join(OUTPUT_PATH);
 
@@ -125,12 +123,11 @@ fn write_objects(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::dl_test;
 
     // @runWith cargo test --all-features --package rust-releases --lib source::rust_dist_with_cli::dl::tests::test_fetch_meta_manifest -- --exact
     #[test]
     fn test_fetch_meta_manifest() {
-        dl_test!({
+        __internal_dl_test!({
             let meta = fetch();
             assert!(meta.is_ok());
         })

@@ -1,42 +1,37 @@
-use crate::channel::Channel;
-use crate::source::channel_manifests::ChannelManifestsError;
-use crate::TResult;
+use crate::{ChannelManifestsError, ChannelManifestsResult};
+use rust_releases_core::Channel;
 
 #[derive(Debug)]
-pub(in crate::source::channel_manifests) struct MetaManifest {
+pub(crate) struct MetaManifest {
     manifests: Vec<ManifestSource>,
 }
 
 impl MetaManifest {
-    pub(in crate::source::channel_manifests) fn try_from_str<T: AsRef<str>>(
-        item: T,
-    ) -> TResult<Self> {
+    pub(crate) fn try_from_str<T: AsRef<str>>(item: T) -> ChannelManifestsResult<Self> {
         let item = item.as_ref();
 
         let manifests = item
             .lines()
             .map(ManifestSource::try_from_str)
-            .collect::<TResult<Vec<_>>>()?;
+            .collect::<ChannelManifestsResult<Vec<_>>>()?;
 
         Ok(Self { manifests })
     }
 
-    pub(in crate::source::channel_manifests) fn manifests(&self) -> &[ManifestSource] {
+    pub(crate) fn manifests(&self) -> &[ManifestSource] {
         &self.manifests
     }
 }
 
 #[derive(Debug)]
-pub(in crate::source::channel_manifests) struct ManifestSource {
+pub(crate) struct ManifestSource {
     url: String,
     channel: Channel,
     date: String,
 }
 
 impl ManifestSource {
-    pub(in crate::source::channel_manifests) fn try_from_str<T: AsRef<str>>(
-        item: T,
-    ) -> TResult<Self> {
+    pub(crate) fn try_from_str<T: AsRef<str>>(item: T) -> ChannelManifestsResult<Self> {
         let item = item.as_ref();
 
         let channel = Self::parse_channel(item)?;
@@ -49,19 +44,19 @@ impl ManifestSource {
         })
     }
 
-    pub(in crate::source::channel_manifests) fn url(&self) -> &str {
+    pub(crate) fn url(&self) -> &str {
         &self.url
     }
 
-    pub(in crate::source::channel_manifests) fn channel(&self) -> Channel {
+    pub(crate) fn channel(&self) -> Channel {
         self.channel
     }
 
-    pub(in crate::source::channel_manifests) fn date(&self) -> &str {
+    pub(crate) fn date(&self) -> &str {
         &self.date
     }
 
-    fn parse_date(input: &str) -> TResult<String> {
+    fn parse_date(input: &str) -> ChannelManifestsResult<String> {
         // an input has the following form:
         // `static.rust-lang.org/dist/YYYY-MM-DD/channel-rust-CHANNEL.toml`
         // where YYYY    is the year,
@@ -75,7 +70,7 @@ impl ManifestSource {
         Ok(date.to_string())
     }
 
-    fn parse_channel(input: &str) -> TResult<Channel> {
+    fn parse_channel(input: &str) -> ChannelManifestsResult<Channel> {
         Ok(if input.contains("beta") {
             Channel::Beta
         } else if input.contains("nightly") {
@@ -83,7 +78,7 @@ impl ManifestSource {
         } else if input.contains("stable") {
             Channel::Stable
         } else {
-            return Err(ChannelManifestsError::ParseManifestSource.into());
+            return Err(ChannelManifestsError::ParseManifestSource);
         })
     }
 }
@@ -91,13 +86,13 @@ impl ManifestSource {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::source::channel_manifests::Document;
+    use rust_releases_io::Document;
 
     #[test]
     fn test_parse_meta_manifest() {
         let path = [
             env!("CARGO_MANIFEST_DIR"),
-            "/resources/channel_manifests/manifests.txt",
+            "/../../resources/channel_manifests/manifests.txt",
         ]
         .join("");
         let meta_file = Document::LocalPath(path.into());

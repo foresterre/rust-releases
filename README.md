@@ -22,7 +22,7 @@ can obtain, parse and build an index from the above resources. This crate also p
 in a _linear_ fashion, or by using a _bisect_ binary search strategy.
 
 Each data source implements the [Source](https://docs.rs/rust-releases/latest/rust_releases/source/trait.Source.html) trait.  `Source` provides a `build_index` method, which can be used to
-build a catalog of released Rust versions. In addition, for all solution except `DistIndex`, it is possible to let this crate
+build a catalog of released Rust versions. In addition, for all solution except `RustDistWithCLI`, it is possible to let this crate
 [fetch](https://docs.rs/rust-releases/latest/rust_releases/source/trait.FetchResources.html) the required input documents. 
 
 ## Implemented options
@@ -32,7 +32,7 @@ build a catalog of released Rust versions. In addition, for all solution except 
      <tr>
           <th>Type of data source</th>
           <th>Trait</th>
-          <th>Implemented</th>
+          <th>Available</th>
           <th>Channels<sup>1</sup></th>
           <th>Speed<sup>2, 3</sup></th>
           <th>On disk cache size<sup>4</sup></th>
@@ -40,21 +40,6 @@ build a catalog of released Rust versions. In addition, for all solution except 
      </tr>
 </thead>
 <tbody>
-     <tr>
-          <td rowspan="2"><code>DistIndex</code></td>
-          <td>Source</td>
-          <td>✅</td>
-          <td rowspan="2">Stable, <strike>Beta & Nightly</strike><sup>To be implemented</sup></td>
-          <td>Fast</td>
-          <td>-</td>
-          <td rowspan="2"></td>
-     </tr>
-     <tr>
-          <td>FetchResources</td>
-          <td>❌</td>
-          <td>Slow (~1 minute)</td>
-          <td>~8 MB</td>
-     </tr>
      <tr>
           <td rowspan="2"><code>ChannelManifests</code></td>
           <td>Source</td>
@@ -100,22 +85,37 @@ build a catalog of released Rust versions. In addition, for all solution except 
           <td>Medium fast (~10 seconds)</td>
           <td>~1 MB</td>
      </tr>
+     <tr>
+          <td rowspan="2"><code>RustDistWithCLI</code></td>
+          <td>Source</td>
+          <td>✅</td>
+          <td rowspan="2">Stable, <strike>Beta & Nightly</strike><sup>To be implemented</sup></td>
+          <td>Fast</td>
+          <td>-</td>
+          <td rowspan="2"></td>
+     </tr>
+     <tr>
+          <td>FetchResources</td>
+          <td>❌</td>
+          <td>Slow (~1 minute)</td>
+          <td>~8 MB</td>
+     </tr>
 </tbody>
 </table>
 
 <sup>1</sup>: Currently most of the `rust-releases` public API supports only stable. Support for the beta and nightly channel is work-in-progress, and the table currently lists whether there is theoretical support for these channels.<br> 
 <sup>2</sup>: Speed for the `Source` trait primarily consist of parsing speed<br> 
 <sup>3</sup>: Speed for the `FetchResources` trait is primarily limited by your own download speed, and the rate limiting of the server from which the resources are fetched<br>
-<sup>4</sup>: Approximate as of 2020-03-03 <br>
+<sup>4</sup>: Approximate as of 2021-03-03 <br>
 
 **Which data source should I use?**
 
 Since support for the beta and nightly channels is work-in-progress, I would advise to use the `RustChangelog` data source as it's
 a small download, immediately up-to-date on release and fast to parse. It only supports stable channel releases.
 
-Alternatively, the `RustDist` or `DistIndex` data sources can be useful, especially when support for the beta and nightly channel are added.
+Alternatively, the `RustDist` or `RustDistWithCLI` data sources can be useful, especially when support for the beta and nightly channel are added.
 They both get their input data from the Rust AWS S3 distribution bucket. When using `RustDist`, the input data can be obtained
-with the `FetchResources` trait implementation. For `DistIndex`, you have to obtain the input data yourself (by running the
+with the `FetchResources` trait implementation. For `RustDistWithCLI`, you have to obtain the input data yourself (by running the
 `aws` cli with the following options `aws --no-sign-request s3 ls static-rust-lang-org/dist/ > dist.txt`<sup>(<a href="https://github.com/rust-lang/rust/issues/56971#issuecomment-527199391">source</a>)</sup>).
 
 The `ChannelManifests` source has the most potential, as the input data is the most complete. 

@@ -14,7 +14,7 @@
 //! for the second part the crate provides the [`Source`] trait.
 //!
 //! These traits are implemented for certain index strategies:
-//! 1) [`DistIndex`]: Build an index from the AWS S3 Rust distribution bucket; obtain the input data yourself using the `aws` cli.
+//! 1) [`RustDistWithCLI`]: Build an index from the AWS S3 Rust distribution bucket; obtain the input data yourself using the `aws` cli.
 //! 2) [`ChannelManifests`]: Build an index from Rust [release manifests](https://static.rust-lang.org/manifests.txt).
 //! 3) [`RustChangelog`]: Build an index from the [RELEASES.md](https://raw.githubusercontent.com/rust-lang/rust/master/RELEASES.md) found in the root of the Rust source code repository.
 //! 4) [`RustDist`]: Build an index from the AWS S3 Rust distribution bucket; input data can be obtained using the [`FetchResources`] trait.  
@@ -28,7 +28,7 @@
 //! use rust_releases::{FetchResources, Source, Channel, ReleaseIndex};
 //! use rust_releases::source::RustChangelog;
 //!
-//! // We choose the RustChangelog source for this example; alternatives are DistIndex and ChannelManifests
+//! // We choose the RustChangelog source for this example; alternatives are RustDistWithCLI and ChannelManifests
 //! let source = RustChangelog::fetch_channel(Channel::Stable).unwrap();
 //!
 //! // Build a release index using our source of choice
@@ -57,21 +57,6 @@
 //!      </tr>
 //! </thead>
 //! <tbody>
-//!      <tr>
-//!           <td rowspan="2"><code>DistIndex</code></td>
-//!           <td>Source</td>
-//!           <td>✅</td>
-//!           <td rowspan="2">Stable, <strike>Beta & Nightly</strike></td>
-//!           <td>Fast</td>
-//!           <td>-</td>
-//!           <td rowspan="2"></td>
-//!      </tr>
-//!      <tr>
-//!           <td>FetchResources</td>
-//!           <td>❌</td>
-//!           <td>Slow (~1 minute)</td>
-//!           <td>~8 MB</td>
-//!      </tr>
 //!      <tr>
 //!           <td rowspan="2"><code>ChannelManifests</code></td>
 //!           <td>Source</td>
@@ -117,13 +102,28 @@
 //!           <td>Medium fast (~20 seconds)</td>
 //!           <td>~1 MB</td>
 //!      </tr>
+//!      <tr>
+//!           <td rowspan="2"><code>RustDistWithCLI</code></td>
+//!           <td>Source</td>
+//!           <td>✅</td>
+//!           <td rowspan="2">Stable, <strike>Beta & Nightly</strike></td>
+//!           <td>Fast</td>
+//!           <td>-</td>
+//!           <td rowspan="2"></td>
+//!      </tr>
+//!      <tr>
+//!           <td>FetchResources</td>
+//!           <td>❌</td>
+//!           <td>Slow (~1 minute)</td>
+//!           <td>~8 MB</td>
+//!      </tr>
 //! </tbody>
 //! </table>
 //!
 //! <sup>1</sup>: Currently most of the `rust-releases` public API supports only stable. Support for the beta and nightly channel is work-in-progress, and the table currently lists whether there is theoretical support for these channels.<br>
 //! <sup>2</sup>: Speed for the `Source` trait primarily consist of parsing speed<br>
 //! <sup>3</sup>: Speed for the `FetchResources` trait is primarily limited by your own download speed, and the rate limiting of the server from which the resources are fetched<br>
-//! <sup>4</sup>: Approximate as of 2020-03-03 <br>
+//! <sup>4</sup>: Approximate as of 2021-03-03 <br>
 //!
 //!
 //! ## Issues
@@ -133,7 +133,7 @@
 //!
 //! [`FetchResources`]: crate::FetchResources
 //! [`Source`]: crate::Source
-//! [`DistIndex`]: crate::source::DistIndex
+//! [`RustDistWithCLI`]: crate::source::RustDistWithCLI
 //! [`ChannelManifests`]: crate::source::ChannelManifests
 //! [`RustChangelog`]: crate::source::RustChangelog
 //! [`RustDist`]: crate::source::RustDist

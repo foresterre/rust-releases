@@ -127,7 +127,7 @@ mod tests {
     use super::*;
     use crate::dl_test;
 
-    // @runWith cargo test --all-features --package rust-releases --lib source::dist_index::dl::tests::test_fetch_meta_manifest -- --exact
+    // @runWith cargo test --all-features --package rust-releases --lib source::rust_dist_with_cli::dl::tests::test_fetch_meta_manifest -- --exact
     #[test]
     fn test_fetch_meta_manifest() {
         dl_test!({

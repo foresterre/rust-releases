@@ -68,7 +68,7 @@ impl FetchResources for RustDist {
 
 #[derive(Debug, thiserror::Error)]
 pub enum RustDistError {
-    #[error("Channel {0} is not yet available for the 'DistIndex' source type")]
+    #[error("Channel {0} is not yet available for the 'RustDistWithCLI' source type")]
     ChannelNotAvailable(Channel),
 
     #[cfg(feature = "aws_index")]

@@ -1,7 +1,7 @@
 use crate::source::channel_manifests::ChannelManifestsError;
-use crate::source::dist_index::DistIndexError;
 use crate::source::rust_changelog::RustChangelogError;
 use crate::source::rust_dist::RustDistError;
+use crate::source::rust_dist_with_cli::DistIndexError;
 
 pub type TResult<T> = Result<T, RustReleasesError>;
 

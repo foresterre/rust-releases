@@ -1,18 +1,18 @@
 use crate::{Channel, ReleaseIndex, TResult};
 
 pub use channel_manifests::{ChannelManifests, ChannelManifestsError};
-pub use dist_index::{DistIndex, DistIndexError};
 pub use rust_changelog::{RustChangelog, RustChangelogError};
 pub use rust_dist::{RustDist, RustDistError};
+pub use rust_dist_with_cli::{DistIndexError, RustDistWithCLI};
 
 use std::fs::File;
 use std::io::{BufReader, Read};
 use std::path::{Path, PathBuf};
 
 pub mod channel_manifests;
-pub mod dist_index;
 pub mod rust_changelog;
 pub mod rust_dist;
+pub mod rust_dist_with_cli;
 
 pub trait Source {
     fn build_index(&self) -> TResult<ReleaseIndex>;

@@ -1,3 +1,6 @@
+#![deny(clippy::all)]
+#![allow(clippy::upper_case_acronyms)]
+
 use crate::{Channel, ReleaseIndex, TResult};
 
 pub use channel_manifests::{ChannelManifests, ChannelManifestsError};

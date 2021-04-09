@@ -15,6 +15,45 @@ impl<'slice> Bisect<'slice> {
     /// The binary search is instrumented by a narrowing function `f`, which is used to determine
     /// to which side the slice should be narrowed.
     ///
+    /// # Example
+    ///
+    /// ```
+    /// use rust_releases::Release;
+    /// use rust_releases::index::{Bisect, Narrow};
+    ///
+    /// let items = vec![
+    ///     Release::new(semver::Version::new(1, 47, 0)),
+    ///     Release::new(semver::Version::new(1, 46, 0)),
+    ///     Release::new(semver::Version::new(1, 45, 2)),
+    ///     Release::new(semver::Version::new(1, 45, 1)),
+    ///     Release::new(semver::Version::new(1, 45, 0)),
+    ///     Release::new(semver::Version::new(1, 44, 0)),
+    ///     Release::new(semver::Version::new(1, 43, 0)),
+    ///     Release::new(semver::Version::new(1, 42, 0)),
+    ///     Release::new(semver::Version::new(1, 41, 0)),
+    /// ];
+    ///
+    /// let mut binary_search = Bisect::from_slice(items.as_slice());
+    ///
+    /// let output = binary_search.search(|f| if f.version().minor >= 43 { Narrow::ToRight } else { Narrow::ToLeft });
+    ///
+    /// assert_eq!(items[output.unwrap()].version().minor, 43)
+    ///
+    /// ```
+    pub fn search(&mut self, f: impl Fn(&Release) -> Narrow) -> Option<usize> {
+        // FIXME: replace with never type, see issue #35121 <https://github.com/rust-lang/rust/issues/35121>
+        #[derive(Debug)]
+        enum Never {}
+
+        self.search_with_result_and_remainder(|release, _| Result::Ok::<Narrow, Never>(f(release)))
+            .unwrap()
+    }
+
+    /// Perform a binary search on a slice of releases.
+    ///
+    /// The binary search is instrumented by a narrowing function `f`, which is used to determine
+    /// to which side the slice should be narrowed.
+    ///
     /// In `search_with_result`, the narrowing function returns a `Result<Narrow, E>` instead of
     /// simply a `Narrow`. This can be useful if your narrowing function can fail externally.
     /// For example, in [`cargo-msrv`], when bisecting Rust version for the Minumum Supported Rust Version,
@@ -71,14 +110,68 @@ impl<'slice> Bisect<'slice> {
         &mut self,
         f: impl Fn(&Release) -> Result<Narrow, E>,
     ) -> Result<Option<usize>, E> {
+        self.search_with_result_and_remainder(|release, _remainder| f(release))
+    }
+
+    /// Perform a binary search on a slice of releases.
+    ///
+    /// The binary search is instrumented by a narrowing function `f`, which is used to determine
+    /// to which side the slice should be narrowed. This variant of the search method also provides the
+    /// amount of remaining (i.e. searchable) items as the second argument of the narowing function.
+    ///
+    /// See [`search_with_result`] for more.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use rust_releases::Release;
+    /// use rust_releases::index::{Bisect, Narrow};
+    ///
+    /// #[derive(Debug)]
+    /// struct RequiresRust2018;
+    ///
+    /// let items = vec![
+    ///     Release::new(semver::Version::new(1, 34, 0)),
+    ///     Release::new(semver::Version::new(1, 33, 0)),
+    ///     Release::new(semver::Version::new(1, 32, 0)),
+    ///     Release::new(semver::Version::new(1, 31, 0)),
+    ///     Release::new(semver::Version::new(1, 30, 0)),
+    /// ];
+    ///
+    /// let mut binary_search = Bisect::from_slice(items.as_slice());
+    ///
+    /// let output: Result<Option<usize>, RequiresRust2018> = binary_search.search_with_result_and_remainder(|release, remainder| {
+    ///     println!("items remaining: {}", remainder);
+    ///
+    ///     if release.version().minor < 31 {
+    ///         return Err(RequiresRust2018);
+    ///     }   
+    ///
+    ///     Ok(if release.version().minor >= 33 { Narrow::ToRight } else { Narrow::ToLeft })
+    /// });
+    ///
+    /// assert_eq!(items[output.unwrap().unwrap()].version().minor, 43)
+    ///
+    /// ```
+    ///
+    /// [`search_with_result`]: crate::index::bisect::Bisect::search_with_result
+    pub fn search_with_result_and_remainder<E>(
+        &mut self,
+        f: impl Fn(&Release, usize) -> Result<Narrow, E>,
+    ) -> Result<Option<usize>, E> {
         let mut left = 0;
         let mut right = self.view.len() - 1;
         let mut result = None;
 
         'search: while left <= right {
+            // Re-compute the mid point, where we'll divide the remaining values
             let mid_point: usize = ((left as f32 + right as f32) / 2f32).floor() as usize;
+            // Add 1 since `left` and `right` are indices
+            let remainder = 1 + right - left;
 
-            match f(&self.view[mid_point])? {
+            // Let the narrowing function `f` compute which half of the remainder should be used
+            // to continue the search
+            match f(&self.view[mid_point], remainder)? {
                 Narrow::ToLeft => {
                     if mid_point >= 1 {
                         right = mid_point - 1;
@@ -94,44 +187,6 @@ impl<'slice> Bisect<'slice> {
         }
 
         Ok(result)
-    }
-
-    /// Perform a binary search on a slice of releases.
-    /// The binary search is instrumented by a narrowing function `f`, which is used to determine
-    /// to which side the slice should be narrowed.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// use rust_releases::Release;
-    /// use rust_releases::index::{Bisect, Narrow};
-    ///
-    /// let items = vec![
-    ///     Release::new(semver::Version::new(1, 47, 0)),
-    ///     Release::new(semver::Version::new(1, 46, 0)),
-    ///     Release::new(semver::Version::new(1, 45, 2)),
-    ///     Release::new(semver::Version::new(1, 45, 1)),
-    ///     Release::new(semver::Version::new(1, 45, 0)),
-    ///     Release::new(semver::Version::new(1, 44, 0)),
-    ///     Release::new(semver::Version::new(1, 43, 0)),
-    ///     Release::new(semver::Version::new(1, 42, 0)),
-    ///     Release::new(semver::Version::new(1, 41, 0)),
-    /// ];
-    ///
-    /// let mut binary_search = Bisect::from_slice(items.as_slice());
-    ///
-    /// let output = binary_search.search(|f| if f.version().minor >= 43 { Narrow::ToRight } else { Narrow::ToLeft });
-    ///
-    /// assert_eq!(items[output.unwrap()].version().minor, 43)
-    ///
-    /// ```
-    pub fn search(&mut self, f: impl Fn(&Release) -> Narrow) -> Option<usize> {
-        // FIXME: replace with never type, see issue #35121 <https://github.com/rust-lang/rust/issues/35121>
-        #[derive(Debug)]
-        enum Never {}
-
-        self.search_with_result(|release| Result::Ok::<Narrow, Never>(f(release)))
-            .unwrap()
     }
 }
 
@@ -268,5 +323,59 @@ mod tests {
         let output = searcher.search_with_result(|_release| Err(MyError)); // not in range;
 
         assert!(output.is_err());
+    }
+
+    #[test]
+    fn with_result_and_remainder_to_error() {
+        let items = vec![Release::new(semver::Version::new(1, 10, 0))];
+
+        let mut searcher = Bisect {
+            view: items.as_ref(),
+        };
+
+        #[derive(Debug)]
+        struct MyError;
+
+        let output = searcher.search_with_result_and_remainder(|_, _| Err(MyError));
+
+        assert!(output.is_err());
+    }
+    #[test]
+    fn with_result_and_remainder() {
+        let items = vec![
+            Release::new(semver::Version::new(1, 10, 0)),
+            Release::new(semver::Version::new(1, 9, 0)),
+            Release::new(semver::Version::new(1, 8, 0)),
+            Release::new(semver::Version::new(1, 7, 0)),
+            Release::new(semver::Version::new(1, 6, 0)),
+            Release::new(semver::Version::new(1, 5, 0)),
+            Release::new(semver::Version::new(1, 4, 0)),
+            Release::new(semver::Version::new(1, 3, 0)),
+            Release::new(semver::Version::new(1, 2, 0)),
+            Release::new(semver::Version::new(1, 1, 0)),
+        ];
+
+        let mut searcher = Bisect {
+            view: items.as_ref(),
+        };
+
+        #[derive(Debug)]
+        struct MyError;
+
+        use std::cell::Cell;
+
+        let cell = Cell::new(vec![]);
+
+        let _ = searcher.search_with_result_and_remainder(|_, rem| {
+            let mut prev = cell.take();
+            prev.push(rem);
+            cell.set(prev);
+
+            Result::Ok::<Narrow, ()>(Narrow::ToLeft)
+        });
+
+        let vec = cell.take();
+
+        assert_eq!(vec, vec![10, 4, 1]);
     }
 }

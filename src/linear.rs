@@ -1,4 +1,4 @@
-use crate::Release;
+use rust_releases_core::Release;
 use std::iter;
 
 /// An iterator over the latest stable releases, with only the latest patch version included.

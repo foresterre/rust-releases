@@ -1,15 +1,29 @@
-use crate::source::Document;
-#[cfg(feature = "aws_index")]
-use crate::source::FetchResources;
-use crate::source::Source;
-use crate::{Channel, Release, ReleaseIndex, TResult};
+#![deny(missing_docs)]
+#![deny(clippy::all)]
+#![deny(unsafe_code)]
+#![allow(clippy::upper_case_acronyms)]
+//! Please, see the [`rust-releases`] for additional documentation on how this crate can be used.
+//!
+//! [`rust-releases`]: https://docs.rs/rust-releases
+
+#[cfg(test)]
+#[macro_use]
+extern crate rust_releases_io;
+
 use regex::{Captures, Regex};
+use rust_releases_core::{semver, Channel, FetchResources, Release, ReleaseIndex, Source};
+use rust_releases_io::Document;
 use std::collections::BTreeSet;
 use std::iter::FromIterator;
 
-#[cfg(feature = "aws_index")]
-pub(in crate::source::rust_dist) mod dl;
+pub(crate) mod errors;
+pub(crate) mod fetch;
 
+pub use crate::errors::{RustDistError, RustDistResult};
+
+/// A [`Source`] which obtains its input data from the Rust distribution bucket on AWS S3.
+///
+/// [`Source`]: rust_releases_core::Source
 pub struct RustDist {
     source: Document,
 }
@@ -27,20 +41,22 @@ lazy_static::lazy_static! {
 }
 
 impl Source for RustDist {
-    fn build_index(&self) -> TResult<ReleaseIndex> {
+    type Error = RustDistError;
+
+    fn build_index(&self) -> Result<ReleaseIndex, Self::Error> {
         let contents = self.source.load()?;
         let content = String::from_utf8(contents).map_err(RustDistError::UnrecognizedText)?;
 
         let releases = MATCHER
             .captures_iter(&content)
             .map(parse_release)
-            .collect::<TResult<BTreeSet<Release>>>()?;
+            .collect::<RustDistResult<BTreeSet<Release>>>()?;
 
         Ok(ReleaseIndex::from_iter(releases))
     }
 }
 
-fn parse_release(capture: Captures) -> TResult<Release> {
+fn parse_release(capture: Captures) -> RustDistResult<Release> {
     let major = capture["major"]
         .parse::<u64>()
         .map_err(RustDistError::UnableToParseNumber)?;
@@ -51,47 +67,35 @@ fn parse_release(capture: Captures) -> TResult<Release> {
         .parse::<u64>()
         .map_err(RustDistError::UnableToParseNumber)?;
 
-    Ok(Release::new(semver::Version::new(major, minor, patch)))
+    Ok(Release::new_stable(semver::Version::new(
+        major, minor, patch,
+    )))
 }
 
-#[cfg(feature = "aws_index")]
 impl FetchResources for RustDist {
-    fn fetch_channel(channel: Channel) -> TResult<Self> {
+    type Error = RustDistError;
+
+    fn fetch_channel(channel: Channel) -> Result<Self, Self::Error> {
         if let Channel::Stable = channel {
-            let source = dl::fetch()?;
+            let source = fetch::fetch()?;
             Ok(Self { source })
         } else {
-            Err(RustDistError::ChannelNotAvailable(channel).into())
+            Err(RustDistError::ChannelNotAvailable(channel))
         }
     }
 }
 
-#[derive(Debug, thiserror::Error)]
-pub enum RustDistError {
-    #[error("Channel {0} is not yet available for the 'RustDistWithCLI' source type")]
-    ChannelNotAvailable(Channel),
-
-    #[cfg(feature = "aws_index")]
-    #[error("{0}")]
-    RusotoTlsError(#[from] rusoto_core::request::TlsError),
-
-    #[error("{0}")]
-    UnrecognizedText(#[from] std::string::FromUtf8Error),
-
-    #[error("{0}")]
-    UnableToParseNumber(#[from] std::num::ParseIntError),
-}
-
 #[cfg(test)]
 mod tests {
-    use crate::source::{Document, RustDist};
-    use crate::{Release, ReleaseIndex};
+    use crate::RustDist;
+    use rust_releases_core::{semver, Release, ReleaseIndex};
+    use rust_releases_io::Document;
 
     #[test]
     fn source_rust_dist() {
         let path = [
             env!("CARGO_MANIFEST_DIR"),
-            "/resources/rust_dist/dist_static-rust-lang-org.txt",
+            "/../..//resources/rust_dist/dist_static-rust-lang-org.txt",
         ]
         .join("");
         let strategy = RustDist::from_document(Document::LocalPath(path.into()));
@@ -101,11 +105,11 @@ mod tests {
         assert_eq!(index.releases().len(), 71);
         assert_eq!(
             index.releases()[0],
-            &Release::new(semver::Version::new(1, 51, 0))
+            Release::new_stable(semver::Version::new(1, 51, 0))
         );
         assert_eq!(
             index.releases()[70],
-            &Release::new(semver::Version::new(1, 0, 0))
+            Release::new_stable(semver::Version::new(1, 0, 0))
         );
     }
 }

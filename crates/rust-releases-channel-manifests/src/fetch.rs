@@ -1,21 +1,21 @@
-use crate::channel::Channel;
-use crate::io::{base_cache_dir, download_if_not_stale};
-use crate::source::channel_manifests::meta_manifest::{ManifestSource, MetaManifest};
-use crate::source::Document;
-use crate::TResult;
+use crate::meta_manifest::{ManifestSource, MetaManifest};
+use crate::{ChannelManifestsError, ChannelManifestsResult};
+use rust_releases_core::Channel;
+use rust_releases_io::{base_cache_dir, download_if_not_stale, Document};
 use std::path::PathBuf;
 use std::time::Duration;
 
+// URL to meta manifest
 const META_MANIFEST: &str = "https://static.rust-lang.org/manifests.txt";
 // 1 day timeout for the meta manifest
 const META_MANIFEST_STALENESS_TIMEOUT: Duration = Duration::from_secs(86_400);
-// 1 year timeout for the individual release manifests (these manifests should not get outdated)
-const RELEASE_MANIFEST_STALENESS_TIMEOUT: Duration = Duration::from_secs(31_557_600);
+// Max duration timeout for the individual release manifests (these manifests should not get outdated)
+const RELEASE_MANIFEST_STALENESS_TIMEOUT: Duration = Duration::from_secs(u64::MAX);
 // Directory where cached files reside for this source
 const SOURCE_CACHE_DIR: &str = "source_channel_manifests";
 
 /// Download the meta manifest, unless it exists in the cache and is not stale
-pub(in crate::source::channel_manifests) fn fetch_meta_manifest() -> TResult<Document> {
+pub(crate) fn fetch_meta_manifest() -> ChannelManifestsResult<Document> {
     let cache = from_manifests_cache_dir()?;
     let manifest = download_if_not_stale(
         META_MANIFEST,
@@ -29,10 +29,10 @@ pub(in crate::source::channel_manifests) fn fetch_meta_manifest() -> TResult<Doc
 
 /// Download the the release manifests for a certain channel, unless they exists in the cache and
 /// are not stale
-pub(in crate::source::channel_manifests) fn fetch_release_manifests(
+pub(crate) fn fetch_release_manifests(
     meta_manifest: &MetaManifest,
     channel: Channel,
-) -> TResult<Vec<Document>> {
+) -> ChannelManifestsResult<Vec<Document>> {
     let sources = meta_manifest.manifests();
     let cache = from_manifests_cache_dir()?;
 
@@ -48,13 +48,14 @@ pub(in crate::source::channel_manifests) fn fetch_release_manifests(
                 manifest,
                 RELEASE_MANIFEST_STALENESS_TIMEOUT,
             )
+            .map_err(ChannelManifestsError::RustReleasesIoError)
         })
-        .collect::<TResult<Vec<Document>>>()?;
+        .collect::<ChannelManifestsResult<Vec<Document>>>()?;
 
     Ok(manifests)
 }
 
-fn from_manifests_cache_dir() -> TResult<PathBuf> {
+fn from_manifests_cache_dir() -> ChannelManifestsResult<PathBuf> {
     let cache = base_cache_dir()?;
     Ok(cache.join(SOURCE_CACHE_DIR))
 }
@@ -70,11 +71,10 @@ fn manifest_file_name(source: &ManifestSource) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::dl_test;
 
     #[test]
     fn test_fetch_meta_manifest() {
-        dl_test!({
+        __internal_dl_test!({
             let meta = fetch_meta_manifest();
             assert!(meta.is_ok());
         })
@@ -82,7 +82,7 @@ mod tests {
 
     #[test]
     fn test_fetch_release_manifest_stable() {
-        dl_test!({
+        __internal_dl_test!({
             let meta = fetch_meta_manifest().unwrap();
             let meta_manifest =
                 MetaManifest::try_from_str(String::from_utf8(meta.load().unwrap()).unwrap())

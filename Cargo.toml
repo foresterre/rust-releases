@@ -1,6 +1,6 @@
 [package]
 name = "rust-releases"
-version = "0.14.0"
+version = "0.15.0"
 authors = ["Martijn Gribnau <garm@ilumeo.com>"]
 description = "Index and access all available Rust releases"
 license = "MIT OR Apache-2.0"
@@ -9,32 +9,33 @@ edition = "2018"
 documentation = "https://docs.rs/rust-releases"
 repository = "https://github.com/foresterre/rust-releases"
 
-[features]
-default = ["aws_index"]
-# Dependencies requires to download the S3 index
-aws_index = ["rusoto_core", "rusoto_s3", "tokio"]
+[workspace]
+members = [
+    "crates/rust-releases-core",
+    "crates/rust-releases-io",
+    "crates/rust-releases-channel-manifests",
+    "crates/rust-releases-rust-changelog",
+    "crates/rust-releases-rust-dist",
+    "crates/rust-releases-rust-dist-with-cli",
+]
 
-# internal feature: enable download test, which is heavily rate limitted
-dl_test = []
+[features]
+default = [
+    "rust-releases-channel-manifests",
+    "rust-releases-rust-changelog",
+    "rust-releases-rust-dist",
+    "rust-releases-rust-dist-with-cli"
+]
+
+io = ["rust-releases-io"]
 
 [dependencies]
-# error handling
-thiserror = "1.0.23"
-
-# caching, fetching, etc.
-attohttpc = "0.17.0"
-directories-next = "2.0.0"
-
-rusoto_core = { version = "0.46.0", optional = true }
-rusoto_s3 = { version = "0.46.0", optional = true }
-tokio = { version = "1", optional = true }
-
-# parsing manifests
-semver = "0.11"
-serde = { version = "1", features = ["derive"] }
-toml = "0.5"
-regex = "1.4.5"
-lazy_static = "1.4.0"
+rust-releases-core = { version = "0.15.0", path = "crates/rust-releases-core" }
+rust-releases-io = { version = "0.15.0", path = "crates/rust-releases-io", optional = true }
+rust-releases-channel-manifests = { version = "0.15.0", path = "crates/rust-releases-channel-manifests", optional = true }
+rust-releases-rust-changelog = { version = "0.15.0", path = "crates/rust-releases-rust-changelog", optional = true }
+rust-releases-rust-dist = { version = "0.15.0", path = "crates/rust-releases-rust-dist", optional = true }
+rust-releases-rust-dist-with-cli = { version = "0.15.0", path = "crates/rust-releases-rust-dist-with-cli", optional = true }
 
 [dev-dependencies]
 yare = "1.0.0"

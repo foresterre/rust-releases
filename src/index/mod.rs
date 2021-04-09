@@ -11,7 +11,7 @@ pub(crate) mod bisect;
 pub(crate) mod linear;
 
 /// A Rust version release of any channel (stable, beta, nightly)
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Release {
     version: semver::Version,
 }

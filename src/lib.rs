@@ -14,12 +14,18 @@
 //! for the second part the crate provides the [`Source`] trait.
 //!
 //! These traits are implemented for certain index strategies:
-//! 1) [`RustDistWithCLI`]: Build an index from the AWS S3 Rust distribution bucket; obtain the input data yourself using the `aws` cli.
-//! 2) [`ChannelManifests`]: Build an index from Rust [release manifests](https://static.rust-lang.org/manifests.txt).
-//! 3) [`RustChangelog`]: Build an index from the [RELEASES.md](https://raw.githubusercontent.com/rust-lang/rust/master/RELEASES.md) found in the root of the Rust source code repository.
-//! 4) [`RustDist`]: Build an index from the AWS S3 Rust distribution bucket; input data can be obtained using the [`FetchResources`] trait.  
+//! 1) [`ChannelManifests`]: Build an index from Rust [release manifests](https://static.rust-lang.org/manifests.txt).
+//! 2) [`RustChangelog`]: Build an index from the [RELEASES.md](https://raw.githubusercontent.com/rust-lang/rust/master/RELEASES.md) found in the root of the Rust source code repository.
+//! 3) [`RustDist`]: Build an index from the AWS S3 Rust distribution bucket; input data can be obtained using the [`FetchResources`] trait.  
+//! 4) [`RustDistWithCLI`]: Build an index from the AWS S3 Rust distribution bucket; obtain the input data yourself using the `aws` cli.
 //!
-//! In the below example, we chose the third source type, and we'll use it to show you how you can
+//! When in doubt, use the [`RustChangelog`] source for stable releases, and [`RustDist`] for anything else.
+//! [`ChannelManifests`] should usually not be used, as it's out of date (last checked April 2021;
+//! the last available input manifest is dated 2020-02-23). [`RustDistWithCLI`] requires manual input
+//! but pulls from the same data source as [`RustDist`]. The [`RustDist`] source is however more complete
+//! than the [`RustDistWithCLI`] source (as of April 2021).
+//!
+//! In the below example, we'll use one of the above sources ([`RustChangelog`]) to show you how you can
 //! use this library.
 //!
 //! ## Example
@@ -133,10 +139,10 @@
 //!
 //! [`FetchResources`]: crate::FetchResources
 //! [`Source`]: crate::Source
-//! [`RustDistWithCLI`]: crate::source::RustDistWithCLI
 //! [`ChannelManifests`]: crate::source::ChannelManifests
 //! [`RustChangelog`]: crate::source::RustChangelog
 //! [`RustDist`]: crate::source::RustDist
+//! [`RustDistWithCLI`]: crate::source::RustDistWithCLI
 
 pub use crate::channel::Channel;
 pub use crate::errors::{RustReleasesError, TResult};

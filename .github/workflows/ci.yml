@@ -52,9 +52,7 @@ jobs:
     steps:
       # checkout
       - name: Checkout repository
-        uses: actions/checkout@v1
-        with:
-          fetch-depth: 1
+        uses: actions/checkout@v2
 
       # install: rust
       - name: Install Rust
@@ -86,7 +84,7 @@ jobs:
         uses: actions-rs/clippy-check@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          args:  --tests -- -Dclippy::all
+          args:  --all --tests -- -Dclippy::all
 
   rustfmt:
     name: rustfmt
@@ -104,4 +102,4 @@ jobs:
         run: rustup component add rustfmt
       - name: Check formatting
         run: |
-          cargo fmt -- --check
+          cargo fmt --all -- --check

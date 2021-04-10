@@ -231,6 +231,14 @@ pub mod bisect;
 /// Provides an iterator over the latest patch versions for stable releases.
 pub mod linear;
 
+// core re-exports
+pub use rust_releases_core::{
+    Channel, CoreError, CoreResult, FetchResources, Release, ReleaseIndex, Source,
+};
+
+#[cfg(feature = "rust-releases-io")]
+pub use rust_releases_io::{base_cache_dir, is_stale, Document, IoError, IoResult};
+
 #[cfg(feature = "rust-releases-channel-manifests")]
 pub use rust_releases_channel_manifests::{
     ChannelManifests, ChannelManifestsError, ChannelManifestsResult,

@@ -1,14 +1,17 @@
 [package]
 name = "rust-releases-channel-manifests"
-version = "0.15.0"
+version = "0.15.1"
 authors = ["Martijn Gribnau <garm@ilumeo.com>"]
+description = "ChannelManifests source implementation for rust-releases"
+license = "MIT OR Apache-2.0"
 edition = "2018"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+documentation = "https://docs.rs/rust-releases-channel-manifests"
+repository = "https://github.com/foresterre/rust-releases"
 
 [dependencies]
-rust-releases-core = { version = "0.15.0", path = "../rust-releases-core" }
-rust-releases-io = { version = "0.15.0", path = "../rust-releases-io", features = ["http_client"] }
+rust-releases-core = { version = "0.15.1", path = "../rust-releases-core" }
+rust-releases-io = { version = "0.15.1", path = "../rust-releases-io", features = ["http_client"] }
 
 thiserror = "1.0.24"
 

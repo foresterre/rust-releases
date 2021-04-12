@@ -1,6 +1,6 @@
 [package]
 name = "rust-releases"
-version = "0.15.2"
+version = "0.15.3"
 authors = ["Martijn Gribnau <garm@ilumeo.com>"]
 description = "Find, index and obtain all offically available Rust releases"
 license = "MIT OR Apache-2.0"

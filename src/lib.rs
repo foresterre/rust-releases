@@ -233,7 +233,7 @@ pub mod linear;
 
 // core re-exports
 pub use rust_releases_core::{
-    Channel, CoreError, CoreResult, FetchResources, Release, ReleaseIndex, Source,
+    semver, Channel, CoreError, CoreResult, FetchResources, Release, ReleaseIndex, Source,
 };
 
 #[cfg(feature = "rust-releases-io")]

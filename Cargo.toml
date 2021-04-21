@@ -21,11 +21,16 @@ members = [
 
 [features]
 default = [
-    "rust-releases-channel-manifests",
-    "rust-releases-rust-changelog",
-    "rust-releases-rust-dist",
-    "rust-releases-rust-dist-with-cli"
+    "channel-manifests",
+    "rust-changelog",
+    "rust-dist",
+    "rust-dist-with-cli"
 ]
+
+channel-manifests = ["rust-releases-channel-manifests"]
+rust-changelog = ["rust-releases-rust-changelog"]
+rust-dist = ["rust-releases-rust-dist"]
+rust-dist-with-cli = ["rust-releases-rust-dist-with-cli"]
 
 io = ["rust-releases-io"]
 

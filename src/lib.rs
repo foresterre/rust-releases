@@ -61,19 +61,20 @@
 //! as [`features`], add the following to your `Cargo.toml`:
 //!
 //! ```toml
-//! [dependencies]
-//! # replace `*` with latest version, and
-//! # replace `$RUST_RELEASES_SOURCE` with one of the implemented source
-//! rust-releases = { version = "*", default-features = false,
-//!     features = ["rust-release-$RUST_RELEASES_SOURCE"] }
+//! # replace `*` with latest version, and replace `$RUST_RELEASES_SOURCE` with one of the available source implementations
+//! [dependencies.rust-releases]
+//! version = "*"
+//! default-features = false
+//! features = ["rust-release-$RUST_RELEASES_SOURCE"]
 //! ```
 //!
 //! For example:
 //!
 //! ```toml
-//! [dependencies]
-//! rust-releases = { version = "0.15.0", default-features = false,
-//!     features = ["rust-release-rust-dist"] }
+//! [dependencies.rust-releases]
+//! version = "0.15.0"
+//! default-features = false
+//! features = ["rust-release-rust-dist"]
 //! ```
 //!
 //! # Implemented sources

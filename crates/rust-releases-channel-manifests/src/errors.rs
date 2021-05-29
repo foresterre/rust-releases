@@ -24,7 +24,7 @@ pub enum ChannelManifestsError {
     ParseMetaManifest,
 
     #[error("{0}")]
-    ParseRustVersion(#[from] semver::SemVerError),
+    ParseRustVersion(#[from] semver::Error),
 
     #[error("{0}")]
     RustReleasesIoError(#[from] IoError),

@@ -4,11 +4,7 @@ copyleft = "deny"
 confidence-threshold = 0.925
 allow = [
     "Apache-2.0",
-    "BSD-2-Clause",
-    "BSD-2-Clause-FreeBSD",
     "BSD-3-Clause",
-    "CC0-1.0",
-    "ISC",
     "MIT",
     "MPL-2.0",
     "Unlicense",
@@ -20,4 +16,10 @@ vulnerability = "deny"
 unmaintained = "deny"
 notice = "deny"
 
-ignore = []
+ignore = [
+    # `stdweb` is unmaintained; This doesn't mean it's broken, but if possible, we should look for a replacement.
+    # Currently a replacement is not really available as it is a dependency of rusoto, which we use to
+    # connect to AWS S3. AWS recently has been recruiting many Rust developers so maybe there will also be an official
+    # AWS Rust SDK in the future?
+    "RUSTSEC-2020-0056"
+]

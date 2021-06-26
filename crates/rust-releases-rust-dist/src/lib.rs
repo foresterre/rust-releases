@@ -57,15 +57,19 @@ impl Source for RustDist {
 }
 
 fn parse_release(capture: Captures) -> RustDistResult<Release> {
-    let major = capture["major"]
-        .parse::<u64>()
-        .map_err(RustDistError::UnableToParseNumber)?;
-    let minor = capture["minor"]
-        .parse::<u64>()
-        .map_err(RustDistError::UnableToParseNumber)?;
-    let patch = capture["patch"]
-        .parse::<u64>()
-        .map_err(RustDistError::UnableToParseNumber)?;
+    const MAJOR: &str = "major";
+    const MINOR: &str = "minor";
+    const PATCH: &str = "patch";
+
+    let major = capture[MAJOR].parse::<u64>().map_err(|_| {
+        RustDistError::UnableToParseVersionNumberComponent(&MAJOR, capture[MAJOR].to_string())
+    })?;
+    let minor = capture[MINOR].parse::<u64>().map_err(|_| {
+        RustDistError::UnableToParseVersionNumberComponent(&MINOR, capture[MINOR].to_string())
+    })?;
+    let patch = capture[PATCH].parse::<u64>().map_err(|_| {
+        RustDistError::UnableToParseVersionNumberComponent(&PATCH, capture[PATCH].to_string())
+    })?;
 
     Ok(Release::new_stable(semver::Version::new(
         major, minor, patch,
@@ -95,20 +99,22 @@ mod tests {
     fn source_rust_dist() {
         let path = [
             env!("CARGO_MANIFEST_DIR"),
-            "/../..//resources/rust_dist/dist_static-rust-lang-org.txt",
+            "/../../resources/rust_dist/dist_static-rust-lang-org.txt",
         ]
         .join("");
         let strategy = RustDist::from_document(Document::LocalPath(path.into()));
         let index = ReleaseIndex::from_source(strategy).unwrap();
 
-        // 71 releases including minor releases from 1.0.0 to 1.51.0
-        assert_eq!(index.releases().len(), 71);
+        // 74 releases including minor releases from 1.0.0 to 1.53.0
+        let releases = index.releases();
+
+        assert_eq!(releases.len(), 74);
         assert_eq!(
-            index.releases()[0],
-            Release::new_stable(semver::Version::new(1, 51, 0))
+            releases[0],
+            Release::new_stable(semver::Version::new(1, 53, 0))
         );
         assert_eq!(
-            index.releases()[70],
+            releases[releases.len() - 1],
             Release::new_stable(semver::Version::new(1, 0, 0))
         );
     }

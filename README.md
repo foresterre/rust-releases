@@ -41,21 +41,6 @@ build a catalog of released Rust versions. In addition, for all solution except 
 </thead>
 <tbody>
      <tr>
-          <td rowspan="2"><code>ChannelManifests</code></td>
-          <td>Source</td>
-          <td>✅</td>
-          <td rowspan="2">Stable, <strike>Beta & Nightly</strike><sup>To be implemented</sup></td>
-          <td>Medium</td>
-          <td>-</td>
-          <td rowspan="2">Once cached, much faster</td>
-     </tr>
-     <tr>
-          <td>FetchResources</td>
-          <td>✅</td>
-          <td>Extremely slow (~1 hour)</td>
-          <td>~418 MB</td>
-     </tr>
-     <tr>
           <td rowspan="2"><code>RustChangelog</code></td>
           <td>Source</td>
           <td>✅</td>
@@ -100,6 +85,21 @@ build a catalog of released Rust versions. In addition, for all solution except 
           <td>Slow (~1 minute)</td>
           <td>~8 MB</td>
      </tr>
+     <tr>
+          <td rowspan="2"><code><strike>ChannelManifests</strike></code><sup>Deprecated</sup></td>
+          <td>Source</td>
+          <td>✅</td>
+          <td rowspan="2">Stable, <strike>Beta & Nightly</strike><sup>Won't be implemented</sup></td>
+          <td>Medium</td>
+          <td>-</td>
+          <td rowspan="2">Input data not updated since 2020-02-23<sup>(<a href="https://github.com/foresterre/rust-releases/issues/9">#9</a>)</td>
+     </tr>
+     <tr>
+          <td>FetchResources</td>
+          <td>✅</td>
+          <td>Extremely slow (~1 hour)</td>
+          <td>~418 MB</td>
+     </tr>
 </tbody>
 </table>
 
@@ -118,21 +118,24 @@ They both get their input data from the Rust AWS S3 distribution bucket. When us
 with the `FetchResources` trait implementation. For `RustDistWithCLI`, you have to obtain the input data yourself (by running the
 `aws` cli with the following options `aws --no-sign-request s3 ls static-rust-lang-org/dist/ > dist.txt`<sup>(<a href="https://github.com/rust-lang/rust/issues/56971#issuecomment-527199391">source</a>)</sup>).
 
-The `ChannelManifests` source has the most potential, as the input data is the most complete. 
-We can most easily extend information about releases beyond the version for this source. Once downloaded, it's quite fast since each release manifest is cached as a separate file. 
-However, the initial download is quite large and frankly, because of rate limiting, also quite slow. In addition,
+You should **not** use the `ChannelManifests` source, unless you have a good reason to do so. This source had a lot of potential, as the input data is the most complete (although with a bit of extra work we can get the same data with `RustDist`). 
+With the published channel manifests, we could easily extend information about releases beyond the release version. The separate manifest files could be parsed rather fast, and
+new manifests can be downloaded iteratively.
+There were however also major downsides. The initial download is quite large, and slow (because of rate limiting), in the order of hours, and,
 the resource is approximately one-week out of date since the root manifest is only updated one week after a release <sup>(<a href="https://github.com/rust-lang/rust/issues/56971#issuecomment-527199391">source</a>)</sup>.
-_NB: The input data has not been updated since 2020-02-23_<sup>(<a href="https://github.com/foresterre/rust-releases/issues/9">#9</a>)</sup>.
+Most importantly however, the input data has not been updated since 2020-02-23<sup>(<a href="https://github.com/foresterre/rust-releases/issues/9">#9</a>)</sup>. As a result, this source has been deprecated, and will not be further extended.
 
 ## Applications
 
 [cargo-msrv](https://github.com/foresterre/cargo-msrv) is a tool which can be used to determine the minimal supported Rust version (MSRV).
-In cargo-msrv I started by parsing the latest channel manifest, and then decreasing the minor semver version.
+It builds your Rust crate and checks whether the build succeeds or fails, as this gives the most complete idea whether a version will work
+with your (external) dependencies. `cargo-msrv` uses bisection, or a reverse-linear search, to find the lowest appropriate Rust version.
+For this, it needs to have an idea about the toolchains which have been released, and can be installed.
 
-This is not great for many reasons:
+Originally we simply parsed the latest channel manifest, and then decreased the minor semver version, but this was obviously not great for many reasons, including:
 * Except for the latest released version, we are left guessing the decreased version numbers
   actually exist
-* Only stable versions are supported, not nightly, beta, or other channels
-* Only 1.x.0 versions are supported
+* Only stable versions were supported, not nightly, beta, or other channels
+* Only 1.x.0 versions were supported
 
-This is not ideal, thus `rust-releases` was born. Now cargo-msrv can iterate over Rust releases of which we know they exist and are available.
+This was not ideal, thus `rust-releases` was born. Now cargo-msrv can iterate over Rust releases of which we know they exist and are available.

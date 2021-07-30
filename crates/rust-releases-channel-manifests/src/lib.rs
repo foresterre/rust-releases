@@ -37,6 +37,7 @@ pub struct ChannelManifests {
     documents: Vec<Document>,
 }
 
+#[allow(deprecated)]
 impl Source for ChannelManifests {
     type Error = ChannelManifestsError;
 
@@ -56,6 +57,7 @@ impl Source for ChannelManifests {
     }
 }
 
+#[allow(deprecated)]
 impl FetchResources for ChannelManifests {
     type Error = ChannelManifestsError;
 

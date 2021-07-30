@@ -30,7 +30,7 @@ impl Document {
     // FIXME: may clone the resource, maybe also provide a version which does not clone?
     pub fn load(&self) -> IoResult<Vec<u8>> {
         match self {
-            Self::LocalPath(path) => Self::read_from_path(&path),
+            Self::LocalPath(path) => Self::read_from_path(path),
             Self::Memory(buffer) => Ok(buffer.to_owned()),
             Self::RemoteCached(_, buffer) => Ok(buffer.to_owned()),
         }

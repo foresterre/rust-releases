@@ -241,6 +241,7 @@ pub use rust_releases_core::{
 pub use rust_releases_io::{base_cache_dir, is_stale, Document, IoError, IoResult};
 
 #[cfg(feature = "rust-releases-channel-manifests")]
+#[allow(deprecated)]
 pub use rust_releases_channel_manifests::{
     ChannelManifests, ChannelManifestsError, ChannelManifestsResult,
 };

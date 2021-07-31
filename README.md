@@ -4,6 +4,7 @@
 [![Crates.io version shield](https://img.shields.io/crates/v/rust-releases.svg)](https://crates.io/crates/rust-releases)
 [![Docs](https://docs.rs/rust-releases/badge.svg)](https://docs.rs/rust-releases)
 [![Crates.io license shield](https://img.shields.io/crates/l/rust-releases.svg)](https://crates.io/crates/rust-releases)
+[![MSRV shield](https://img.shields.io/badge/MSRV-1.51.0-informational)](https://github.com/foresterre/cargo-msrv)
 
 ## Introduction
 
@@ -92,7 +93,7 @@ build a catalog of released Rust versions. In addition, for all solution except 
           <td rowspan="2">Stable, <strike>Beta & Nightly</strike><sup>Won't be implemented</sup></td>
           <td>Medium</td>
           <td>-</td>
-          <td rowspan="2">Input data not updated since 2020-02-23<sup>(<a href="https://github.com/foresterre/rust-releases/issues/9">#9</a>)</td>
+          <td rowspan="2">Input data not updated since 2020-02-23<sup>(<a href="https://github.com/foresterre/rust-releases/issues/9">#9</a>)</sup></td>
      </tr>
      <tr>
           <td>FetchResources</td>

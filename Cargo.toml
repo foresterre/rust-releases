@@ -7,7 +7,7 @@ license = "MIT OR Apache-2.0"
 edition = "2018"
 
 [package.metadata]
-msrv = "1.46.0"
+msrv = "1.51.0"
 
 documentation = "https://docs.rs/rust-releases"
 repository = "https://github.com/foresterre/rust-releases"

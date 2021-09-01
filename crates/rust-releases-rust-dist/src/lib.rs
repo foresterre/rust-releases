@@ -16,6 +16,7 @@ use rust_releases_io::Document;
 use std::collections::BTreeSet;
 use std::iter::FromIterator;
 
+pub(crate) mod download;
 pub(crate) mod errors;
 pub(crate) mod fetch;
 

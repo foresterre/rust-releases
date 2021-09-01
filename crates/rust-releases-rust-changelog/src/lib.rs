@@ -172,7 +172,7 @@ mod tests {
     #[test]
     fn parse_date() {
         let date = ReleaseDate::parse("2021-09-01").unwrap();
-        assert_eq!(date.0, chrono::NaiveDate::from_ymd(2021, 09, 01));
+        assert_eq!(date.0, chrono::NaiveDate::from_ymd(2021, 9, 1));
     }
 
     #[test]

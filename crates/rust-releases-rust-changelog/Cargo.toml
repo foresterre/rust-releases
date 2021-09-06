@@ -1,6 +1,6 @@
 [package]
 name = "rust-releases-rust-changelog"
-version = "0.15.2"
+version = "0.16.0"
 authors = ["Martijn Gribnau <garm@ilumeo.com>"]
 edition = "2018"
 description = "RustChangelog source implementation for rust-releasess"
@@ -11,8 +11,8 @@ repository = "https://github.com/foresterre/rust-releases"
 
 [dependencies]
 chrono = "0.4.19"
-rust-releases-core = { version = "0.15.1", path = "../rust-releases-core" }
-rust-releases-io = { version = "0.15.1", path = "../rust-releases-io", features = ["http_client"] }
+rust-releases-core = { version = "0.16.0", path = "../rust-releases-core" }
+rust-releases-io = { version = "0.16.0", path = "../rust-releases-io", features = ["http_client"] }
 thiserror = "1.0.24"
 
 [dev-dependencies]

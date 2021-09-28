@@ -5,12 +5,17 @@ authors = ["Martijn Gribnau <garm@ilumeo.com>"]
 description = "Find, index and obtain all officially available Rust releases"
 license = "MIT OR Apache-2.0"
 edition = "2018"
+documentation = "https://docs.rs/rust-releases"
+repository = "https://github.com/foresterre/rust-releases"
+exclude = [
+    "/resources", # used by test cases; not relevant for library consumers; approx. 1MB
+    "/.github", # version control and CI configs
+    "/bors.toml", # CI staging bot config
+    "/deny.toml" # dependency license checking config
+]
 
 [package.metadata]
 msrv = "1.51.0"
-
-documentation = "https://docs.rs/rust-releases"
-repository = "https://github.com/foresterre/rust-releases"
 
 [workspace]
 members = [

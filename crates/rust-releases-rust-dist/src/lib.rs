@@ -11,7 +11,7 @@
 extern crate rust_releases_io;
 
 use regex::{Captures, Regex};
-use rust_releases_core::{semver, Channel, FetchResources, Release, ReleaseIndex, Source};
+use rust_releases_core::{semver, Channel, FetchResources, IndexBuilder, Release, ReleaseIndex};
 use rust_releases_io::Document;
 use std::collections::BTreeSet;
 use std::iter::FromIterator;
@@ -40,7 +40,7 @@ lazy_static::lazy_static! {
         Regex::new(r"(?m)^dist/rustc-(?P<major>\d+).(?P<minor>\d+).(?P<patch>\d+)(?:\-(alpha|beta|nightly)(\.\d+))?").unwrap();
 }
 
-impl Source for RustDist {
+impl IndexBuilder for RustDist {
     type Error = RustDistError;
 
     fn build_index(&self) -> Result<ReleaseIndex, Self::Error> {

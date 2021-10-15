@@ -12,7 +12,7 @@ extern crate rust_releases_io;
 use crate::fetch::{fetch_meta_manifest, fetch_release_manifests};
 use crate::meta_manifest::MetaManifest;
 use crate::release_manifest::parse_release_manifest;
-use rust_releases_core::{Channel, FetchResources, Release, ReleaseIndex, Source};
+use rust_releases_core::{Channel, FetchResources, IndexBuilder, Release, ReleaseIndex, Resource};
 use rust_releases_io::Document;
 use std::collections::BTreeSet;
 use std::iter::FromIterator;
@@ -38,10 +38,10 @@ pub struct ChannelManifests {
 }
 
 #[allow(deprecated)]
-impl Source for ChannelManifests {
+impl IndexBuilder for ChannelManifests {
     type Error = ChannelManifestsError;
 
-    fn build_index(&self) -> Result<ReleaseIndex, Self::Error> {
+    fn build_index<T: Resource>(&self, resource: T) -> Result<ReleaseIndex, Self::Error> {
         let releases = self
             .documents
             .iter()

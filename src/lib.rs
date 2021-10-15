@@ -107,7 +107,7 @@
 //! # Example
 //!
 //! ```rust
-//! use rust_releases_core::{FetchResources, Source, Channel, ReleaseIndex};
+//! use rust_releases_core::{FetchResources, IndexBuilder, Channel, ReleaseIndex};
 //! use rust_releases_rust_changelog::RustChangelog;
 //!
 //! // We choose the RustChangelog source for this example; alternatives are RustDistWithCLI and ChannelManifests
@@ -234,7 +234,7 @@ pub mod linear;
 
 // core re-exports
 pub use rust_releases_core::{
-    semver, Channel, CoreError, CoreResult, FetchResources, Release, ReleaseIndex, Source,
+    semver, Channel, CoreError, CoreResult, FetchResources, IndexBuilder, Release, ReleaseIndex,
 };
 
 #[cfg(feature = "rust-releases-io")]

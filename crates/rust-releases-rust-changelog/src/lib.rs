@@ -4,7 +4,9 @@
 //! Please, see the [`rust-releases`] for additional documentation on how this crate can be used.
 //!
 //! [`rust-releases`]: https://docs.rs/rust-releases
-use rust_releases_core::{semver, Channel, FetchResources, Release, ReleaseIndex, Source};
+use rust_releases_core::{
+    semver, Channel, FetchResources, IndexBuilder, Release, ReleaseIndex, Resource,
+};
 use rust_releases_io::Document;
 #[cfg(test)]
 #[macro_use]
@@ -22,8 +24,6 @@ use std::str::FromStr;
 ///
 /// [`Source`]: rust_releases_core::Source
 pub struct RustChangelog {
-    source: Document,
-
     /// Used to compare against the date of an unreleased version which does already exist in the
     /// changelog. If this date is at least as late as the time found in a release registration, we
     /// will say that such a version is released (i.e. published).
@@ -31,28 +31,18 @@ pub struct RustChangelog {
 }
 
 impl RustChangelog {
-    pub(crate) fn from_document(source: Document) -> Self {
-        Self {
-            source,
-            today: ReleaseDate::today(),
-        }
-    }
-
     #[cfg(test)]
-    pub(crate) fn from_document_with_date(source: Document, date: ReleaseDate) -> Self {
-        Self {
-            source,
-            today: date,
-        }
+    pub(crate) fn from_date(source: Document, date: ReleaseDate) -> Self {
+        Self { today: date }
     }
 }
 
-impl Source for RustChangelog {
+impl IndexBuilder for RustChangelog {
     type Error = RustChangelogError;
 
-    fn build_index(&self) -> Result<ReleaseIndex, Self::Error> {
-        let contents = self.source.load()?;
-        let content = String::from_utf8(contents).map_err(RustChangelogError::UnrecognizedText)?;
+    fn build_index<T: Resource>(&self, resource: T) -> Result<ReleaseIndex, Self::Error> {
+        let contents = resource.read()?;
+        let content = String::from_utf8_lossy(contents);
 
         let releases = content
             .lines()
@@ -88,7 +78,7 @@ impl Source for RustChangelog {
 impl FetchResources for RustChangelog {
     type Error = RustChangelogError;
 
-    fn fetch_channel(channel: Channel) -> Result<Self, Self::Error> {
+    fn fetch_channel<T: Resource>(&self, channel: Channel) -> Result<T, Self::Error> {
         if let Channel::Stable = channel {
             let document = fetch()?;
             Ok(Self::from_document(document))
@@ -184,8 +174,7 @@ mod tests {
         .join("");
 
         let date = ReleaseDate::parse("2021-09-01").unwrap();
-        let strategy =
-            RustChangelog::from_document_with_date(Document::LocalPath(path.into()), date);
+        let strategy = RustChangelog::from_date(Document::LocalPath(path.into()), date);
         let index = ReleaseIndex::from_source(strategy).unwrap();
 
         let mut releases = index.releases().iter();

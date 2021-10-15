@@ -4,7 +4,7 @@
 //!
 //! [`Source`]: crate::Source
 //! [`rust-releases`]: https://docs.rs/rust-releases
-#![deny(missing_docs)]
+// #![deny(missing_docs)]
 #![deny(clippy::all)]
 #![deny(unsafe_code)]
 
@@ -27,13 +27,34 @@ pub use crate::{
     channel::Channel, errors::CoreError, errors::CoreResult, index::ReleaseIndex, release::Release,
 };
 
-/// A `Source` is a set of inputs from which a release index can be built.
-pub trait Source {
+/// TODO docs
+pub trait IndexBuilder {
     /// The error to be returned when an index can not be build for a source.
     type Error;
 
     /// Build a release index from a data set.
-    fn build_index(&self) -> Result<ReleaseIndex, Self::Error>;
+    fn build_index<T: Resource>(&self, resource: T) -> Result<ReleaseIndex, Self::Error>;
+}
+
+/// todo
+pub trait Resource {
+    fn consume(self) -> Self;
+
+    fn read(&self) -> &Self;
+
+    fn from_spec<Spec: ResourceSpec>(spec: Spec) -> Self;
+}
+
+pub struct ResourceBuilder<R: Resource> {
+    into_resource: R,
+}
+
+impl<R: Resource> ResourceSpec for ResourceBuilder<R> {
+    fn add_toolchain(&mut self, toolchain: ()) {}
+}
+
+pub trait ResourceSpec {
+    fn add_toolchain(&mut self, toolchain: ());
 }
 
 /// With `FetchResources`, the set of inputs required to build a release index can be fetched.
@@ -45,5 +66,5 @@ where
     type Error;
 
     /// Fetch a set of inputs for a release channel.
-    fn fetch_channel(channel: Channel) -> Result<Self, Self::Error>;
+    fn fetch_channel<R: Resource>(&self, channel: Channel) -> Result<R, Self::Error>;
 }

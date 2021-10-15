@@ -6,7 +6,7 @@
 //!
 //! [`rust-releases`]: https://docs.rs/rust-releases
 
-use rust_releases_core::{semver, Release, ReleaseIndex, Source};
+use rust_releases_core::{semver, IndexBuilder, Release, ReleaseIndex, Resource};
 use rust_releases_io::Document;
 use std::collections::BTreeSet;
 use std::iter::FromIterator;
@@ -26,7 +26,7 @@ pub use crate::errors::{RustDistWithCLIError, RustDistWithCLIResult};
 /// from the `Source` trait.
 ///
 /// ```rust,no_run
-/// use rust_releases_core::Source;
+/// use rust_releases_core::IndexBuilder;
 /// use rust_releases_rust_dist_with_cli::RustDistWithCLI;
 ///
 /// let source = RustDistWithCLI::from_path("rust_dist_with_cli.txt");
@@ -42,16 +42,11 @@ pub use crate::errors::{RustDistWithCLIError, RustDistWithCLIResult};
 /// [`RustDist`]: https://docs.rs/rust-releases-rust-dist/0.15.0/rust_releases_rust_dist/struct.RustDist.html
 /// [`aws`]: https://aws.amazon.com/cli/
 
-pub struct RustDistWithCLI {
-    source: Document,
-}
+pub struct RustDistWithCLI {}
 
 impl RustDistWithCLI {
-    /// Creates a `RustDistWithCLI` from a path.
-    pub fn from_path<P: AsRef<Path>>(path: P) -> Self {
-        Self {
-            source: Document::LocalPath(path.as_ref().to_path_buf()),
-        }
+    pub fn new() -> Self {
+        Self {}
     }
 
     #[cfg(test)]
@@ -60,11 +55,11 @@ impl RustDistWithCLI {
     }
 }
 
-impl Source for RustDistWithCLI {
+impl IndexBuilder for RustDistWithCLI {
     type Error = RustDistWithCLIError;
 
-    fn build_index(&self) -> Result<ReleaseIndex, Self::Error> {
-        let contents = self.source.load()?;
+    fn build_index<T: Resource>(&self, resource: T) -> Result<ReleaseIndex, Self::Error> {
+        let contents = resource.read()?;
         let content = String::from_utf8(contents)?;
 
         // NB: poor man's parsing for stable releases only

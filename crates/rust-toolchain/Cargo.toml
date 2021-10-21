@@ -10,6 +10,9 @@ documentation = "https://docs.rs/rust-toolchain"
 repository = "https://github.com/foresterre/rust-releases"
 
 [dependencies]
+semver = "1"
+time = "0.3"
+thiserror = "1"
 
 [dev-dependencies]
-
+yare = "1.0.1"

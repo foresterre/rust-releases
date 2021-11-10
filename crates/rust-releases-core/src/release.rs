@@ -1,19 +1,6 @@
 use crate::semver;
 use std::cmp::Ordering;
 
-/// A Rust release with an associated version.
-///
-/// A release may be associated with a channel (stable, beta, nightly).
-///
-/// **Breaking change for > 0.15*: After the release of `rust-releases` 0.15, a breaking change will
-/// be made to add support for beta and nightly versions.  
-#[derive(Clone, Debug, Eq, PartialEq)]
-pub struct Release {
-    // Fixme: for beta or nightly versions, dates should be used
-    // Fixme: should be paired with a channel
-    version: semver::Version,
-}
-
 impl Release {
     /// Construct a new stable release
     pub fn new_stable(version: semver::Version) -> Self {

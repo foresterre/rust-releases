@@ -20,12 +20,17 @@ pub(crate) mod index;
 /// Defines a `Release`
 pub(crate) mod release;
 
+pub(crate) mod next;
+
 /// Re-export the semver crate to the root scope
 pub use semver;
 
 pub use crate::{
     channel::Channel, errors::CoreError, errors::CoreResult, index::ReleaseIndex, release::Release,
 };
+
+// TODO!
+pub use crate::next::*;
 
 /// A `Source` is a set of inputs from which a release index can be built.
 pub trait Source {

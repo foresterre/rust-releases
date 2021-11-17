@@ -1,6 +1,6 @@
 [package]
 name = "rust-releases-channel-manifests"
-version = "0.16.0"
+version = "0.17.0"
 authors = ["Martijn Gribnau <garm@ilumeo.com>"]
 description = "ChannelManifests source implementation for rust-releases"
 license = "MIT OR Apache-2.0"

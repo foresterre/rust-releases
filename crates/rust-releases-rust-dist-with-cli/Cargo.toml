@@ -11,6 +11,6 @@ repository = "https://github.com/foresterre/rust-releases"
 
 [dependencies]
 rust-releases-core = { version = "^0.21.0", path = "../rust-releases-core" }
-rust-releases-io = { version = "0.16.0", path = "../rust-releases-io" }
+rust-releases-io = { version = "^0.21.0", path = "../rust-releases-io" }
 
 thiserror = "1.0.24"

@@ -17,12 +17,6 @@ unmaintained = "deny"
 notice = "deny"
 
 ignore = [
-    # `stdweb` is unmaintained; This doesn't mean it's broken, but if possible, we should look for a replacement.
-    # Currently a replacement is not really available as it is a dependency of rusoto, which we use to
-    # connect to AWS S3. AWS recently has been recruiting many Rust developers so maybe there will also be an official
-    # AWS Rust SDK in the future?
-    "RUSTSEC-2020-0056",
-
     # Potential segfault in the time crate
     # NB: has been fixed in time >=0.2.23, however waiting on chrono crate to update
     # chrono PR: https://github.com/chronotope/chrono/pull/578

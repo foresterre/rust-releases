@@ -19,4 +19,5 @@ lazy_static = "1.4.0"
 rusoto_core = "0.47.0"
 rusoto_s3 = "0.47.0"
 regex = "1.4.5"
-tokio = { version = "1" }
+# minimum is set because of RUSTSEC-2021-0124 advisory: https://rustsec.org/advisories/RUSTSEC-2021-0124
+tokio = "1.13.1"

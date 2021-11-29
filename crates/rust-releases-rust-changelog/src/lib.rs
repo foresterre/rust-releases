@@ -81,7 +81,9 @@ fn create_release(line: &str, today: &ReleaseDate) -> Option<RustChangelogResult
 
     match parsed {
         // If the version and date can be parsed, and the version has been released
-        Ok((version, date)) if date.is_available(today) => Some(Ok(Release::new_stable(version))),
+        Ok((version, date)) if date.is_available(today) && version.pre.is_empty() => {
+            Some(Ok(Release::new_stable(version)))
+        }
         // If the version and date can be parsed, but the version is not yet released
         Ok(_) => None,
         // We skip versions 0.10, 0.9, etc. which require more lenient semver parsing

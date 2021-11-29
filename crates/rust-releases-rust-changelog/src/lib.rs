@@ -57,31 +57,43 @@ impl Source for RustChangelog {
         let releases = content
             .lines()
             .filter(|s| s.starts_with("Version"))
-            .filter_map(|line| {
-                let parsed = parse_release(line.split_ascii_whitespace());
-
-                match parsed {
-                    // If the version and date can be parsed, and the version has been released
-                    Ok((version, date)) if date.is_available(&self.today) => {
-                        Some(Ok(Release::new_stable(version)))
-                    }
-                    // If the version and date can be parsed, but the version is not yet released
-                    Ok(_) => None,
-                    // We skip versions 0.10, 0.9, etc. which require more lenient semver parsing
-                    // Unfortunately we can't access the error kind, so we have to match the string instead
-                    Err(RustChangelogError::SemverError(err, _))
-                        if err.to_string().as_str()
-                            == "unexpected end of input while parsing minor version number" =>
-                    {
-                        None
-                    }
-                    // In any ony other error case, we forward the error
-                    Err(err) => Some(Err(err)),
-                }
-            })
+            .filter_map(|line| create_release(line, &self.today))
             .collect::<Result<ReleaseIndex, Self::Error>>()?;
 
         Ok(releases)
+    }
+}
+
+/// Create a release from a `Version ...` header in the Rust changelog file (`RELEASES.md`).
+///
+/// We skip a few older versions which did not use full 3-component semver versions.
+/// While we could parse them as `SemverReq` requirements, adding those would not be worth the hassle
+///   (at least for now).
+///
+/// Versions which we should be able to parse, and are based on their release date available, are
+///   returned as `Some(Result<Release, Error>)`.
+/// If a version is not yet available based on their release date we return `None`.
+/// Versions we currently do not support are also returned as `None`.
+///
+/// The resulting releases can then be filtered on `Option::is_some`, to only keep relevant results.
+fn create_release(line: &str, today: &ReleaseDate) -> Option<RustChangelogResult<Release>> {
+    let parsed = parse_release(line.split_ascii_whitespace());
+
+    match parsed {
+        // If the version and date can be parsed, and the version has been released
+        Ok((version, date)) if date.is_available(today) => Some(Ok(Release::new_stable(version))),
+        // If the version and date can be parsed, but the version is not yet released
+        Ok(_) => None,
+        // We skip versions 0.10, 0.9, etc. which require more lenient semver parsing
+        // Unfortunately we can't access the error kind, so we have to match the string instead
+        Err(RustChangelogError::SemverError(err, _))
+            if err.to_string().as_str()
+                == "unexpected end of input while parsing minor version number" =>
+        {
+            None
+        }
+        // In any ony other error case, we forward the error
+        Err(err) => Some(Err(err)),
     }
 }
 

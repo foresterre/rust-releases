@@ -55,7 +55,7 @@ build a catalog of released Rust versions. In addition, for all solution except 
           <td rowspan="2">Stable</td>
           <td>Fast</td>
           <td>-</td>
-          <td rowspan="2"></td>
+          <td rowspan="2"><i>Enabled by default. Disable by setting <code>default-features = false</code> for the <code>rust-releases</code> dependency in your Cargo.toml manifest.</i></td>
      </tr>
      <tr>
           <td>FetchResources</td>
@@ -82,7 +82,7 @@ build a catalog of released Rust versions. In addition, for all solution except 
           <td rowspan="2"><code>RustDistWithCLI</code></td>
           <td>Source</td>
           <td>✅</td>
-          <td rowspan="2">Stable, <strike>Beta & Nightly</strike><sup>To be implemented</sup></td>
+          <td rowspan="2">Stable, <strike>Beta & Nightly</strike><sup>TBD</sup></td>
           <td>Fast</td>
           <td>-</td>
           <td rowspan="2"></td>
@@ -94,13 +94,13 @@ build a catalog of released Rust versions. In addition, for all solution except 
           <td>~8 MB</td>
      </tr>
      <tr>
-          <td rowspan="2"><code><strike>ChannelManifests</strike></code><sup>Deprecated</sup></td>
+          <td rowspan="2"><code><strike>ChannelManifests</strike></code><sup>TDB</sup></td>
           <td>Source</td>
           <td>✅</td>
-          <td rowspan="2">Stable, <strike>Beta & Nightly</strike><sup>Won't be implemented</sup></td>
+          <td rowspan="2">Stable, <strike>Beta & Nightly</strike><sup>TBD</sup></td>
           <td>Medium</td>
           <td>-</td>
-          <td rowspan="2">Input data not updated since 2020-02-23<sup>(<a href="https://github.com/foresterre/rust-releases/issues/9">#9</a>)</sup></td>
+          <td rowspan="2">Input data works again<sup>(<a href="https://github.com/foresterre/rust-releases/issues/9">#9</a>)</sup>. Further implementation commitments TBD<sup>5</sup></td>
      </tr>
      <tr>
           <td>FetchResources</td>
@@ -114,7 +114,11 @@ build a catalog of released Rust versions. In addition, for all solution except 
 <sup>1</sup>: Currently most of the `rust-releases` public API supports only stable. Support for the beta and nightly channel is work-in-progress, and the table currently lists whether there is theoretical support for these channels.<br> 
 <sup>2</sup>: Speed for the `Source` trait primarily consist of parsing speed<br> 
 <sup>3</sup>: Speed for the `FetchResources` trait is primarily limited by your own download speed, and the rate limiting of the server from which the resources are fetched<br>
-<sup>4</sup>: Approximate as of 2021-03-03 <br>
+<sup>4</sup>: Approximate as of 2021-03-03<br>
+<sup>5</sup>: While the channel manifests are the most complete source available, they're practically too slow to download without
+adding some incremental implementation first, while this would still require a large initial download. Since
+we currently do not use most of the data available in the manifest files, it's usually better to instead pick
+a different source. It's more likely we'll take the channel manifests, take a subset and compile it into a smaller source type.<br>
 
 **Which data source should I use?**
 

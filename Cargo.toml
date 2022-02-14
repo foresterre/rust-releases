@@ -30,10 +30,7 @@ members = [
 
 [features]
 default = [
-    "channel-manifests",
     "rust-changelog",
-    "rust-dist",
-    "rust-dist-with-cli"
 ]
 
 channel-manifests = ["rust-releases-channel-manifests"]

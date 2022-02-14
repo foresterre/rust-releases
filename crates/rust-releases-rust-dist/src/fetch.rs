@@ -2,10 +2,16 @@
 //   to look for a proper mocking library for Rust yet. No excuses of course, ..., but personal project
 //   and such 🙄. Instead, this text serves as a header of shame.
 
-use crate::errors::{RustDistError, RustDistResult};
-use rusoto_core::credential::{AwsCredentials, StaticProvider};
-use rusoto_core::{HttpClient, Region};
-use rusoto_s3::{ListObjectsV2Request, S3Client, S3};
+use crate::errors::{AwsError, RustDistError, RustDistResult};
+use aws_config::AppName;
+use aws_sdk_s3::middleware::DefaultMiddleware;
+use aws_sdk_s3::model::Object;
+use aws_sdk_s3::operation::ListObjectsV2;
+use aws_sdk_s3::output::ListObjectsV2Output;
+use aws_sdk_s3::{Config, Region};
+use aws_sig_auth::signer::OperationSigningConfig;
+use aws_sig_auth::signer::SigningRequirements;
+use aws_smithy_client::erase::DynConnector;
 use rust_releases_io::{base_cache_dir, is_stale, Document};
 use std::convert::{TryFrom, TryInto};
 use std::fs::{File, OpenOptions};
@@ -14,7 +20,7 @@ use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 // Rust currently always uses the US West 1 bucket
-const RUST_DIST_REGION: Region = Region::UsWest1;
+const RUST_DIST_REGION: Region = Region::from_static("us-west-1");
 
 // The bucket from which the official Rust sources are distributed
 const RUST_DIST_BUCKET: &str = "static-rust-lang-org";
@@ -30,7 +36,7 @@ const SOURCE_CACHE_DIR: &str = "source_dist_index";
 const OUTPUT_PATH: &str = "dist_static-rust-lang-org.txt";
 
 // amount of objects requested per chunk
-const REQUEST_SIZE: i64 = 1000;
+const REQUEST_SIZE: i32 = 1000;
 
 // Use the filtered index cache for up to 1 day
 const TIMEOUT: Duration = Duration::from_secs(86_400);
@@ -55,27 +61,72 @@ trait ChunkClient {
 
 // The default Rust Releases client
 struct Client {
-    s3_client: S3Client,
+    #[allow(dead_code)]
+    aws_config: Config,
+    aws_s3_client: SmithyClient,
     runtime: tokio::runtime::Runtime,
 }
 
 impl Client {
     pub fn try_default() -> RustDistResult<Self> {
-        let mut http_client = HttpClient::new().map_err(RustDistError::from)?;
-        http_client.local_agent_append(
-            "rust-releases (github.com/foresterre/rust-releases/issues)".to_string(),
-        );
-
-        let s3_client = S3Client::new_with(
-            http_client,
-            StaticProvider::from(AwsCredentials::default()),
-            RUST_DIST_REGION,
-        );
-
         let runtime = tokio::runtime::Runtime::new()?;
 
-        Ok(Self { s3_client, runtime })
+        let app_name = AppName::new("rust-releases+`github|foresterre|rust-releases`")
+            .map_err(AwsError::InvalidAppName)?;
+
+        let aws_config = aws_sdk_s3::Config::builder()
+            .app_name(app_name)
+            .region(RUST_DIST_REGION)
+            .build();
+
+        let aws_s3_client = aws_smithy_client::Builder::dyn_https()
+            .middleware(aws_sdk_s3::middleware::DefaultMiddleware::new())
+            .build();
+
+        Ok(Self {
+            aws_config,
+            aws_s3_client,
+            runtime,
+        })
     }
+}
+
+type SmithyClient = aws_smithy_client::Client<DynConnector, DefaultMiddleware>;
+
+// Uses workaround for using unsigned requests, since aws-sdk-s3 0.6.0 does not have an
+// anonymous credentials provider:
+// https://github.com/awslabs/aws-sdk-rust/issues/425#issuecomment-1020265854
+async fn list_objects(
+    client: &SmithyClient,
+    conf: &Config,
+    offset: Option<impl Into<String>>,
+) -> Result<ListObjectsV2Output, AwsError> {
+    let input = ListObjectsV2::builder()
+        .bucket(RUST_DIST_BUCKET)
+        .max_keys(REQUEST_SIZE)
+        .set_start_after(offset.map(Into::into))
+        .prefix(OBJECT_PREFIX)
+        .build()
+        .map_err(|_| AwsError::ListObjectsBuildOperationInput)?;
+
+    let mut operation = input
+        .make_operation(conf)
+        .await
+        .map_err(|_| AwsError::ListObjectsMakeOperation)?;
+
+    {
+        let mut properties = operation.properties_mut();
+        let signing_config = properties
+            .get_mut::<OperationSigningConfig>()
+            .ok_or(AwsError::DisableSigning)?;
+
+        signing_config.signing_requirements = SigningRequirements::Disabled;
+    }
+
+    client
+        .call(operation)
+        .await
+        .map_err(|e| AwsError::ListObjectsError(Box::new(e)))
 }
 
 impl ChunkClient for Client {
@@ -84,18 +135,11 @@ impl ChunkClient for Client {
         offset: Option<impl Into<String>>,
         to: &mut impl Write,
     ) -> RustDistResult<ChunkState> {
-        let raw = self
-            .runtime
-            .block_on(self.s3_client.list_objects_v2(ListObjectsV2Request {
-                bucket: RUST_DIST_BUCKET.to_string(),
-                start_after: offset.map(Into::into),
-                max_keys: Some(REQUEST_SIZE),
-                prefix: Some(OBJECT_PREFIX.to_owned()),
-                ..Default::default()
-            }))?;
+        let raw =
+            self.runtime
+                .block_on(list_objects(&self.aws_s3_client, &self.aws_config, offset))?;
 
         let objects = raw.contents.ok_or(RustDistError::ChunkMetadataMissing)?;
-
         let state = match write_objects(to, &objects) {
             Some(key) => ChunkState::Offset(key),
             None => ChunkState::Complete,
@@ -234,14 +278,11 @@ pub(in crate) fn fetch() -> RustDistResult<Document> {
     buffer.try_into()
 }
 
-fn write_objects(
-    buffer: &mut impl std::io::Write,
-    objects: &[rusoto_s3::Object],
-) -> Option<String> {
+fn write_objects(buffer: &mut impl std::io::Write, objects: &[Object]) -> Option<String> {
     for object in objects {
-        let key = object.key.clone().unwrap_or_else(|| "".to_string());
-
-        let _ = buffer.write(format!("{}\n", key).as_bytes());
+        if let Some(key) = object.key.as_deref() {
+            let _ = buffer.write(format!("{}\n", key).as_bytes());
+        }
     }
 
     let _ = buffer.flush();

@@ -6,6 +6,13 @@
 [![Crates.io license shield](https://img.shields.io/crates/l/rust-releases.svg)](https://crates.io/crates/rust-releases)
 [![MSRV shield](https://img.shields.io/badge/MSRV-1.51.0-informational)](https://github.com/foresterre/cargo-msrv)
 
+| rust-releases version | MSRV |
+|-----------------------|------|
+| 0.21.1                | 1.51 |
+| 0.22.0*               | 1.53 |
+
+`*` Unreleased, MSRV subject to change  
+
 ## Introduction
 
 The Rust programming language uses deterministic versioning for toolchain releases. Stable versions use SemVer, 

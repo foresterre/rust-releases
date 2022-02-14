@@ -2,8 +2,19 @@ use rust_releases_core::Release;
 
 /// A data structure used to perform a binary search on [`Releases`].
 ///
+/// # Deprecated
+///
+/// The `rust-releases` built in bisection method has been deprecated.
+/// It was primarily created for [`cargo-msrv`], and has been replaced
+/// by the [`bisector`] crate.
+///
+/// This struct and related implementation blocks are subject to removal in a future release.
+///
 /// [`Releases`]: rust_releases_core::Release
+/// [`cargo-msrv`]: https://github.com/foresterre/cargo-msrv
+/// [`bisector`]: https://crates.io/crates/bisector
 #[derive(Clone, Debug)]
+#[deprecated]
 pub struct Bisect<'slice> {
     view: &'slice [Release],
 }

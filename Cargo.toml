@@ -48,7 +48,7 @@ rust-releases-core = { version = "^0.22.0", path = "crates/rust-releases-core" }
 rust-releases-io = { version = "^0.22.0", path = "crates/rust-releases-io", optional = true }
 rust-releases-channel-manifests = { version = "^0.22.0", path = "crates/rust-releases-channel-manifests", optional = true }
 rust-releases-rust-changelog = { version = "^0.22.0", path = "crates/rust-releases-rust-changelog", optional = true }
-rust-releases-rust-dist = { version = "^0.21.0", path = "crates/rust-releases-rust-dist", optional = true }
+rust-releases-rust-dist = { version = "^0.22.0", path = "crates/rust-releases-rust-dist", optional = true }
 rust-releases-rust-dist-with-cli = { version = "^0.21.0", path = "crates/rust-releases-rust-dist-with-cli", optional = true }
 
 [dev-dependencies]

@@ -14,7 +14,7 @@ pub enum RustChangelogError {
 
     /// Returned in case of of `chrono` parse errors
     #[error("Unable to parse release date in a release entry '{0}'")]
-    ChronoParseError(String),
+    TimeParseError(String),
 
     /// Returned in a case a release entry does not contain a recognizable release date
     #[error("Unable to find a valid release date in a release entry")]

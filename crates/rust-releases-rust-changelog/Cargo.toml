@@ -13,7 +13,7 @@ repository = "https://github.com/foresterre/rust-releases"
 msrv = "1.46.0"
 
 [dependencies]
-chrono = "0.4.19"
+time = { version = "0.3.7", features = ["macros", "parsing"] }
 rust-releases-core = { version = "^0.22.0", path = "../rust-releases-core" }
 rust-releases-io = { version = "^0.22.0", path = "../rust-releases-io", features = ["http_client"] }
 thiserror = "1.0.24"

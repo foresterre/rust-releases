@@ -17,6 +17,7 @@ use crate::fetch::fetch;
 
 pub use errors::{RustChangelogError, RustChangelogResult};
 use std::str::FromStr;
+use time::macros::format_description;
 
 /// A [`Source`] which obtains release data from the official Rust changelog.
 ///
@@ -131,11 +132,13 @@ fn parse_release<'line>(
 }
 
 #[derive(Debug)]
-struct ReleaseDate(chrono::NaiveDate);
+struct ReleaseDate(time::Date);
 
 impl ReleaseDate {
     fn today() -> Self {
-        Self(chrono::Utc::today().naive_utc())
+        let date = time::OffsetDateTime::now_utc().date();
+
+        Self(date)
     }
 
     fn parse(from: &str) -> Result<Self, RustChangelogError> {
@@ -151,8 +154,10 @@ impl FromStr for ReleaseDate {
     type Err = crate::RustChangelogError;
 
     fn from_str(item: &str) -> Result<Self, Self::Err> {
-        let result = chrono::NaiveDate::parse_from_str(item, "%Y-%m-%d")
-            .map_err(|_| RustChangelogError::ChronoParseError(item.to_string()))?;
+        let format = format_description!("[year]-[month]-[day]");
+
+        let result = time::Date::parse(item.trim(), &format)
+            .map_err(|err| RustChangelogError::TimeParseError(item.to_string(), err))?;
 
         Ok(Self(result))
     }
@@ -164,6 +169,7 @@ mod tests {
     use crate::RustChangelog;
     use rust_releases_core::{semver, Channel, FetchResources, Release, ReleaseIndex};
     use rust_releases_io::Document;
+    use time::macros::date;
     use yare::parameterized;
 
     #[test]
@@ -186,7 +192,8 @@ mod tests {
     #[test]
     fn parse_date() {
         let date = ReleaseDate::parse("2021-09-01").unwrap();
-        assert_eq!(date.0, chrono::NaiveDate::from_ymd(2021, 9, 1));
+        let expected = date!(2021 - 09 - 01);
+        assert_eq!(date.0, expected);
     }
 
     #[test]

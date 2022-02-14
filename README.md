@@ -130,13 +130,6 @@ They both get their input data from the Rust AWS S3 distribution bucket. When us
 with the `FetchResources` trait implementation. For `RustDistWithCLI`, you have to obtain the input data yourself (by running the
 `aws` cli with the following options `aws --no-sign-request s3 ls static-rust-lang-org/dist/ > dist.txt`<sup>(<a href="https://github.com/rust-lang/rust/issues/56971#issuecomment-527199391">source</a>)</sup>).
 
-You should **not** use the `ChannelManifests` source, unless you have a good reason to do so. This source had a lot of potential, as the input data is the most complete (although with a bit of extra work we can get the same data with `RustDist`). 
-With the published channel manifests, we could easily extend information about releases beyond the release version. The separate manifest files could be parsed rather fast, and
-new manifests can be downloaded iteratively.
-There were however also major downsides. The initial download is quite large, and slow (because of rate limiting), in the order of hours, and,
-the resource is approximately one-week out of date since the root manifest is only updated one week after a release <sup>(<a href="https://github.com/rust-lang/rust/issues/56971#issuecomment-527199391">source</a>)</sup>.
-Most importantly however, the input data has not been updated since 2020-02-23<sup>(<a href="https://github.com/foresterre/rust-releases/issues/9">#9</a>)</sup>. As a result, this source has been deprecated, and will not be further extended.
-
 ## Applications
 
 [cargo-msrv](https://github.com/foresterre/cargo-msrv) is a tool which can be used to determine the minimal supported Rust version (MSRV).

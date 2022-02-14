@@ -9,7 +9,14 @@ status = [
     "clippy",
     "cargo_deny (advisories)",
     "cargo_deny (bans licenses sources)",
-    "msrv"
+
+    "msrv",
+    "msrv-workspace-crates (crates/rust-releases-channel-manifests)",
+    "msrv-workspace-crates (crates/rust-releases-core)",
+    "msrv-workspace-crates (crates/rust-releases-io)",
+    "msrv-workspace-crates (crates/rust-releases-rust-changelog)",
+    "msrv-workspace-crates (crates/rust-releases-rust-dist)",
+    "msrv-workspace-crates (crates/rust-releases-rust-dist-with-cli)",
 ]
 
 delete_merged_branches = true

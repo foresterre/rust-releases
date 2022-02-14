@@ -15,7 +15,7 @@ msrv = "1.46.0"
 [dependencies]
 chrono = "0.4.19"
 rust-releases-core = { version = "^0.22.0", path = "../rust-releases-core" }
-rust-releases-io = { version = "^0.21.0", path = "../rust-releases-io", features = ["http_client"] }
+rust-releases-io = { version = "^0.22.0", path = "../rust-releases-io", features = ["http_client"] }
 thiserror = "1.0.24"
 
 [dev-dependencies]

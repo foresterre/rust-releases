@@ -67,6 +67,9 @@ jobs:
       - name: test_all
         run: cargo test --verbose --all
 
+      - name: test_all_with_all_features
+        run: cargo test --verbose --all --all-features
+
   rustfmt:
     name: rustfmt
     runs-on: ubuntu-latest

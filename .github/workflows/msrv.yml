@@ -1,0 +1,60 @@
+name: "ci-msrv"
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - main
+      - staging # for Bors
+      - trying # for Bors
+  schedule:
+    - cron: '00 04 * * *'
+jobs:
+  msrv:
+    name: msrv
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: checkout_repo
+        uses: actions/checkout@v2
+      - name: install_rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+          profile: minimal
+      - name: install_cargo_msrv
+        run: cargo install cargo-msrv
+      - name: version_of_cargo_msrv
+        run: cargo msrv --version # as of writing: 0.14.0 (required for verify)
+      - name: run_cargo_msrv
+        run: cargo msrv --ignore-lockfile --output-format json verify -- cargo check
+  msrv-workspace-crates:
+    name: msrv-workspace-crates
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    strategy:
+      matrix:
+        crate: [
+          "crates/rust-releases-channel-manifests",
+          "crates/rust-releases-core",
+          "crates/rust-releases-io",
+          "crates/rust-releases-rust-changelog",
+          "crates/rust-releases-rust-dist",
+          "crates/rust-releases-rust-dist-with-cli"
+        ]
+    steps:
+      - name: checkout_repo
+        uses: actions/checkout@v2
+      - name: install_rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+          profile: minimal
+      - name: install_cargo_msrv
+        run: cargo install cargo-msrv
+      - name: version_of_cargo_msrv
+        run: cargo msrv --version # as of writing: 0.14.0 (required for verify)
+      - name: run_cargo_msrv
+        run: cargo msrv --output-format json --path ${{ matrix.crate }} verify -- cargo check

@@ -132,11 +132,13 @@ fn parse_release<'line>(
 }
 
 #[derive(Debug)]
-struct ReleaseDate(time::OffsetDateTime);
+struct ReleaseDate(time::Date);
 
 impl ReleaseDate {
     fn today() -> Self {
-        Self(time::OffsetDateTime::now_utc())
+        let date = time::OffsetDateTime::now_utc().date();
+
+        Self(date)
     }
 
     fn parse(from: &str) -> Result<Self, RustChangelogError> {
@@ -154,8 +156,8 @@ impl FromStr for ReleaseDate {
     fn from_str(item: &str) -> Result<Self, Self::Err> {
         let format = format_description!("[year]-[month]-[day]");
 
-        let result = time::OffsetDateTime::parse(item, &format)
-            .map_err(|_| RustChangelogError::TimeParseError(item.to_string()))?;
+        let result = time::Date::parse(item.trim(), &format)
+            .map_err(|err| RustChangelogError::TimeParseError(item.to_string(), err))?;
 
         Ok(Self(result))
     }
@@ -191,7 +193,7 @@ mod tests {
     fn parse_date() {
         let date = ReleaseDate::parse("2021-09-01").unwrap();
         let expected = date!(2021 - 09 - 01);
-        assert_eq!(date.0.date(), expected);
+        assert_eq!(date.0, expected);
     }
 
     #[test]

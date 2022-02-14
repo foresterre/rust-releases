@@ -13,8 +13,8 @@ pub enum RustChangelogError {
     ChannelNotAvailable(Channel),
 
     /// Returned in case of of `chrono` parse errors
-    #[error("Unable to parse release date in a release entry '{0}'")]
-    TimeParseError(String),
+    #[error("Unable to parse release date in a release entry '{0}': {1}")]
+    TimeParseError(String, time::error::Parse),
 
     /// Returned in a case a release entry does not contain a recognizable release date
     #[error("Unable to find a valid release date in a release entry")]

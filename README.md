@@ -4,14 +4,14 @@
 [![Crates.io version shield](https://img.shields.io/crates/v/rust-releases.svg)](https://crates.io/crates/rust-releases)
 [![Docs](https://docs.rs/rust-releases/badge.svg)](https://docs.rs/rust-releases)
 [![Crates.io license shield](https://img.shields.io/crates/l/rust-releases.svg)](https://crates.io/crates/rust-releases)
-[![MSRV shield](https://img.shields.io/badge/MSRV-1.51.0-informational)](https://github.com/foresterre/cargo-msrv)
+[![MSRV shield](https://img.shields.io/badge/MSRV-1.53.0-informational)](https://github.com/foresterre/cargo-msrv)
 
 | rust-releases version | MSRV |
 |-----------------------|------|
 | 0.21.1                | 1.51 |
-| 0.22.0*               | 1.53 |
+| 0.22.0                | 1.53 |
 
-`*` Unreleased, MSRV subject to change  
+`*` When unreleased, MSRV subject to change  
 
 ## Introduction
 

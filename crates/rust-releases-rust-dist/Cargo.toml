@@ -13,7 +13,7 @@ repository = "https://github.com/foresterre/rust-releases"
 msrv = "1.53.0"
 
 [dependencies]
-rust-releases-core = { version = "^0.21.0", path = "../rust-releases-core" }
+rust-releases-core = { version = "^0.22.0", path = "../rust-releases-core" }
 rust-releases-io = { version = "^0.21.0", path = "../rust-releases-io" }
 
 aws-config = "0.6.0"

@@ -44,7 +44,7 @@ rust-dist-with-cli = ["rust-releases-rust-dist-with-cli"]
 io = ["rust-releases-io"]
 
 [dependencies]
-rust-releases-core = { version = "^0.21.0", path = "crates/rust-releases-core" }
+rust-releases-core = { version = "^0.22.0", path = "crates/rust-releases-core" }
 rust-releases-io = { version = "^0.21.0", path = "crates/rust-releases-io", optional = true }
 rust-releases-channel-manifests = { version = "^0.21.0", path = "crates/rust-releases-channel-manifests", optional = true }
 rust-releases-rust-changelog = { version = "^0.21.0", path = "crates/rust-releases-rust-changelog", optional = true }

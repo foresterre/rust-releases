@@ -1,6 +1,6 @@
 use aws_config::InvalidAppName;
 use aws_sdk_s3::error::ListObjectsV2Error;
-use aws_sdk_s3::SdkError;
+use aws_smithy_http::result::SdkError;
 use rust_releases_core::Channel;
 
 /// A result type which binds the `RustDistError` to the error type.

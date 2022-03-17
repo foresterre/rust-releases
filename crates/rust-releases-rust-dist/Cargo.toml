@@ -19,7 +19,7 @@ rust-releases-io = { version = "^0.22.0", path = "../rust-releases-io" }
 aws-config = "0.8.0"
 aws-sdk-s3 = "0.8.0"
 aws-sig-auth = "0.8.0" # required for unsigned requests workaround
-aws-smithy-client = "0.38.0" # required for unsigned requests workaround
+aws-smithy-client = "0.39.0" # required for unsigned requests workaround
 aws-smithy-http = "0.38.0" # required for unsigned requests workaround
 
 lazy_static = "1.4.0"

@@ -1,6 +1,6 @@
 [package]
 name = "rust-releases-rust-dist"
-version = "0.22.2"
+version = "0.22.3"
 authors = ["Martijn Gribnau <garm@ilumeo.com>"]
 edition = "2018"
 description = "RustDist source implementation for rust-releases"

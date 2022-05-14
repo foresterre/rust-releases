@@ -9,7 +9,7 @@ edition = "2018"
 documentation = "https://docs.rs/rust-releases-channel-manifests"
 repository = "https://github.com/foresterre/rust-releases"
 
-[metadata]
+[package.metadata]
 msrv = "1.49"
 
 [dependencies]

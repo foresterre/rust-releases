@@ -10,7 +10,7 @@ documentation = "https://docs.rs/rust-releases-channel-manifests"
 repository = "https://github.com/foresterre/rust-releases"
 
 [package.metadata]
-msrv = "1.40.0"
+msrv = "1.46.0"
 
 [features]
 http_client = ["attohttpc"]

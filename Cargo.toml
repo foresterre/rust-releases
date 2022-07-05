@@ -15,7 +15,7 @@ exclude = [
 ]
 
 [package.metadata]
-msrv = "1.53.0"
+msrv = "1.56.1"
 
 [package.metadata.release]
 tag-name = "v{{version}}"

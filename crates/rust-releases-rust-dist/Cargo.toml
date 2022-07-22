@@ -14,7 +14,7 @@ repository = "https://github.com/foresterre/rust-releases"
 rust-releases-core = { version = "^0.22.0", path = "../rust-releases-core" }
 rust-releases-io = { version = "^0.22.0", path = "../rust-releases-io" }
 
-aws-config = "0.15.0"
+aws-config = "0.46.0"
 aws-sdk-s3 = "0.15.0"
 aws-sig-auth = "0.15.0" # required for unsigned requests workaround
 aws-smithy-client = "0.45.0" # required for unsigned requests workaround

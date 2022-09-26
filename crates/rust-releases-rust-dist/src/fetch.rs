@@ -262,7 +262,7 @@ fn cache_file_path() -> RustDistResult<PathBuf> {
     Ok(base)
 }
 
-pub(in crate) fn fetch() -> RustDistResult<Document> {
+pub(crate) fn fetch() -> RustDistResult<Document> {
     let output_path = cache_file_path()?;
 
     // Use the locally cached version if it exists, and is not stale

@@ -79,8 +79,9 @@ impl Client {
             .region(RUST_DIST_REGION)
             .build();
 
-        let aws_s3_client = aws_smithy_client::Builder::dyn_https()
-            .middleware(aws_sdk_s3::middleware::DefaultMiddleware::new())
+        let aws_s3_client = aws_smithy_client::Builder::new()
+            .middleware(DefaultMiddleware::new())
+            .native_tls_connector(Default::default())
             .build();
 
         Ok(Self {

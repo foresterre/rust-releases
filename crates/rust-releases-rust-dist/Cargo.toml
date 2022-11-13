@@ -13,11 +13,11 @@ rust-version = "1.62"
 rust-releases-core = { version = "^0.22.0", path = "../rust-releases-core" }
 rust-releases-io = { version = "^0.22.0", path = "../rust-releases-io" }
 
-aws-config = "0.47.0"
-aws-sdk-s3 = "0.17.0"
-aws-sig-auth = "0.47.0" # required for unsigned requests workaround
-aws-smithy-client = "0.47.0" # required for unsigned requests workaround
-aws-smithy-http = "0.47.0" # required for unsigned requests workaround
+aws-config = "0.51.0"
+aws-sdk-s3 = "0.21.0"
+aws-sig-auth = "0.51.0" # required for unsigned requests workaround
+aws-smithy-client = { version = "0.51.0", default-features = false, features = ["native-tls"] } # required for unsigned requests workaround
+aws-smithy-http = "0.51.0" # required for unsigned requests workaround
 
 lazy_static = "1.4.0"
 regex = "1.4.5"

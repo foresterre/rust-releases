@@ -5,12 +5,9 @@ authors = ["Martijn Gribnau <garm@ilumeo.com>"]
 description = "ChannelManifests source implementation for rust-releases"
 license = "MIT OR Apache-2.0"
 edition = "2018"
-
 documentation = "https://docs.rs/rust-releases-channel-manifests"
 repository = "https://github.com/foresterre/rust-releases"
-
-[package.metadata]
-msrv = "1.59"
+rust-version = "1.62"
 
 [dependencies]
 rust-releases-core = { version = "^0.22.0", path = "../rust-releases-core" }

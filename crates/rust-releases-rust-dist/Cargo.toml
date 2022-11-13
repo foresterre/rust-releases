@@ -5,7 +5,7 @@ authors = ["Martijn Gribnau <garm@ilumeo.com>"]
 edition = "2018"
 description = "RustDist source implementation for rust-releases"
 license = "MIT OR Apache-2.0"
-rust-version = "1.58"
+rust-version = "1.59"
 
 documentation = "https://docs.rs/rust-releases-rust-dist"
 repository = "https://github.com/foresterre/rust-releases"

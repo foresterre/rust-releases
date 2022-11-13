@@ -238,7 +238,7 @@ impl<P: AsRef<Path>> TryFrom<PersistingMemCache<P>> for Document {
 }
 
 fn check_cache(output_path: &Path) -> RustDistResult<Option<Document>> {
-    if output_path.is_file() && !is_stale(&output_path, TIMEOUT)? {
+    if output_path.is_file() && !is_stale(output_path, TIMEOUT)? {
         Ok(Some(Document::LocalPath(output_path.to_path_buf())))
     } else {
         let parent = output_path.parent().ok_or_else(|| {
@@ -262,7 +262,7 @@ fn cache_file_path() -> RustDistResult<PathBuf> {
     Ok(base)
 }
 
-pub(in crate) fn fetch() -> RustDistResult<Document> {
+pub(crate) fn fetch() -> RustDistResult<Document> {
     let output_path = cache_file_path()?;
 
     // Use the locally cached version if it exists, and is not stale

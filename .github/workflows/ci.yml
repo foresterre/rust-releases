@@ -121,3 +121,22 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: EmbarkStudios/cargo-deny-action@v1
+
+  diff_lock:
+    name: diff_lock
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout_repo
+        uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+      - name: install_rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+          profile: minimal
+      - name: generate_lockfile
+        run: cargo generate-lockfile
+      - name: diff_lockfile
+        run: diff Cargo.lock.msrv Cargo.lock

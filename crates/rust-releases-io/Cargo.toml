@@ -21,6 +21,6 @@ thiserror = "1.0.24"
 directories-next = "2.0.0"
 
 # feature: http_client
-attohttpc = { version = "0.19.1", optional = true }
+attohttpc = { version = "0.24.0", optional = true }
 
 

@@ -67,7 +67,7 @@ impl FetchResources for ChannelManifests {
         let content =
             String::from_utf8(content).map_err(|_| ChannelManifestsError::ParseMetaManifest)?;
 
-        let meta_manifest = MetaManifest::try_from_str(&content)?;
+        let meta_manifest = MetaManifest::try_from_str(content)?;
 
         let release_manifests = fetch_release_manifests(&meta_manifest, channel)?;
 

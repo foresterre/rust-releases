@@ -64,7 +64,7 @@ jobs:
       - name: use_msrv_lock_file
         run: cp Cargo.lock.msrv Cargo.lock
       - name: run_cargo_msrv_verify
-        run: cargo msrv --output-format json --path ${{ matrix.crate }} verify -- cargo check --all-features
+        run: cargo msrv --output-format json --path ${{ matrix.crate }} verify -- cargo check --all-features --locked
       - name: run_cargo_msrv
         if: ${{ failure() }}
-        run: cargo msrv --output-format json --path ${{ matrix.crate }} -- cargo check --all-features
+        run: cargo msrv --output-format json --path ${{ matrix.crate }} -- cargo check --all-features --locked

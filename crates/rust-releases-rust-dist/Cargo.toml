@@ -13,7 +13,7 @@ rust-version = "1.62"
 rust-releases-core = { version = "^0.22.0", path = "../rust-releases-core" }
 rust-releases-io = { version = "^0.22.0", path = "../rust-releases-io" }
 
-aws-config = "0.52.0"
+aws-config = "0.53.0"
 aws-sdk-s3 = "0.22.0"
 aws-sig-auth = "0.52.0" # required for unsigned requests workaround
 aws-smithy-client = { version = "0.52.0", default-features = false, features = ["native-tls"] } # required for unsigned requests workaround

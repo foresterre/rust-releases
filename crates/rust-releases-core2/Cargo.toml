@@ -1,0 +1,11 @@
+[package]
+name = "rust-releases-core2"
+version = "0.0.0"
+authors = ["Martijn Gribnau <garm@ilumeo.com>"]
+edition = "2021"
+description = "Base traits and definitions for rust-releases"
+license = "MIT OR Apache-2.0"
+documentation = "https://docs.rs/rust-releases"
+repository = "https://github.com/foresterre/rust-releases"
+
+[dependencies]

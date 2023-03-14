@@ -7,7 +7,7 @@ description = "I/O helper crate for rust-releases"
 license = "MIT OR Apache-2.0"
 documentation = "https://docs.rs/rust-releases-channel-manifests"
 repository = "https://github.com/foresterre/rust-releases"
-rust-version = "1.62"
+rust-version = "1.63"
 
 [features]
 http_client = ["ureq"]

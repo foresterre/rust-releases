@@ -8,11 +8,15 @@ pub(crate) struct MetaManifest {
 
 impl MetaManifest {
     pub(crate) fn try_from_str<T: AsRef<str>>(item: T) -> ChannelManifestsResult<Self> {
-        let item = item.as_ref();
+        let item = item.as_ref().trim();
 
         let manifests = item
             .lines()
             .map(ManifestSource::try_from_str)
+            .filter(|result| match result {
+                Err(ChannelManifestsError::ParseManifestSource) => false, // ignore sources we don't understand for now
+                _ => true,
+            })
             .collect::<ChannelManifestsResult<Vec<_>>>()?;
 
         Ok(Self { manifests })
@@ -86,7 +90,7 @@ impl ManifestSource {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use rust_releases_io::Document;
+    use std::fs;
 
     #[test]
     fn test_parse_meta_manifest() {
@@ -95,10 +99,10 @@ mod tests {
             "/../../resources/channel_manifests/manifests.txt",
         ]
         .join("");
-        let meta_file = Document::LocalPath(path.into());
+        let content = fs::read(path).unwrap();
+        let content = std::str::from_utf8(&content).unwrap();
 
-        let buffer = meta_file.load().unwrap();
-        let meta_manifest = MetaManifest::try_from_str(String::from_utf8(buffer).unwrap());
+        let meta_manifest = MetaManifest::try_from_str(content);
         assert!(meta_manifest.is_ok());
     }
 }

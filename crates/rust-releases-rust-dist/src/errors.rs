@@ -16,7 +16,7 @@ pub type RustDistResult<T> = Result<T, RustDistError>;
 #[non_exhaustive]
 pub enum RustDistError {
     /// Returned in case of an error related to the AWS SDK
-    #[error("{0}")]
+    #[error(transparent)]
     AwsError(#[from] AwsError),
 
     /// Returned in case a `Channel` is not available for the `Source`.
@@ -33,16 +33,20 @@ pub enum RustDistError {
     ChunkWriteFlushError(#[from] std::io::IntoInnerError<std::io::BufWriter<Vec<u8>>>),
 
     /// Returned in case of an i/o error.
-    #[error("{0}")]
+    #[error(transparent)]
     Io(#[from] std::io::Error),
 
-    /// Returned in case of an `rust-releases-io` i/o error.
-    #[error("{0}")]
-    RustReleasesIo(#[from] rust_releases_io::IoError),
+    /// Returned in case of the base cache folder could not be found.
+    #[error(transparent)]
+    BaseCacheDir(#[from] rust_releases_io::BaseCacheDirError),
+
+    /// Returned when the staleness check fails.
+    #[error(transparent)]
+    IsStale(#[from] rust_releases_io::IsStaleError),
 
     /// Returned in case the input text cannot be parsed.
-    #[error("{0}")]
-    UnrecognizedText(#[from] std::string::FromUtf8Error),
+    #[error(transparent)]
+    UnrecognizedText(#[from] std::str::Utf8Error),
 
     /// Returned in case a component of a `semver` version could not be parsed as a number.
     ///

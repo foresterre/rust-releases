@@ -1,7 +1,9 @@
 use crate::meta_manifest::{ManifestSource, MetaManifest};
 use crate::{ChannelManifestsError, ChannelManifestsResult};
 use rust_releases_core::Channel;
-use rust_releases_io::{base_cache_dir, download_if_not_stale, Document};
+use rust_releases_io::{
+    base_cache_dir, CachedClient, Document, ResourceFile, RetrievedDocument, RustReleasesClient,
+};
 use std::path::PathBuf;
 use std::time::Duration;
 
@@ -17,14 +19,13 @@ const SOURCE_CACHE_DIR: &str = "source_channel_manifests";
 /// Download the meta manifest, unless it exists in the cache and is not stale
 pub(crate) fn fetch_meta_manifest() -> ChannelManifestsResult<Document> {
     let cache = from_manifests_cache_dir()?;
-    let manifest = download_if_not_stale(
-        META_MANIFEST,
-        &cache,
-        "manifests.txt",
-        META_MANIFEST_STALENESS_TIMEOUT,
-    )?;
 
-    Ok(manifest)
+    let client = CachedClient::new(cache, META_MANIFEST_STALENESS_TIMEOUT);
+    let resource_file = ResourceFile::new(META_MANIFEST, "manifests.txt");
+
+    let retrieved_document = client.fetch(resource_file)?;
+
+    Ok(retrieved_document.into_document())
 }
 
 /// Download the the release manifests for a certain channel, unless they exists in the cache and
@@ -36,19 +37,19 @@ pub(crate) fn fetch_release_manifests(
     let sources = meta_manifest.manifests();
     let cache = from_manifests_cache_dir()?;
 
+    let client = CachedClient::new(cache, RELEASE_MANIFEST_STALENESS_TIMEOUT);
+
     let manifests = sources
         .iter()
         .filter(|source| source.channel() == channel)
         .map(|source| {
             let manifest = manifest_file_name(source);
+            let resource_file = ResourceFile::new(source.url(), &manifest);
 
-            download_if_not_stale(
-                source.url(),
-                &cache,
-                manifest,
-                RELEASE_MANIFEST_STALENESS_TIMEOUT,
-            )
-            .map_err(ChannelManifestsError::RustReleasesIoError)
+            client
+                .fetch(resource_file)
+                .map_err(ChannelManifestsError::CachedClient)
+                .map(RetrievedDocument::into_document)
         })
         .collect::<ChannelManifestsResult<Vec<Document>>>()?;
 
@@ -84,10 +85,9 @@ mod tests {
     fn test_fetch_release_manifest_stable() {
         __internal_dl_test!({
             let meta = fetch_meta_manifest().unwrap();
-            let meta_manifest =
-                MetaManifest::try_from_str(String::from_utf8(meta.load().unwrap()).unwrap())
-                    .unwrap();
+            let content = std::str::from_utf8(meta.buffer()).unwrap();
 
+            let meta_manifest = MetaManifest::try_from_str(content).unwrap();
             let result = fetch_release_manifests(&meta_manifest, Channel::Stable);
 
             assert!(result.is_ok());

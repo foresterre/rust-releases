@@ -45,12 +45,7 @@ impl Source for ChannelManifests {
         let releases = self
             .documents
             .iter()
-            .map(|document| {
-                document
-                    .load()
-                    .map_err(ChannelManifestsError::RustReleasesIoError)
-                    .and_then(|content| parse_release_manifest(&content).map(Release::new_stable))
-            })
+            .map(|document| parse_release_manifest(document.buffer()).map(Release::new_stable))
             .collect::<ChannelManifestsResult<BTreeSet<_>>>()?;
 
         Ok(ReleaseIndex::from_iter(releases))
@@ -62,10 +57,10 @@ impl FetchResources for ChannelManifests {
     type Error = ChannelManifestsError;
 
     fn fetch_channel(channel: Channel) -> Result<Self, Self::Error> {
-        let source = fetch_meta_manifest()?;
-        let content = source.load()?;
+        let document = fetch_meta_manifest()?;
+        let content = document.buffer();
         let content =
-            String::from_utf8(content).map_err(|_| ChannelManifestsError::ParseMetaManifest)?;
+            std::str::from_utf8(content).map_err(|_| ChannelManifestsError::ParseMetaManifest)?;
 
         let meta_manifest = MetaManifest::try_from_str(content)?;
 

@@ -13,7 +13,7 @@ exclude = [
     "/bors.toml", # CI staging bot config
     "/deny.toml" # dependency license checking config
 ]
-rust-version = "1.62"
+rust-version = "1.63"
 
 [package.metadata.release]
 tag-name = "v{{version}}"
@@ -40,6 +40,7 @@ rust-dist = ["rust-releases-rust-dist"]
 rust-dist-with-cli = ["rust-releases-rust-dist-with-cli"]
 
 io = ["rust-releases-io"]
+io-http = ["rust-releases-io/http_client"]
 
 [dependencies]
 rust-releases-core = { version = "^0.22.0", path = "crates/rust-releases-core" }

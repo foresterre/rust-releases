@@ -19,6 +19,7 @@ pub struct Bisect<'slice> {
     view: &'slice [Release],
 }
 
+#[allow(deprecated)]
 impl<'slice> Bisect<'slice> {
     /// Create a new binary searcher from a slice of releases
     pub fn from_slice(view: &'slice [Release]) -> Self {
@@ -32,6 +33,7 @@ impl<'slice> Bisect<'slice> {
     /// # Example
     ///
     /// ```
+    /// # #![allow(deprecated)]
     /// use rust_releases_core::{Release, semver};
     /// use rust_releases::bisect::{Bisect, Narrow};
     ///
@@ -87,6 +89,7 @@ impl<'slice> Bisect<'slice> {
     /// # Example
     ///
     /// ```
+    /// # #![allow(deprecated)]
     /// use rust_releases_core::{Release, semver};
     /// use rust_releases::bisect::{Bisect, Narrow};
     ///
@@ -138,6 +141,7 @@ impl<'slice> Bisect<'slice> {
     /// # Example
     ///
     /// ```
+    /// # #![allow(deprecated)]
     /// use rust_releases_core::{Release, semver};
     /// use rust_releases::bisect::{Bisect, Narrow};
     ///
@@ -223,6 +227,8 @@ pub enum Narrow {
 
 #[cfg(test)]
 mod tests {
+    #![allow(deprecated)]
+
     use super::*;
     use rust_releases_core::{semver, Release};
 

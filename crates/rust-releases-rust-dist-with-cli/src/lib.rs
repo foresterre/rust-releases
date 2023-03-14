@@ -9,8 +9,9 @@
 use rust_releases_core::{semver, Release, ReleaseIndex, Source};
 use rust_releases_io::Document;
 use std::collections::BTreeSet;
+use std::fs;
 use std::iter::FromIterator;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 pub(crate) mod errors;
 
@@ -43,20 +44,15 @@ pub use crate::errors::{RustDistWithCLIError, RustDistWithCLIResult};
 /// [`aws`]: https://aws.amazon.com/cli/
 
 pub struct RustDistWithCLI {
-    source: Document,
+    path: PathBuf,
 }
 
 impl RustDistWithCLI {
     /// Creates a `RustDistWithCLI` from a path.
     pub fn from_path<P: AsRef<Path>>(path: P) -> Self {
         Self {
-            source: Document::LocalPath(path.as_ref().to_path_buf()),
+            path: path.as_ref().to_path_buf(),
         }
-    }
-
-    #[cfg(test)]
-    pub(crate) fn from_document(source: Document) -> Self {
-        Self { source }
     }
 }
 
@@ -64,8 +60,9 @@ impl Source for RustDistWithCLI {
     type Error = RustDistWithCLIError;
 
     fn build_index(&self) -> Result<ReleaseIndex, Self::Error> {
-        let contents = self.source.load()?;
-        let content = String::from_utf8(contents)?;
+        let file = fs::read(&self.path)?;
+        let document = Document::new(file);
+        let content = std::str::from_utf8(document.buffer())?;
 
         // NB: poor man's parsing for stable releases only
         let versions = content
@@ -88,7 +85,6 @@ impl Source for RustDistWithCLI {
 mod tests {
     use crate::{ReleaseIndex, RustDistWithCLI};
     use rust_releases_core::semver;
-    use rust_releases_io::Document;
 
     #[test]
     fn strategy_dist_index() {
@@ -99,7 +95,8 @@ mod tests {
             "/../../resources/rust_dist_with_cli/dist.txt",
         ]
         .join("");
-        let strategy = RustDistWithCLI::from_document(Document::LocalPath(path.into()));
+
+        let strategy = RustDistWithCLI::from_path(path);
         let index = ReleaseIndex::from_source(strategy).unwrap();
 
         assert!(index.releases().len() > 50);

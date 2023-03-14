@@ -37,7 +37,7 @@ pub(crate) fn parse_release_manifest(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use rust_releases_io::Document;
+    use std::fs;
 
     #[test]
     fn test_parse_meta_manifest() {
@@ -46,10 +46,9 @@ mod tests {
             "/../../resources/channel_manifests/stable_2016-04-12.toml",
         ]
         .join("");
-        let release_manifest = Document::LocalPath(path.into());
+        let content = fs::read(path).unwrap();
 
-        let buffer = release_manifest.load().unwrap();
-        let version = parse_release_manifest(&buffer);
+        let version = parse_release_manifest(&content);
         assert_eq!(version.unwrap(), semver::Version::parse("1.8.0").unwrap());
     }
 }

@@ -238,7 +238,10 @@ pub use rust_releases_core::{
 };
 
 #[cfg(feature = "rust-releases-io")]
-pub use rust_releases_io::{base_cache_dir, is_stale, Document, IoError, IoResult};
+pub use rust_releases_io::{
+    base_cache_dir, is_stale, BaseCacheDirError, CachedClient, CachedClientError, Document,
+    IsStaleError, RetrievedDocument, RustReleasesClient,
+};
 
 #[cfg(feature = "rust-releases-channel-manifests")]
 #[allow(deprecated)]

@@ -52,8 +52,8 @@ impl Source for RustChangelog {
     type Error = RustChangelogError;
 
     fn build_index(&self) -> Result<ReleaseIndex, Self::Error> {
-        let contents = self.source.load()?;
-        let content = String::from_utf8(contents).map_err(RustChangelogError::UnrecognizedText)?;
+        let buffer = self.source.buffer();
+        let content = std::str::from_utf8(buffer).map_err(RustChangelogError::UnrecognizedText)?;
 
         let releases = content
             .lines()
@@ -169,6 +169,7 @@ mod tests {
     use crate::RustChangelog;
     use rust_releases_core::{semver, Channel, FetchResources, Release, ReleaseIndex};
     use rust_releases_io::Document;
+    use std::fs;
     use time::macros::date;
     use yare::parameterized;
 
@@ -179,7 +180,11 @@ mod tests {
             "/../../resources/rust_changelog/RELEASES.md",
         ]
         .join("");
-        let strategy = RustChangelog::from_document(Document::LocalPath(path.into()));
+
+        let buffer = fs::read(path).unwrap();
+        let document = Document::new(buffer);
+
+        let strategy = RustChangelog::from_document(document);
         let index = ReleaseIndex::from_source(strategy).unwrap();
 
         assert!(index.releases().len() > 50);
@@ -203,10 +208,11 @@ mod tests {
             "/../../resources/rust_changelog/RELEASES_with_unreleased.md",
         ]
         .join("");
+        let buffer = fs::read(path).unwrap();
+        let document = Document::new(buffer);
 
         let date = ReleaseDate::parse("2021-09-01").unwrap();
-        let strategy =
-            RustChangelog::from_document_with_date(Document::LocalPath(path.into()), date);
+        let strategy = RustChangelog::from_document_with_date(document, date);
         let index = ReleaseIndex::from_source(strategy).unwrap();
 
         let mut releases = index.releases().iter();

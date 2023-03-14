@@ -6,7 +6,7 @@ pub type CoreResult<T> = Result<T, CoreError>;
 #[non_exhaustive]
 pub enum CoreError {
     /// Returned in case of an i/o error
-    #[error("{0}")]
+    #[error(transparent)]
     Io(#[from] std::io::Error),
 
     /// Returned in the event that the parsing a release channel with a given identifier does not exist

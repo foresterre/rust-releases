@@ -1,5 +1,4 @@
 use rust_releases_core::Channel;
-use rust_releases_io::IoError;
 
 /// A result type which binds the `RustChangelogError` to the error type.
 pub type RustChangelogResult<T> = Result<T, RustChangelogError>;
@@ -24,15 +23,23 @@ pub enum RustChangelogError {
     #[error("Unable to find a valid version in a release entry")]
     NoVersionInChangelogItem,
 
-    /// Returned in case a `rust-releases-io` error is caught
-    #[error("{0}")]
-    RustReleasesIoError(#[from] IoError),
+    /// Returned in case the base cache dir could not be found
+    #[error(transparent)]
+    BaseCacheDir(#[from] rust_releases_io::BaseCacheDirError),
+
+    /// Returned in case a cached client error is returned
+    #[error(transparent)]
+    CachedClient(#[from] rust_releases_io::CachedClientError),
+
+    /// Returned in case a staleness check error is returned
+    #[error(transparent)]
+    IsStale(#[from] rust_releases_io::IsStaleError),
 
     /// Returned in case of semver error on the hot path
     #[error("{0}, input was: {1}")]
     SemverError(rust_releases_core::semver::Error, String),
 
     /// Returned in case a input resource cannot be parsed as UTF-8
-    #[error("{0}")]
-    UnrecognizedText(#[from] std::string::FromUtf8Error),
+    #[error(transparent)]
+    UnrecognizedText(#[from] std::str::Utf8Error),
 }

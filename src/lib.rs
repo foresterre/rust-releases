@@ -106,7 +106,7 @@
 //!
 //! # Example
 //!
-//! ```rust
+//! ```rust,no_run
 //! use rust_releases_core::{FetchResources, Source, Channel, ReleaseIndex};
 //! use rust_releases_rust_changelog::RustChangelog;
 //!

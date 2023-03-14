@@ -1,0 +1,19 @@
+name: "ci-diff-lock"
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+jobs:
+  diff_lock:
+    name: diff_lock
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout_repo
+        uses: actions/checkout@v3
+      - name: install_rust
+        uses: dtolnay/rust-toolchain@stable
+      - name: generate_lockfile
+        run: cargo generate-lockfile
+      - name: diff_lockfile
+        run: diff Cargo.lock.msrv Cargo.lock || exit 0

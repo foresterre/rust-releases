@@ -7,20 +7,14 @@ description = "I/O helper crate for rust-releases"
 license = "MIT OR Apache-2.0"
 documentation = "https://docs.rs/rust-releases-channel-manifests"
 repository = "https://github.com/foresterre/rust-releases"
-rust-version = "1.62"
+rust-version = "1.63"
 
 [features]
-http_client = ["attohttpc"]
-
+http_client = ["ureq"]
 # NB: excluded from SemVer, please do not use this in your crates
 internal_dl_test = []
 
 [dependencies]
-thiserror = "1.0.24"
-
 directories-next = "2.0.0"
-
-# feature: http_client
-attohttpc = { version = "0.19.1", optional = true }
-
-
+thiserror = "1.0.24"
+ureq = { version = "2.6.2", optional = true } # feature: http_client

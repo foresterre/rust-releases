@@ -10,11 +10,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let stdout = stdout();
     let mut output = stdout.lock();
 
-    output.write("source: rust-changelog\n".as_bytes())?;
-    output.write(format!("parsed-releases: {}\n", index.releases().len()).as_bytes())?;
+    let _ = output.write("source: rust-changelog\n".as_bytes())?;
+    let _ = output.write(format!("parsed-releases: {}\n", index.releases().len()).as_bytes())?;
 
     for release in index.releases() {
-        output.write(format!("{}\n", release.version()).as_bytes())?;
+        let _ = output.write(format!("{}\n", release.version()).as_bytes())?;
     }
 
     Ok(())

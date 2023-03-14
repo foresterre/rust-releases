@@ -5,16 +5,20 @@
 #![deny(clippy::all)]
 #![deny(unsafe_code)]
 
-pub(crate) mod document;
-pub(crate) mod errors;
-pub(crate) mod io;
+const DEFAULT_MEMORY_SIZE: usize = 4096;
+
+mod client;
+mod document;
+mod io;
 
 pub use crate::{
-    document::Document, errors::IoError, errors::IoResult, io::base_cache_dir, io::is_stale,
+    client::{ResourceFile, RustReleasesClient},
+    document::{Document, RetrievalLocation, RetrievedDocument},
+    io::{base_cache_dir, is_stale, BaseCacheDirError, IsStaleError},
 };
 
 #[cfg(feature = "http_client")]
-pub use crate::io::download_if_not_stale;
+pub use crate::client::cached_client::{CachedClient, CachedClientError};
 
 /// A macro used to feature gate tests which fetch resources from third party services.
 ///

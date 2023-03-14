@@ -44,11 +44,11 @@ impl Source for RustDist {
     type Error = RustDistError;
 
     fn build_index(&self) -> Result<ReleaseIndex, Self::Error> {
-        let contents = self.source.load()?;
-        let content = String::from_utf8(contents).map_err(RustDistError::UnrecognizedText)?;
+        let buffer = self.source.buffer();
+        let content = std::str::from_utf8(buffer).map_err(RustDistError::UnrecognizedText)?;
 
         let releases = MATCHER
-            .captures_iter(&content)
+            .captures_iter(content)
             .map(parse_release)
             .collect::<RustDistResult<BTreeSet<Release>>>()?;
 
@@ -94,6 +94,7 @@ mod tests {
     use crate::RustDist;
     use rust_releases_core::{semver, Release, ReleaseIndex};
     use rust_releases_io::Document;
+    use std::fs;
 
     #[test]
     fn source_rust_dist() {
@@ -102,7 +103,11 @@ mod tests {
             "/../../resources/rust_dist/dist_static-rust-lang-org.txt",
         ]
         .join("");
-        let strategy = RustDist::from_document(Document::LocalPath(path.into()));
+
+        let buffer = fs::read(path).unwrap();
+        let document = Document::new(buffer);
+
+        let strategy = RustDist::from_document(document);
         let index = ReleaseIndex::from_source(strategy).unwrap();
 
         // 74 releases including minor releases from 1.0.0 to 1.53.0

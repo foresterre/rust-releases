@@ -7,7 +7,7 @@ license = "MIT OR Apache-2.0"
 edition = "2018"
 documentation = "https://docs.rs/rust-releases-channel-manifests"
 repository = "https://github.com/foresterre/rust-releases"
-rust-version = "1.62"
+rust-version = "1.63"
 
 [dependencies]
 rust-releases-core = { version = "^0.22.0", path = "../rust-releases-core" }

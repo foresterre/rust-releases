@@ -8,19 +8,19 @@ use aws_sdk_s3::middleware::DefaultMiddleware;
 use aws_sdk_s3::model::Object;
 use aws_sdk_s3::operation::ListObjectsV2;
 use aws_sdk_s3::output::ListObjectsV2Output;
-use aws_sdk_s3::{Config, Region};
 use aws_sig_auth::signer::OperationSigningConfig;
 use aws_sig_auth::signer::SigningRequirements;
 use aws_smithy_client::erase::DynConnector;
 use rust_releases_io::{base_cache_dir, is_stale, Document};
 use std::convert::{TryFrom, TryInto};
+use std::fs;
 use std::fs::{File, OpenOptions};
 use std::io::{BufWriter, Write};
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 // Rust currently always uses the US West 1 bucket
-const RUST_DIST_REGION: Region = Region::from_static("us-west-1");
+const RUST_DIST_REGION: aws_sdk_s3::Region = aws_sdk_s3::Region::from_static("us-west-1");
 
 // The bucket from which the official Rust sources are distributed
 const RUST_DIST_BUCKET: &str = "static-rust-lang-org";
@@ -62,7 +62,7 @@ trait ChunkClient {
 // The default Rust Releases client
 struct Client {
     #[allow(dead_code)]
-    aws_config: Config,
+    aws_config: aws_sdk_s3::Config,
     aws_s3_client: SmithyClient,
     runtime: tokio::runtime::Runtime,
 }
@@ -99,7 +99,7 @@ type SmithyClient = aws_smithy_client::Client<DynConnector, DefaultMiddleware>;
 // https://github.com/awslabs/aws-sdk-rust/issues/425#issuecomment-1020265854
 async fn list_objects(
     client: &SmithyClient,
-    conf: &Config,
+    conf: &aws_sdk_s3::Config,
     offset: Option<impl Into<String>>,
 ) -> Result<ListObjectsV2Output, AwsError> {
     let input = ListObjectsV2::builder()
@@ -201,23 +201,19 @@ impl BiWriter<BufWriter<Vec<u8>>, BufWriter<File>> {
 }
 
 /// A data structure which holds a writer which writes both to memory and to a file.
-struct PersistingMemCache<P: AsRef<Path>> {
-    cache_file: P,
+struct PersistingMemCache {
     buffer: BiWriter<BufWriter<Vec<u8>>, BufWriter<File>>,
 }
 
-impl<P: AsRef<Path>> PersistingMemCache<P> {
-    fn try_from_path(path: P) -> RustDistResult<Self> {
+impl PersistingMemCache {
+    fn try_from_path<P: AsRef<Path>>(path: P) -> RustDistResult<Self> {
         let buffer = BiWriter::try_from_path(path.as_ref())?;
 
-        Ok(Self {
-            cache_file: path,
-            buffer,
-        })
+        Ok(Self { buffer })
     }
 }
 
-impl<P: AsRef<Path>> Write for PersistingMemCache<P> {
+impl Write for PersistingMemCache {
     fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
         self.buffer.write(buf)
     }
@@ -227,27 +223,29 @@ impl<P: AsRef<Path>> Write for PersistingMemCache<P> {
     }
 }
 
-impl<P: AsRef<Path>> TryFrom<PersistingMemCache<P>> for Document {
+impl TryFrom<PersistingMemCache> for Document {
     type Error = RustDistError;
 
-    fn try_from(value: PersistingMemCache<P>) -> Result<Self, Self::Error> {
-        let path = value.cache_file.as_ref().to_path_buf();
+    fn try_from(value: PersistingMemCache) -> Result<Self, Self::Error> {
         let mem = value.buffer.into_owned_memory()?;
 
-        Ok(Document::RemoteCached(path, mem))
+        Ok(Document::new(mem))
     }
 }
 
 fn check_cache(output_path: &Path) -> RustDistResult<Option<Document>> {
     if output_path.is_file() && !is_stale(output_path, TIMEOUT)? {
-        Ok(Some(Document::LocalPath(output_path.to_path_buf())))
+        let buffer = fs::read(output_path)?;
+        let document = Document::new(buffer);
+
+        Ok(Some(document))
     } else {
         let parent = output_path.parent().ok_or_else(|| {
             let error: std::io::Error = std::io::ErrorKind::NotFound.into();
             error
         })?;
 
-        std::fs::create_dir_all(parent)?;
+        fs::create_dir_all(parent)?;
         Ok(None)
     }
 }
@@ -279,7 +277,7 @@ pub(crate) fn fetch() -> RustDistResult<Document> {
     buffer.try_into()
 }
 
-fn write_objects(buffer: &mut impl std::io::Write, objects: &[Object]) -> Option<String> {
+fn write_objects(buffer: &mut impl Write, objects: &[Object]) -> Option<String> {
     for object in objects {
         if let Some(key) = object.key.as_deref() {
             let _ = buffer.write(format!("{}\n", key).as_bytes());

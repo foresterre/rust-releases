@@ -1,5 +1,4 @@
 use rust_releases_core::{semver, Channel};
-use rust_releases_io::IoError;
 
 /// A result type which binds the `ChannelManifestsError` to the error type.
 pub type ChannelManifestsResult<T> = Result<T, ChannelManifestsError>;
@@ -13,7 +12,7 @@ pub enum ChannelManifestsError {
     ChannelNotAvailable(Channel),
 
     /// Returned when a retrieved manifest is not decodable as TOML.
-    #[error("{0}")]
+    #[error(transparent)]
     DeserializeToml(#[from] toml::de::Error),
 
     /// Returned when the manifest date can not be parsed.
@@ -29,12 +28,16 @@ pub enum ChannelManifestsError {
     ParseMetaManifest,
 
     /// Returned when there is an issue with a semver version.
-    #[error("{0}")]
+    #[error(transparent)]
     ParseRustVersion(#[from] semver::Error),
 
     /// Returned in case of an I/O error.
-    #[error("{0}")]
-    RustReleasesIoError(#[from] IoError),
+    #[error(transparent)]
+    BaseCacheDir(#[from] rust_releases_io::BaseCacheDirError),
+
+    /// Returned in case the client failed to fetch a resource file.
+    #[error(transparent)]
+    CachedClient(#[from] rust_releases_io::CachedClientError),
 
     /// Returned when the Rust version can not be found in a release manifest.
     #[error("Unable to find Rust version in release manifest")]

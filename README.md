@@ -1,6 +1,6 @@
 # rust-releases
 
-[![GitHub Actions: CI](https://github.com/foresterre/rust-releases/actions/workflows/ci.yml/badge.svg)](https://github.com/foresterre/rust-releases/actions/workflows/ci.yml)
+[![GitHub Actions: CI](https://github.com/foresterre/rust-releases/actions/workflows/ci.yml/badge.svg)](https://github.com/foresterre/rust-releases/actions/workflows/msrv.yml)
 [![Crates.io version shield](https://img.shields.io/crates/v/rust-releases.svg)](https://crates.io/crates/rust-releases)
 [![Docs](https://docs.rs/rust-releases/badge.svg)](https://docs.rs/rust-releases)
 [![Crates.io license shield](https://img.shields.io/crates/l/rust-releases.svg)](https://crates.io/crates/rust-releases)
@@ -10,6 +10,8 @@
 |-----------------------|------|
 | 0.21.1                | 1.51 |
 | 0.22.0                | 1.53 |
+| ~~0.23.0~~            | 1.63 |
+| 0.24.0                | 1.63 |
 
 `*` When unreleased, MSRV subject to change  
 

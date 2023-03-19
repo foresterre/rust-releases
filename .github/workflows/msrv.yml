@@ -55,8 +55,8 @@ jobs:
         run: cargo install cargo-msrv
       - name: version_of_cargo_msrv
         run: cargo msrv --version # as of writing: 0.14.0 (required for verify)
-      - name: use_msrv_lock_file
-        run: cargo msrv --output-format json --path ${{ matrix.crate }} verify -- cargo check --all-features --locked
+      - name: run_cargo_msrv_verify
+        run: cargo msrv --output-format json --path ${{ matrix.crate }} verify -- cargo check --all-features
       - name: run_cargo_msrv
         if: ${{ failure() }}
-        run: cargo msrv --output-format json --path ${{ matrix.crate }} -- cargo check --all-features --locked
+        run: cargo msrv --output-format json --path ${{ matrix.crate }} -- cargo check --all-features

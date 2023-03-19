@@ -132,7 +132,7 @@ fn read_from_path(path: &Path) -> Result<Vec<u8>, CachedClientError> {
     let mut memory = Vec::with_capacity(DEFAULT_MEMORY_SIZE);
     reader
         .read_to_end(&mut memory)
-        .map_err(|err| IoError::without_path(err))?;
+        .map_err(IoError::without_path)?;
 
     Ok(memory)
 }

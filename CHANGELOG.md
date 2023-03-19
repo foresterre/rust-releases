@@ -4,7 +4,23 @@
 
 [Unreleased]: https://github.com/foresterre/rust-releases
 
-## [0.23.0]
+## [0.24.0] - 2023-03-19
+
+### Added
+
+* **rust-releases-io** Created new `IoError` which provides extra details on top of `std::io::Error` and related I/O errors.
+
+### Fixed
+
+* **rust-releases-io** Fixed bug in `CachedClient` where the cache directory would not be created if it didn't exist prior, 
+  and instead would return an error _"No such file or directory (os error 2)"_.
+
+[0.24.0]: https://github.com/foresterre/rust-releases/releases/tag/v0.24.0
+
+## ~~[0.23.0]~~* - 2023-03-15
+
+_* yanked on 2023-03-19, because **rust-releases-io** contained a bug where
+the `CachedClient` could not create its cache location, if it didn't exist yet._
 
 ### Added
 

@@ -1,6 +1,6 @@
 [package]
 name = "rust-releases"
-version = "0.23.0"
+version = "0.24.0"
 authors = ["Martijn Gribnau <garm@ilumeo.com>"]
 description = "Find, index and obtain all officially available Rust releases"
 license = "MIT OR Apache-2.0"
@@ -43,12 +43,12 @@ io = ["rust-releases-io"]
 io-http = ["rust-releases-io/http_client"]
 
 [dependencies]
-rust-releases-core = { version = "^0.23.0", path = "crates/rust-releases-core" }
-rust-releases-io = { version = "^0.23.0", path = "crates/rust-releases-io", optional = true }
-rust-releases-channel-manifests = { version = "^0.23.0", path = "crates/rust-releases-channel-manifests", optional = true }
-rust-releases-rust-changelog = { version = "^0.23.0", path = "crates/rust-releases-rust-changelog", optional = true }
-rust-releases-rust-dist = { version = "^0.23.0", path = "crates/rust-releases-rust-dist", optional = true }
-rust-releases-rust-dist-with-cli = { version = "^0.23.0", path = "crates/rust-releases-rust-dist-with-cli", optional = true }
+rust-releases-core = { version = "^0.24.0", path = "crates/rust-releases-core" }
+rust-releases-io = { version = "^0.24.0", path = "crates/rust-releases-io", optional = true }
+rust-releases-channel-manifests = { version = "^0.24.0", path = "crates/rust-releases-channel-manifests", optional = true }
+rust-releases-rust-changelog = { version = "^0.24.0", path = "crates/rust-releases-rust-changelog", optional = true }
+rust-releases-rust-dist = { version = "^0.24.0", path = "crates/rust-releases-rust-dist", optional = true }
+rust-releases-rust-dist-with-cli = { version = "^0.24.0", path = "crates/rust-releases-rust-dist-with-cli", optional = true }
 
 [dev-dependencies]
 yare = "1.0.0"

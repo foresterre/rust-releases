@@ -23,13 +23,34 @@ pub enum CachedClientError {
     Http(#[from] HttpError),
 
     /// Returned in case of an `std::io::Error`.
-    #[error("I/O error: {0}")]
-    Io(#[from] io::Error),
+    #[error(transparent)]
+    Io(#[from] IoError),
 
     /// Returned in case it wasn't possible to check whether the cache file is
     /// stale or not.
     #[error(transparent)]
     IsStale(#[from] IsStaleError),
+}
+
+#[derive(Debug, thiserror::Error)]
+#[error("I/O error: {error}{}", .path.as_ref().map(|p| format!(" at '{}'", p.display())).unwrap_or_else(|| "".to_string()))]
+pub struct IoError {
+    error: io::Error,
+    path: Option<PathBuf>,
+}
+
+impl IoError {
+    fn new(error: io::Error, path: Option<PathBuf>) -> Self {
+        Self { error, path }
+    }
+
+    pub fn without_path(error: io::Error) -> Self {
+        Self::new(error, None)
+    }
+
+    pub fn with_path(error: io::Error, path: PathBuf) -> Self {
+        Self::new(error, Some(path))
+    }
 }
 
 /// An error which is returned for a fault which occurred during processing of an HTTP request.
@@ -104,10 +125,14 @@ impl RustReleasesClient for CachedClient {
 }
 
 fn read_from_path(path: &Path) -> Result<Vec<u8>, CachedClientError> {
-    let mut reader = BufReader::new(fs::File::open(path)?);
+    let mut reader = BufReader::new(
+        fs::File::open(path).map_err(|err| IoError::with_path(err, path.to_path_buf()))?,
+    );
 
     let mut memory = Vec::with_capacity(DEFAULT_MEMORY_SIZE);
-    reader.read_to_end(&mut memory)?;
+    reader
+        .read_to_end(&mut memory)
+        .map_err(IoError::without_path)?;
 
     Ok(memory)
 }
@@ -118,13 +143,17 @@ fn setup_cache_folder(manifest_path: &Path) -> Result<(), CachedClientError> {
     if let Some(cache_folder) = manifest_path.parent() {
         // Check whether the manifest already exists - if it does, the cache folder is already
         // present and doesn't need to be created.
-        let manifest_exists = manifest_path.try_exists()?;
+        let manifest_exists = manifest_path
+            .try_exists()
+            .map_err(|err| IoError::with_path(err, manifest_path.to_path_buf()))?;
 
         if !manifest_exists {
             // Check that the cache folder doesn't exist yet.
-            let cache_folder_metadata = fs::metadata(cache_folder)?;
+            let cache_folder_metadata = fs::metadata(cache_folder)
+                .map_err(|err| IoError::with_path(err, cache_folder.to_path_buf()))?;
             if !cache_folder_metadata.is_dir() {
-                fs::create_dir_all(cache_folder)?;
+                fs::create_dir_all(cache_folder)
+                    .map_err(|err| IoError::with_path(err, cache_folder.to_path_buf()))?;
             }
         }
     }
@@ -152,13 +181,21 @@ fn write_document_and_cache(
 ) -> Result<Document, CachedClientError> {
     let mut buffer = Vec::with_capacity(DEFAULT_MEMORY_SIZE);
 
-    if reader.read_to_end(&mut buffer)? == 0 {
+    let bytes_read = reader
+        .read_to_end(&mut buffer)
+        .map_err(|err| IoError::with_path(err, file_path.to_path_buf()))?;
+
+    if bytes_read == 0 {
         return Err(CachedClientError::EmptyFile);
     }
 
-    let mut file = fs::File::create(file_path)?;
+    let mut file = fs::File::create(file_path)
+        .map_err(|err| IoError::with_path(err, file_path.to_path_buf()))?;
+
     let mut writer = BufWriter::new(&mut file);
-    writer.write_all(&buffer)?;
+    writer
+        .write_all(&buffer)
+        .map_err(|err| IoError::with_path(err, file_path.to_path_buf()))?;
 
     Ok(Document::new(buffer))
 }

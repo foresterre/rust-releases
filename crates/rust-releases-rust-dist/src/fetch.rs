@@ -4,13 +4,11 @@
 
 use crate::errors::{AwsError, RustDistError, RustDistResult};
 use aws_config::AppName;
-use aws_sdk_s3::middleware::DefaultMiddleware;
+use aws_sdk_s3::config::retry::RetryConfig;
 use aws_sdk_s3::model::Object;
-use aws_sdk_s3::operation::ListObjectsV2;
 use aws_sdk_s3::output::ListObjectsV2Output;
 use aws_sig_auth::signer::OperationSigningConfig;
 use aws_sig_auth::signer::SigningRequirements;
-use aws_smithy_client::erase::DynConnector;
 use rust_releases_io::{base_cache_dir, is_stale, Document};
 use std::convert::{TryFrom, TryInto};
 use std::fs;
@@ -61,9 +59,7 @@ trait ChunkClient {
 
 // The default Rust Releases client
 struct Client {
-    #[allow(dead_code)]
-    aws_config: aws_sdk_s3::Config,
-    aws_s3_client: SmithyClient,
+    aws_s3_client: aws_sdk_s3::Client,
     runtime: tokio::runtime::Runtime,
 }
 
@@ -79,53 +75,48 @@ impl Client {
             .region(RUST_DIST_REGION)
             .build();
 
-        let aws_s3_client = aws_smithy_client::Builder::new()
-            .middleware(DefaultMiddleware::new())
-            .native_tls_connector(Default::default())
-            .build();
+        let aws_s3_client = aws_sdk_s3::Client::from_conf(aws_config);
 
         Ok(Self {
-            aws_config,
             aws_s3_client,
             runtime,
         })
     }
 }
 
-type SmithyClient = aws_smithy_client::Client<DynConnector, DefaultMiddleware>;
-
 // Uses workaround for using unsigned requests, since aws-sdk-s3 0.6.0 does not have an
 // anonymous credentials provider:
 // https://github.com/awslabs/aws-sdk-rust/issues/425#issuecomment-1020265854
 async fn list_objects(
-    client: &SmithyClient,
-    conf: &aws_sdk_s3::Config,
+    client: &aws_sdk_s3::Client,
     offset: Option<impl Into<String>>,
 ) -> Result<ListObjectsV2Output, AwsError> {
-    let input = ListObjectsV2::builder()
+    let operation = client
+        .list_objects_v2()
         .bucket(RUST_DIST_BUCKET)
         .max_keys(REQUEST_SIZE)
         .set_start_after(offset.map(Into::into))
         .prefix(OBJECT_PREFIX)
-        .build()
+        .customize()
+        .await
         .map_err(|_| AwsError::ListObjectsBuildOperationInput)?;
 
-    let mut operation = input
-        .make_operation(conf)
-        .await
-        .map_err(|_| AwsError::ListObjectsMakeOperation)?;
+    let customized_operation = operation
+        .map_operation(|mut op| {
+            {
+                let mut properties = op.properties_mut();
+                let signing_config = properties
+                    .get_mut::<OperationSigningConfig>()
+                    .ok_or_else(RetryConfig::standard)?;
 
-    {
-        let mut properties = operation.properties_mut();
-        let signing_config = properties
-            .get_mut::<OperationSigningConfig>()
-            .ok_or(AwsError::DisableSigning)?;
+                signing_config.signing_requirements = SigningRequirements::Disabled;
+            }
+            Ok(op)
+        })
+        .map_err(|_err: RetryConfig| AwsError::DisableSigning)?;
 
-        signing_config.signing_requirements = SigningRequirements::Disabled;
-    }
-
-    client
-        .call(operation)
+    customized_operation
+        .send()
         .await
         .map_err(|e| AwsError::ListObjectsError(Box::new(e)))
 }
@@ -136,9 +127,9 @@ impl ChunkClient for Client {
         offset: Option<impl Into<String>>,
         to: &mut impl Write,
     ) -> RustDistResult<ChunkState> {
-        let raw =
-            self.runtime
-                .block_on(list_objects(&self.aws_s3_client, &self.aws_config, offset))?;
+        let raw = self
+            .runtime
+            .block_on(list_objects(&self.aws_s3_client, offset))?;
 
         let objects = raw.contents.ok_or(RustDistError::ChunkMetadataMissing)?;
         let state = match write_objects(to, &objects) {

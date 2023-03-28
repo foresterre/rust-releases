@@ -12,6 +12,7 @@
 | 0.22.0                | 1.53 |
 | ~~0.23.0~~            | 1.63 |
 | 0.24.0                | 1.63 |
+| 0.25.0                | 1.63 |
 
 `*` When unreleased, MSRV subject to change  
 

@@ -18,6 +18,8 @@
 * **rust-releases-rust-dist** Removed `aws-smithy-client`
 * **rust-releases-rust-dist** Removed `aws-smithy-http`
 
+[0.25.0]: https://github.com/foresterre/rust-releases/releases/tag/v0.25.0
+
 ## [0.24.0] - 2023-03-19
 
 ### Added

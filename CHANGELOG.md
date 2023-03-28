@@ -4,6 +4,20 @@
 
 [Unreleased]: https://github.com/foresterre/rust-releases
 
+## [0.25.0] - 2023-03-29
+
+### Changed
+
+*  **rust-releases-rust-dist** Replaced `aws_smithy_http::result::SdkError` in `AwsError::ListObjectsError` with `aws_sdk_s3::types::SdkError`.
+
+### Dependency updates
+
+* **rust-releases-rust-dist** Updated `aws-config` to `0.54.1`.
+* **rust-releases-rust-dist** Updated `aws-sdk-s3` to `0.24.0`.
+* **rust-releases-rust-dist** Updated `aws-sig-auth` to `0.54.1`.
+* **rust-releases-rust-dist** Removed `aws-smithy-client`
+* **rust-releases-rust-dist** Removed `aws-smithy-http`
+
 ## [0.24.0] - 2023-03-19
 
 ### Added

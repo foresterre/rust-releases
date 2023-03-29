@@ -18,6 +18,7 @@ rust-version = "1.67"
 
 [workspace]
 members = [
+    "crates/rust-release",
     "crates/rust-releases-core",
     "crates/rust-releases-core2",
     "crates/rust-releases-compact-index",
@@ -25,7 +26,8 @@ members = [
     "crates/rust-releases-channel-manifests",
     "crates/rust-releases-rust-changelog",
     "crates/rust-releases-rust-dist",
-    "crates/rust-releases-rust-dist-with-cli",
+    "crates/rust-releases-rust-dist-with-cli", # todo: remove support
+    # todo: add rr-github
     "crates/rust-toolchain",
 ]
 

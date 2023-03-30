@@ -14,7 +14,7 @@ rust-releases-core = { version = "^0.25.0", path = "../rust-releases-core" }
 rust-releases-io = { version = "^0.25.0", path = "../rust-releases-io" }
 
 aws-config = "0.54.1"
-aws-sdk-s3 = "0.24.0"
+aws-sdk-s3 = "0.25.0"
 aws-sig-auth = "0.54.1" # required for unsigned requests workaround
 
 lazy_static = "1.4.0"

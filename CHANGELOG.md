@@ -4,6 +4,22 @@
 
 [Unreleased]: https://github.com/foresterre/rust-releases
 
+## [0.26.0] - 2023-03-29
+
+### Changed
+
+*  **rust-releases-rust-dist** Replaced `aws_sdk_s3::types::SdkError` in `AwsError::ListObjectsError` with `aws_sdk_s3::error::SdkError`.
+*  **rust-releases-rust-dist** Replaced `aws_sdk_s3::error::ListObjectsV2Error` in `AwsError::ListObjectsError` with `aws_sdk_s3::operation::list_objects_v2::ListObjectsV2Error`.
+
+### Dependency updates
+
+* **rust-releases-rust-dist** Updated `aws-config` to `0.55.0`.
+* **rust-releases-rust-dist** Updated `aws-sdk-s3` to `0.25.0`.
+* **rust-releases-rust-dist** Updated `aws-sig-auth` to `0.55.0`.
+
+[0.26.0]: https://github.com/foresterre/rust-releases/releases/tag/v0.26.0
+
+
 ## [0.25.0] - 2023-03-29
 
 ### Changed

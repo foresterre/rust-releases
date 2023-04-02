@@ -5,8 +5,9 @@
 use crate::errors::{AwsError, RustDistError, RustDistResult};
 use aws_config::AppName;
 use aws_sdk_s3::config::retry::RetryConfig;
-use aws_sdk_s3::model::Object;
-use aws_sdk_s3::output::ListObjectsV2Output;
+use aws_sdk_s3::config::Region;
+use aws_sdk_s3::operation::list_objects_v2::ListObjectsV2Output;
+use aws_sdk_s3::types::Object;
 use aws_sig_auth::signer::OperationSigningConfig;
 use aws_sig_auth::signer::SigningRequirements;
 use rust_releases_io::{base_cache_dir, is_stale, Document};
@@ -18,7 +19,7 @@ use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 // Rust currently always uses the US West 1 bucket
-const RUST_DIST_REGION: aws_sdk_s3::Region = aws_sdk_s3::Region::from_static("us-west-1");
+const RUST_DIST_REGION: Region = Region::from_static("us-west-1");
 
 // The bucket from which the official Rust sources are distributed
 const RUST_DIST_BUCKET: &str = "static-rust-lang-org";

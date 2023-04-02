@@ -1,6 +1,6 @@
 [package]
 name = "rust-releases-rust-dist"
-version = "0.25.0"
+version = "0.26.0"
 authors = ["Martijn Gribnau <garm@ilumeo.com>"]
 edition = "2018"
 description = "RustDist source implementation for rust-releases"
@@ -10,8 +10,8 @@ repository = "https://github.com/foresterre/rust-releases"
 rust-version = "1.63"
 
 [dependencies]
-rust-releases-core = { version = "^0.25.0", path = "../rust-releases-core" }
-rust-releases-io = { version = "^0.25.0", path = "../rust-releases-io" }
+rust-releases-core = { version = "^0.26.0", path = "../rust-releases-core" }
+rust-releases-io = { version = "^0.26.0", path = "../rust-releases-io" }
 
 aws-config = "0.55.0"
 aws-sdk-s3 = "0.25.0"

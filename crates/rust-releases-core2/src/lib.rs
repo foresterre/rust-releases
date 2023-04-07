@@ -1,3 +1,10 @@
-pub mod platform;
-pub mod release;
-pub mod rust_releases;
+pub struct Release {
+    toolchain: rust_toolchain::Toolchain,
+}
+
+#[test]
+fn test() {
+    let release = Release {
+        toolchain: rust_toolchain::RustupToolchain::active().unwrap().into(),
+    };
+}

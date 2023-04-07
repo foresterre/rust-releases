@@ -9,3 +9,4 @@ documentation = "https://docs.rs/rust-releases"
 repository = "https://github.com/foresterre/rust-releases"
 
 [dependencies]
+rust-toolchain = { path = "../rust-toolchain" }

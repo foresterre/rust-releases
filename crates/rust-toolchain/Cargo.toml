@@ -26,3 +26,4 @@ version-number = "0.2.2"
 target-lexicon = "0.12.6"
 
 [dev-dependencies]
+yare = "1"

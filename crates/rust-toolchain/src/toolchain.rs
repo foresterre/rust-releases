@@ -8,9 +8,7 @@ pub struct Toolchain {
     pub channel: Channel,
     pub date: ReleaseDate,
     pub platform: Platform,
-    // Different from Channel::Versioned, since stable and beta releases
-    // also have a version. Maybe enumify?
-    pub(crate) version: Option<RustVersion>,
+    pub version: Option<RustVersion>,
 }
 
 impl Toolchain {

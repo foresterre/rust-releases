@@ -33,4 +33,17 @@ struct DateImpl {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[yare::parameterized(
+        zeroes = { ReleaseDate::new(0, 0, 0), 0, 0, 0  },
+        one_two_three = { ReleaseDate::new(1, 2, 3), 1, 2, 3 },
+        max = { ReleaseDate::new(u16::MAX, u8::MAX, u8::MAX), u16::MAX, u8::MAX, u8::MAX },
+    )]
+    fn create_release_date(date: ReleaseDate, year: u16, month: u8, day: u8) {
+        let expected = ReleaseDate {
+            date: DateImpl { year, month, day },
+        };
+
+        assert_eq!(date, expected);
+    }
 }

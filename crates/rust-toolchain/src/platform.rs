@@ -39,4 +39,15 @@ impl Platform {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn create_platform() {
+        let this_platform = Platform::host();
+
+        let expected = Platform {
+            platform: target_lexicon::HOST,
+        };
+
+        assert_eq!(this_platform, expected);
+    }
 }

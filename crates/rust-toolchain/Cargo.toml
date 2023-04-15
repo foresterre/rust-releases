@@ -14,7 +14,7 @@ repository = "https://github.com/foresterre/rust-releases"
 # does not support labels, but does support conversions between the two and three
 # components, where semver is three components only.
 # For this library we do not need the labels, so something more minimal is desirable.
-version-number = "0.2.2"
+version-number = "0.3.0"
 
 # A dependency which describes a "platform" via its target triple.
 # There are two crates which are almost equal in support: `platforms` and

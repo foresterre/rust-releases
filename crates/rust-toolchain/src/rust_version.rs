@@ -5,31 +5,32 @@
 /// metadata, and other labels, are rejected.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct RustVersion {
-    version: version_number::MajorMinorPatch,
+    version: version_number::FullVersion,
 }
 
 impl RustVersion {
     pub fn new(major: u64, minor: u64, patch: u64) -> Self {
-        todo!()
-        // Self {
-        //     version: version_number::MajorMinorPatch {
-        //         major, minor, patch
-        //     }
-        // }
+        Self {
+            version: version_number::FullVersion {
+                major,
+                minor,
+                patch,
+            },
+        }
     }
 }
 
 impl RustVersion {
     pub fn major(&self) -> u64 {
-        todo!()
+        self.version.major
     }
 
     pub fn minor(&self) -> u64 {
-        todo!()
+        self.version.minor
     }
 
     pub fn patch(&self) -> u64 {
-        todo!()
+        self.version.patch
     }
 }
 

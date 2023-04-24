@@ -2,7 +2,7 @@ use crate::{Channel, Platform, ReleaseDate, RustVersion};
 
 mod rustup_toolchain;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 #[non_exhaustive]
 pub struct Toolchain {
     pub channel: Channel,
@@ -27,6 +27,18 @@ impl Toolchain {
             platform,
             version,
         }
+    }
+
+    pub fn channel(&self) -> Channel {
+        self.channel
+    }
+
+    pub fn release_date(&self) -> &ReleaseDate {
+        &self.date
+    }
+
+    pub fn platform(&self) -> &Platform {
+        &self.platform
     }
 
     /// The version of the toolchain, if any.

@@ -10,7 +10,7 @@ use std::str::FromStr;
 // Extra information may be found here:
 // - https://doc.rust-lang.org/rustc/platform-support.html
 // - https://rust-lang.github.io/rustup/concepts/toolchains.html
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct Platform {
     platform: target_lexicon::Triple,
 }

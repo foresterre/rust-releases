@@ -1,7 +1,7 @@
 /// A Rust release channel
 ///
 /// Alpha releases, which are no longer used, are unsupported.
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum Channel {
     /// The stable release channel
     Stable,

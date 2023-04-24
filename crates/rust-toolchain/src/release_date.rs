@@ -3,7 +3,7 @@
 /// It is up to the implementer to ensure that a constructed date is valid.
 /// E.g. this date may accept `2023-02-30`, while February only has 28 or 29 days in
 /// the Gregorian calendar.
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, Hash, PartialEq, Ord, PartialOrd)]
 pub struct ReleaseDate {
     date: DateImpl,
 }
@@ -23,7 +23,7 @@ impl ReleaseDate {
 /// Up to the caller to ensure it matches with their reality of a 'valid date'.
 ///
 /// Not intended to be compatible with common date standards
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, Ord, PartialOrd)]
 struct DateImpl {
     year: u16,
     month: u8,

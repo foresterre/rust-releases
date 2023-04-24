@@ -21,12 +21,14 @@
 #![deny(unsafe_code)]
 
 mod channel;
+mod component;
 mod platform;
 mod release_date;
 mod rust_version;
 mod toolchain;
 
 pub use channel::Channel;
+pub use component::Component;
 pub use platform::Platform;
 pub use release_date::ReleaseDate;
 pub use rust_version::RustVersion;

@@ -1,54 +1,38 @@
-use std::collections::BTreeSet;
+use std::collections::{BTreeSet, HashMap};
+use std::iter;
 
-/// A data structure consisting of the known Rust releases.
-///
-/// Whether a release is known, and how much information is known about a release,
-/// depends on the source used to build up this information.
-pub struct Releases {
-    releases: BTreeSet<Release>,
-}
+mod register;
+mod release;
 
-impl Releases {
-    pub fn find(&self) -> Option<&Release> {
-        todo!()
-    }
-
-    /// Least recent to most recent
-    pub fn all_ascending(&self) -> impl Iterator<Item = Release> {
-        todo!();
-    }
-
-    /// Most recent to least recent
-    pub fn all_descending(&self) -> impl Iterator<Item = Release> {
-        todo!();
-    }
-
-    pub fn last(&self) -> &Release {
-        todo!();
-    }
-}
-
-pub struct ReleasesBuilder {
-    f: (),
-}
-
-impl ReleasesBuilder {
-    pub fn from_parser<P>(parser: P) -> Self {
-        todo!()
-    }
-
-    pub fn build(self) -> Releases {
-        todo!()
-    }
-}
-
-pub struct Release {
-    toolchain: rust_toolchain::Toolchain,
-}
+/// todo!
+pub use register::Register;
+/// todo!
+pub use release::Release;
 
 #[test]
 fn test() {
+    pub struct ReleasesBuilder {
+        f: (),
+    }
+
+    impl ReleasesBuilder {
+        pub fn from_parser<P>(parser: P) -> Self {
+            todo!()
+        }
+
+        pub fn build(self) -> Register {
+            todo!()
+        }
+    }
+
     let builder = ReleasesBuilder::from_parser(todo!()).build();
 
     let last_release = builder.last();
+}
+
+#[test]
+fn rust_releases() {
+    let input = vec![];
+
+    let register = Register::from_iter(input.iter());
 }

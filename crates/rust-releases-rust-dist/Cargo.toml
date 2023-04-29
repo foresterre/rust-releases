@@ -13,14 +13,14 @@ rust-version = "1.63"
 rust-releases-core = { version = "^0.26.0", path = "../rust-releases-core" }
 rust-releases-io = { version = "^0.26.0", path = "../rust-releases-io" }
 
-aws-config = "0.55.0"
+aws-config = "0.55.1"
 aws-sdk-s3 = "0.26.0"
-aws-sig-auth = "0.55.0" # required for unsigned requests workaround
+aws-sig-auth = "0.55.1" # required for unsigned requests workaround
 
 lazy_static = "1.4.0"
-regex = "1.4.5"
-thiserror = "1.0.24"
+regex = "1.8.1"
+thiserror = "1.0.40"
 
 [dependencies.tokio]
-version = "1.13.1" # minimum is set because of RUSTSEC-2021-0124 advisory: https://rustsec.org/advisories/RUSTSEC-2021-0124
+version = "1.28.0" # minimum is set because of RUSTSEC-2021-0124 advisory: https://rustsec.org/advisories/RUSTSEC-2021-0124
 features = ["full"] # full required by aws-sdk-s3

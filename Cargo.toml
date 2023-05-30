@@ -18,7 +18,6 @@ rust-version = "1.67"
 
 [workspace]
 members = [
-    "crates/rust-release",
     "crates/rust-releases-core",
     "crates/rust-releases-core2",
     "crates/rust-releases-compact-index",

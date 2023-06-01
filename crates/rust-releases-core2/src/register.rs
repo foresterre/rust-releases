@@ -1,14 +1,16 @@
-use crate::Release;
-use std::cmp::Ordering;
+use crate::{Release, ReleaseSet};
 use std::collections::{BTreeSet, HashMap};
-use std::iter;
+
+#[cfg(test)]
+mod tests;
 
 /// A data structure consisting of the known Rust releases.
 ///
 /// Whether a release is known, and how much information is known about a release,
 /// depends on the source used to build up this information.
+#[derive(Clone, Debug)]
 pub struct Register {
-    platform_register: HashMap<rust_toolchain::Platform, PlatformRegister>,
+    platform_register: HashMap<rust_toolchain::Platform, ReleaseSet>,
 }
 
 impl Register {
@@ -27,7 +29,7 @@ impl Register {
         iterable: I,
     ) -> Self {
         let platform_register = iterable.into_iter().fold(
-            HashMap::<rust_toolchain::Platform, PlatformRegister>::new(),
+            HashMap::<rust_toolchain::Platform, ReleaseSet>::new(),
             |mut map, (platform, release)| {
                 map.entry(platform).or_default().add(release);
                 map
@@ -40,7 +42,7 @@ impl Register {
 
 impl Register {
     /// Get a subset of the register, where the subset contains just the releases of the given platform.
-    pub fn platform(&self, id: &rust_toolchain::Platform) -> Option<&PlatformRegister> {
+    pub fn platform(&self, id: &rust_toolchain::Platform) -> Option<&ReleaseSet> {
         self.platform_register.get(id)
     }
 
@@ -86,89 +88,5 @@ impl Register {
     /// The amount of releases inked into this register, regardless of the platform.
     pub fn count_releases(&self) -> usize {
         self.platform_register.values().map(|reg| reg.len()).sum()
-    }
-}
-
-/// A data structure consisting of the known Rust releases for a specific platform.
-#[derive(Clone, Debug, Default, PartialEq)]
-pub struct PlatformRegister {
-    releases: BTreeSet<Release>,
-}
-
-impl PlatformRegister {
-    pub fn from_iter<I: IntoIterator<Item = Release>>(iterable: I) -> Self {
-        Self {
-            releases: iterable.into_iter().collect(),
-        }
-    }
-
-    /// Add a release to the register.
-    pub fn add(&mut self, release: Release) {
-        self.releases.insert(release);
-    }
-}
-
-impl PlatformRegister {
-    /// Find the least recently released Rust release for the current platform.
-    ///
-    /// Returns `None` if no release could be found.
-    pub fn first(&self) -> Option<&Release> {
-        self.releases.first()
-    }
-
-    /// Find the most recently released Rust release for the current platform.
-    ///
-    /// Returns `None` if no release could be found.
-    pub fn last(&self) -> Option<&Release> {
-        self.releases.last()
-    }
-
-    /// All releases of the given platform, in ascending order.
-    pub fn ascending(&self) -> impl IntoIterator<Item = &Release> {
-        self.releases.iter()
-    }
-
-    /// All releases of the given platform, in descending order.
-    pub fn descending(&self) -> impl IntoIterator<Item = &Release> {
-        self.releases.iter().rev()
-    }
-
-    /// Amount of releases held by this platform register.
-    pub fn len(&self) -> usize {
-        self.releases.len()
-    }
-}
-
-#[cfg(test)]
-mod tests_register {
-    use crate::{Register, Release};
-    use rust_toolchain::Channel;
-
-    #[test]
-    fn from_iter() {
-        let platform = rust_toolchain::Platform::host();
-        let date = rust_toolchain::ReleaseDate::new(2023, 1, 1);
-        let version = rust_toolchain::RustVersion::new(1, 0, 0);
-
-        let toolchain = rust_toolchain::Toolchain::new(
-            Channel::Stable,
-            date.clone(),
-            platform.clone(),
-            Some(version.clone()),
-        );
-
-        let releases = vec![
-            (
-                rust_toolchain::Platform::host(),
-                Release::new(toolchain.clone(), vec![]),
-            ),
-            (
-                rust_toolchain::Platform::host(),
-                Release::new(toolchain, vec![]),
-            ),
-        ];
-
-        let register = Register::from_iter(releases);
-        assert_eq!(register.count_releases(), 2);
     }
 }

@@ -3,11 +3,14 @@ use std::iter;
 
 mod register;
 mod release;
+mod release_set;
 
 /// todo!
 pub use register::Register;
 /// todo!
 pub use release::Release;
+/// todo!
+pub use release_set::ReleaseSet;
 
 #[test]
 fn rust_releases() {

@@ -1,6 +1,3 @@
-use std::collections::{BTreeSet, HashMap};
-use std::iter;
-
 mod register;
 mod release;
 mod release_set;

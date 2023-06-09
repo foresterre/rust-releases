@@ -101,13 +101,6 @@ mod ordering {
 }
 
 #[test]
-fn find_component() {
-    let release: Release = todo!();
-
-    release.find_component("hello-world");
-}
-
-#[test]
 fn extensions() {
     let channel = rust_toolchain::Channel::Nightly;
     let release_date = rust_toolchain::ReleaseDate::new(2023, 1, 1);
@@ -118,8 +111,13 @@ fn extensions() {
 
     let release = Release::new(toolchain, vec![]);
 
-    let ext = release.extension_components();
-    let ext = release.default_components();
+    let default_components = release
+        .default_components()
+        .collect::<Vec<&rust_toolchain::Component>>();
+    let extension_components = release.extension_components().collect::<Vec<_>>();
+
+    assert!(default_components.is_empty());
+    assert!(extension_components.is_empty());
 }
 
 #[test]

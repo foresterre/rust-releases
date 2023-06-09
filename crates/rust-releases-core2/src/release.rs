@@ -1,4 +1,3 @@
-use rust_toolchain::Toolchain;
 use std::cmp::Ordering;
 
 #[cfg(test)]
@@ -118,9 +117,9 @@ impl<'toolchain> Ord for CompareRustToolchain<'toolchain> {
             // If both have a version, newer versions win
             (Some(l), Some(r)) => l.cmp(&r),
             // If either has a version, but the other hasn't, the version wins,
-            (Some(l), None) => Ordering::Greater,
+            (Some(_), None) => Ordering::Greater,
             // Same as above
-            (None, Some(r)) => Ordering::Less,
+            (None, Some(_)) => Ordering::Less,
             // If neither has a version, we only do a date compare,
             (None, None) => self_toolchain
                 .release_date()

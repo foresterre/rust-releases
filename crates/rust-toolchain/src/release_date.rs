@@ -58,6 +58,7 @@ struct DateImpl {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::cmp::Ordering;
 
     #[yare::parameterized(
         zeroes = { ReleaseDate::new(0, 0, 0), 0, 0, 0  },
@@ -109,5 +110,13 @@ mod tests {
     )]
     fn to_string(date: ReleaseDate, expected: &str) {
         assert_eq!(date.ymd().to_string(), expected.to_string());
+    }
+
+    #[test]
+    fn newer_date() {
+        let newer = ReleaseDate::new(2000, 1, 1);
+        let older = ReleaseDate::new(1999, 1, 1);
+
+        assert_eq!(newer.cmp(&older), Ordering::Greater);
     }
 }

@@ -20,7 +20,7 @@ impl Register {
         self.platform_register
             .entry(platform)
             .or_default()
-            .add(release)
+            .push(release)
     }
 }
 
@@ -31,7 +31,7 @@ impl Register {
         let platform_register = iterable.into_iter().fold(
             HashMap::<rust_toolchain::Platform, ReleaseSet>::new(),
             |mut map, (platform, release)| {
-                map.entry(platform).or_default().add(release);
+                map.entry(platform).or_default().push(release);
                 map
             },
         );
@@ -71,13 +71,16 @@ impl Register {
     }
 
     /// List the releases, published on the given date.
-    pub fn by_date(&self, date: rust_toolchain::ReleaseDate) -> impl IntoIterator<Item = &Release> {
+    pub fn by_date(
+        &self,
+        date: &rust_toolchain::ReleaseDate,
+    ) -> impl IntoIterator<Item = &Release> {
         self.platform_register
             .values()
             .map(|reg| {
                 reg.ascending()
                     .into_iter()
-                    .filter(|rel| rel.release_date() == date)
+                    .filter(|rel| rel.toolchain().release_date() == date)
             })
             .fold(BTreeSet::new(), |mut acc: BTreeSet<&Release>, next| {
                 acc.extend(next);

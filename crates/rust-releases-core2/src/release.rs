@@ -1,7 +1,14 @@
 use std::cmp::Ordering;
 
+mod comparator;
+
 #[cfg(test)]
 mod tests;
+
+#[cfg(test)]
+mod tests_eq;
+#[cfg(test)]
+mod tests_ord;
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Release {
@@ -10,6 +17,7 @@ pub struct Release {
 }
 
 impl Release {
+    /// Create a new [`Release`] instance for a given toolchain with the given components.
     pub fn new(
         toolchain: rust_toolchain::Toolchain,
         components: impl IntoIterator<Item = rust_toolchain::Component>,
@@ -20,6 +28,7 @@ impl Release {
         }
     }
 
+    /// Create a new [`Release`] instance for a given toolchain, without any components.
     pub fn new_without_components(toolchain: rust_toolchain::Toolchain) -> Self {
         Self {
             toolchain,
@@ -27,12 +36,14 @@ impl Release {
         }
     }
 
+    /// Returns a shared reference to the [`rust_toolchain::Toolchain`].
     pub fn toolchain(&self) -> &rust_toolchain::Toolchain {
         &self.toolchain
     }
 
-    pub fn release_date(&self) -> rust_toolchain::ReleaseDate {
-        todo!("release date of the toolchain")
+    /// Returns an exclusive reference to the [`rust_toolchain::Toolchain`].
+    pub fn toolchain_mut(&mut self) -> &mut rust_toolchain::Toolchain {
+        &mut self.toolchain
     }
 
     /// Find a component by its name.
@@ -78,58 +89,9 @@ impl PartialOrd for Release {
 
 impl Ord for Release {
     fn cmp(&self, other: &Self) -> Ordering {
-        let c1 = CompareRustToolchain::new(self.toolchain());
-        let c2 = CompareRustToolchain::new(other.toolchain());
+        let c1 = comparator::RustToolchainComparator::from(self.toolchain());
+        let c2 = comparator::RustToolchainComparator::from(other.toolchain());
 
         c1.cmp(&c2)
-    }
-}
-
-/// Comparator which prioritizes Rust versions over release dates, but will fall back
-/// to release dates if no version is known.
-///
-/// While this comparator accepts a mix of versions (stable has both) and release dates
-/// (as used by nightly), commonly, you should only use either versions or release dates.
-/// TODO: maybe we should use just release date and only prio versions to those which do not
-///     have a version; why?: because stuff like PlatformRegister::most_recent, can now
-///     be incorrect, because we return an old version over a recent nighly.
-///     To compare for just stable, we can still use `.iter(|r| r.channel == Stable)`.
-#[derive(Clone, Debug, PartialEq, Eq)]
-struct CompareRustToolchain<'toolchain> {
-    toolchain: &'toolchain rust_toolchain::Toolchain,
-}
-
-impl<'toolchain> CompareRustToolchain<'toolchain> {
-    pub fn new(toolchain: &'toolchain rust_toolchain::Toolchain) -> Self {
-        Self { toolchain }
-    }
-}
-
-impl<'toolchain> Ord for CompareRustToolchain<'toolchain> {
-    fn cmp(&self, other: &Self) -> Ordering {
-        let self_toolchain = self.toolchain;
-        let other_toolchain = other.toolchain;
-
-        let this = self_toolchain.version();
-        let that = other_toolchain.version();
-
-        match (this, that) {
-            // If both have a version, newer versions win
-            (Some(l), Some(r)) => l.cmp(&r),
-            // If either has a version, but the other hasn't, the version wins,
-            (Some(_), None) => Ordering::Greater,
-            // Same as above
-            (None, Some(_)) => Ordering::Less,
-            // If neither has a version, we only do a date compare,
-            (None, None) => self_toolchain
-                .release_date()
-                .cmp(&other_toolchain.release_date()),
-        }
-    }
-}
-
-impl<'toolchain> PartialOrd for CompareRustToolchain<'toolchain> {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
     }
 }

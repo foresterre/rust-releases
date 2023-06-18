@@ -18,8 +18,12 @@ impl ReleaseSet {
     }
 
     /// Add a release to the register.
-    pub fn add(&mut self, release: Release) {
+    pub fn push(&mut self, release: Release) {
+        dbg!(&self.releases, &release);
+
         self.releases.insert(release);
+
+        dbg!(&self.releases);
     }
 }
 

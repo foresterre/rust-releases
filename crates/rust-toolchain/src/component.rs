@@ -13,3 +13,19 @@ pub struct Component {
     pub optional: bool,
     // todo!
 }
+
+impl Component {
+    pub fn new_component(name: &'static str) -> Self {
+        Self {
+            name,
+            optional: false,
+        }
+    }
+
+    pub fn new_extension(name: &'static str) -> Self {
+        Self {
+            name,
+            optional: true,
+        }
+    }
+}

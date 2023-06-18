@@ -74,4 +74,82 @@ mod tests {
         assert_eq!(left.partial_cmp(&right), Some(expected_ord));
         assert_eq!(left.cmp(&right), expected_ord);
     }
+
+    mod partial_eq {
+        use super::*;
+
+        #[test]
+        fn symmetric() {
+            let left = RustVersion::new(1, 2, 3);
+            let right = RustVersion::new(1, 2, 3);
+
+            assert_eq!(
+                left, right,
+                "PartialEq should be symmetric: 'left == right' must hold"
+            );
+            assert_eq!(
+                right, left,
+                "PartialEq should be symmetric: 'right == left' must hold"
+            );
+        }
+
+        #[test]
+        fn transitive() {
+            let a = RustVersion::new(1, 2, 3);
+            let b = RustVersion::new(1, 2, 3);
+            let c = RustVersion::new(1, 2, 3);
+
+            assert_eq!(
+                a, b,
+                "PartialEq should be transitive: 'a == b' must hold, by symmetric property"
+            );
+            assert_eq!(
+                b, c,
+                "PartialEq should be transitive: 'b == c' must hold, by symmetric property"
+            );
+
+            assert_eq!(a, c, "PartialEq should be transitive: 'a == c' must hold, given a == b (prior) and b == c (prior)");
+        }
+    }
+
+    mod partial_ord {
+        use super::*;
+
+        #[test]
+        fn equality() {
+            let a = RustVersion::new(1, 2, 3);
+            let b = RustVersion::new(1, 2, 3);
+
+            assert_eq!(
+                a, b,
+                "PartialOrd should hold for equality: 'a == b' must hold"
+            );
+            assert!(
+                a.partial_cmp(&b) == Some(Ordering::Equal),
+                "PartialOrd should hold for equality: 'a.partial_cmp(&b) == Ordering::Equal' must hold"
+            );
+        }
+
+        #[test]
+        fn transitive_lt() {
+            let a = RustVersion::new(1, 2, 1);
+            let b = RustVersion::new(1, 2, 2);
+            let c = RustVersion::new(1, 2, 3);
+
+            assert!(a < b, "PartialOrd should be transitive: 'a < b' must hold");
+            assert!(b < c, "PartialOrd should be transitive: 'b < c' must hold");
+            assert!(a < c, "PartialOrd should be transitive: 'a < c' must hold, given a < b (prior) and b < c (prior)");
+        }
+
+        #[test]
+        fn transitive_gt() {
+            let a = RustVersion::new(1, 2, 3);
+            let b = RustVersion::new(1, 2, 2);
+            let c = RustVersion::new(1, 2, 1);
+
+            assert!(a > b, "PartialOrd should be transitive: 'a > b' must hold");
+            assert!(b > c, "PartialOrd should be transitive: 'b > c' must hold");
+            assert!(a > c, "PartialOrd should be transitive: 'a > c' must hold, given a > b (prior) and b > c (prior)");
+        }
+    }
 }

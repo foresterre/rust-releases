@@ -1,17 +1,12 @@
-use std::cmp::Ordering;
-
-mod comparator;
-
 #[cfg(test)]
 mod tests;
 
 #[cfg(test)]
 mod tests_eq;
-#[cfg(test)]
-mod tests_ord;
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Release {
+    date: rust_toolchain::ReleaseDate,
     toolchain: rust_toolchain::Toolchain,
     components: Vec<rust_toolchain::Component>,
 }
@@ -19,21 +14,37 @@ pub struct Release {
 impl Release {
     /// Create a new [`Release`] instance for a given toolchain with the given components.
     pub fn new(
+        date: rust_toolchain::ReleaseDate,
         toolchain: rust_toolchain::Toolchain,
         components: impl IntoIterator<Item = rust_toolchain::Component>,
     ) -> Self {
         Self {
+            date,
             toolchain,
             components: components.into_iter().collect(),
         }
     }
 
     /// Create a new [`Release`] instance for a given toolchain, without any components.
-    pub fn new_without_components(toolchain: rust_toolchain::Toolchain) -> Self {
+    pub fn new_without_components(
+        date: rust_toolchain::ReleaseDate,
+        toolchain: rust_toolchain::Toolchain,
+    ) -> Self {
         Self {
+            date,
             toolchain,
             components: Vec::with_capacity(0),
         }
+    }
+
+    /// Returns a shared reference to the release date.
+    pub fn date(&self) -> &rust_toolchain::ReleaseDate {
+        &self.date
+    }
+
+    /// Returns an exclusive reference to the release date.
+    pub fn date_mut(&mut self) -> &mut rust_toolchain::ReleaseDate {
+        &mut self.date
     }
 
     /// Returns a shared reference to the [`rust_toolchain::Toolchain`].
@@ -60,9 +71,9 @@ impl Release {
     /// let platform = rust_toolchain::Platform::host();
     /// let version = None;
     ///
-    /// let toolchain = rust_toolchain::Toolchain::new(channel, release_date, platform, version);
+    /// let toolchain = rust_toolchain::Toolchain::new(channel, platform, version);
     ///
-    /// let release = Release::new(toolchain, vec![]);
+    /// let release = Release::new(release_date, toolchain, vec![]);
     /// let component = release.find_component("hello");
     ///
     /// assert!(component.is_none());
@@ -78,20 +89,5 @@ impl Release {
     /// Returns an iterator over the components which are optional, and not installed by default.
     pub fn extension_components(&self) -> impl Iterator<Item = &rust_toolchain::Component> {
         self.components.iter().filter(|f| f.optional)
-    }
-}
-
-impl PartialOrd for Release {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
-}
-
-impl Ord for Release {
-    fn cmp(&self, other: &Self) -> Ordering {
-        let c1 = comparator::RustToolchainComparator::from(self.toolchain());
-        let c2 = comparator::RustToolchainComparator::from(other.toolchain());
-
-        c1.cmp(&c2)
     }
 }

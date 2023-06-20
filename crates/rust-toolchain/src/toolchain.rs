@@ -1,4 +1,5 @@
-use crate::{Channel, Platform, ReleaseDate, RustVersion};
+use crate::channel::{Beta, Stable};
+use crate::{Channel, Platform, RustVersion};
 
 mod rustup_toolchain;
 
@@ -6,44 +7,30 @@ mod rustup_toolchain;
 #[non_exhaustive]
 pub struct Toolchain {
     pub channel: Channel,
-    pub date: ReleaseDate,
     pub platform: Platform,
-    pub version: Option<RustVersion>,
 }
 
 impl Toolchain {
     /// Construct a new toolchain.
     ///
     /// A toolchain consists of a `channel`, a `release date`, a platform
-    pub fn new(
-        channel: Channel,
-        date: ReleaseDate,
-        platform: Platform,
-        version: Option<RustVersion>,
-    ) -> Self {
-        Self {
-            channel,
-            date,
-            platform,
-            version,
-        }
+    pub fn new(channel: Channel, platform: Platform) -> Self {
+        Self { channel, platform }
     }
 
-    pub fn channel(&self) -> Channel {
-        self.channel
-    }
-
-    pub fn release_date(&self) -> &ReleaseDate {
-        &self.date
+    pub fn channel(&self) -> &Channel {
+        &self.channel
     }
 
     pub fn platform(&self) -> &Platform {
         &self.platform
     }
 
-    /// The version of the toolchain, if any.
     pub fn version(&self) -> Option<&RustVersion> {
-        self.version.as_ref()
+        match &self.channel {
+            Channel::Stable(Stable { version }) | Channel::Beta(Beta { version }) => Some(version),
+            _ => None,
+        }
     }
 }
 
@@ -53,16 +40,9 @@ mod tests {
 
     #[test]
     fn create_toolchain() {
-        let toolchain = Toolchain::new(
-            Channel::Stable,
-            ReleaseDate::new(20, 1, 1),
-            Platform::host(),
-            None,
-        );
+        let toolchain = Toolchain::new(Channel::Stable, Platform::host());
 
         assert_eq!(&toolchain.channel, &Channel::Stable);
-        assert_eq!(&toolchain.date, &ReleaseDate::new(20, 1, 1));
         assert_eq!(&toolchain.platform, &Platform::host());
-        assert!(toolchain.version.is_none());
     }
 }

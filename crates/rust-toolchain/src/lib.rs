@@ -27,7 +27,7 @@ mod release_date;
 mod rust_version;
 mod toolchain;
 
-pub use channel::Channel;
+pub use channel::{Beta, Channel, Nightly, Stable};
 pub use component::Component;
 pub use platform::Platform;
 pub use release_date::ReleaseDate;
@@ -40,16 +40,10 @@ mod tests {
 
     #[test]
     fn create_toolchain() {
-        let toolchain = Toolchain::new(
-            Channel::Stable,
-            ReleaseDate::new(20, 1, 1),
-            Platform::host(),
-            None,
-        );
+        let toolchain =
+            Toolchain::new(Channel::stable(RustVersion::new(1, 2, 3)), Platform::host());
 
         assert_eq!(&toolchain.channel, &Channel::Stable);
-        assert_eq!(&toolchain.date, &ReleaseDate::new(20, 1, 1));
         assert_eq!(&toolchain.platform, &Platform::host());
-        assert!(toolchain.version.is_none());
     }
 }

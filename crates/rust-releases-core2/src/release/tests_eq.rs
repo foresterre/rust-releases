@@ -3,12 +3,15 @@
 use super::*;
 
 fn default_test_subject() -> Release {
-    Release::new_without_components(rust_toolchain::Toolchain::new(
-        rust_toolchain::Channel::Stable,
-        rust_toolchain::ReleaseDate::new(2000, 1, 2),
-        rust_toolchain::Platform::host(),
-        Some(rust_toolchain::RustVersion::new(1, 2, 3)),
-    ))
+    let date = rust_toolchain::ReleaseDate::new(2000, 1, 2);
+
+    Release::new_without_components(
+        date,
+        rust_toolchain::Toolchain::new(
+            rust_toolchain::Channel::stable(rust_toolchain::RustVersion::new(1, 2, 3)),
+            rust_toolchain::Platform::host(),
+        ),
+    )
 }
 
 #[test]
@@ -22,7 +25,8 @@ fn partial_eq_identity() {
 #[test]
 fn partial_neq_on_toolchain_channel() {
     let mut toolchain1 = default_test_subject();
-    toolchain1.toolchain.channel = rust_toolchain::Channel::Beta;
+    toolchain1.toolchain.channel =
+        rust_toolchain::Channel::beta(rust_toolchain::RustVersion::new(1, 2, 4));
 
     let toolchain2 = default_test_subject();
 
@@ -30,9 +34,9 @@ fn partial_neq_on_toolchain_channel() {
 }
 
 #[test]
-fn partial_neq_on_toolchain_date() {
+fn partial_neq_on_release_date() {
     let mut toolchain1 = default_test_subject();
-    toolchain1.toolchain.date = rust_toolchain::ReleaseDate::new(2000, 1, 1);
+    toolchain1.date = rust_toolchain::ReleaseDate::new(2000, 1, 1);
 
     let toolchain2 = default_test_subject();
 
@@ -51,9 +55,10 @@ fn partial_neq_on_toolchain_on_platform() {
 }
 
 #[test]
-fn partial_neq_on_toolchain_on_some_version() {
+fn partial_neq_on_channel_with_version() {
     let mut toolchain1 = default_test_subject();
-    toolchain1.toolchain.version = Some(rust_toolchain::RustVersion::new(1, 2, 4));
+    toolchain1.toolchain.channel =
+        rust_toolchain::Channel::stable(rust_toolchain::RustVersion::new(1, 2, 4));
 
     let toolchain2 = default_test_subject();
 
@@ -61,9 +66,10 @@ fn partial_neq_on_toolchain_on_some_version() {
 }
 
 #[test]
-fn partial_neq_on_toolchain_on_none_version() {
+fn partial_neq_on_channel_without_version() {
     let mut toolchain1 = default_test_subject();
-    toolchain1.toolchain.version = None;
+    toolchain1.toolchain.channel =
+        rust_toolchain::Channel::nightly(rust_toolchain::ReleaseDate::new(2001, 1, 1));
 
     let toolchain2 = default_test_subject();
 

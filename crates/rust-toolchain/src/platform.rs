@@ -34,6 +34,19 @@ impl Platform {
 
         Ok(Self { platform })
     }
+
+    /// Create a new `Platform` instance from a [`target triple`], defaults to
+    /// `unknown-unknown-unknown` if the give triple is not recognized.
+    ///
+    /// * See also: [Rustc platform support](https://doc.rust-lang.org/rustc/platform-support.html)
+    ///
+    /// [`target triple`]: https://github.com/rust-lang/rfcs/blob/master/text/0131-target-specification.md#detailed-design
+    pub fn from_target_triple_or_unknown(triple: &str) -> Self {
+        let platform = target_lexicon::Triple::from_str(triple)
+            .unwrap_or_else(|_| target_lexicon::Triple::unknown());
+
+        Self { platform }
+    }
 }
 
 #[cfg(test)]

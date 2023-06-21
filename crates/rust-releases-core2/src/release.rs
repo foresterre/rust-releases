@@ -66,14 +66,15 @@ impl Release {
     /// ```rust
     /// use rust_releases_core2::Release;
     ///
-    /// let channel = rust_toolchain::Channel::Nightly;
     /// let release_date = rust_toolchain::ReleaseDate::new(2023, 1, 1);
+    /// let version = rust_toolchain::RustVersion::new(1, 31, 1);
+    ///
+    /// let channel = rust_toolchain::Channel::beta(version);
     /// let platform = rust_toolchain::Platform::host();
-    /// let version = None;
     ///
-    /// let toolchain = rust_toolchain::Toolchain::new(channel, platform, version);
+    /// let toolchain = rust_toolchain::Toolchain::new(channel, platform);
     ///
-    /// let release = Release::new(release_date, toolchain, vec![]);
+    /// let release = Release::new(release_date, toolchain, []);
     /// let component = release.find_component("hello");
     ///
     /// assert!(component.is_none());

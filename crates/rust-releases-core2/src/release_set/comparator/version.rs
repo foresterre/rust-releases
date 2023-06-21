@@ -64,7 +64,31 @@ impl PartialOrd for VersionComparator {
 
 impl Ord for VersionComparator {
     fn cmp(&self, other: &Self) -> Ordering {
-        todo!()
+        use rust_toolchain::{Beta, Channel, Nightly, Stable};
+
+        match (self.0.toolchain().channel(), other.0.toolchain().channel()) {
+            // If both are stable, compare by version
+            (
+                Channel::Stable(Stable { version: lhs }),
+                Channel::Stable(Stable { version: rhs }),
+            ) => lhs.cmp(rhs),
+            // If stable is compared against another, stable is greater
+            (Channel::Stable(_), _) => Ordering::Greater,
+            // If both are beta, compare by version
+            (Channel::Beta(Beta { version: lhs }), Channel::Beta(Beta { version: rhs })) => {
+                lhs.cmp(rhs)
+            }
+            // If beta is compared against stable, it is smaller
+            (Channel::Beta(_), Channel::Stable(_)) => Ordering::Less,
+            // If beta is compared against another (only Nightly possible), it is greater
+            (Channel::Beta(_), _) => Ordering::Greater,
+            // If both are nightly, compare by date
+            (Channel::Nightly(Nightly { date: lhs }), Channel::Nightly(Nightly { date: rhs })) => {
+                lhs.cmp(rhs)
+            }
+            // Nightly is always smaller, if it isn't compared against itself
+            (Channel::Nightly(_), _) => Ordering::Less,
+        }
     }
 }
 

@@ -33,17 +33,3 @@ pub use platform::Platform;
 pub use release_date::ReleaseDate;
 pub use rust_version::RustVersion;
 pub use toolchain::Toolchain;
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn create_toolchain() {
-        let toolchain =
-            Toolchain::new(Channel::stable(RustVersion::new(1, 2, 3)), Platform::host());
-
-        assert_eq!(&toolchain.channel, &Channel::Stable);
-        assert_eq!(&toolchain.platform, &Platform::host());
-    }
-}

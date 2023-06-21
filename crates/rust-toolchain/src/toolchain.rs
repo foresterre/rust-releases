@@ -40,9 +40,11 @@ mod tests {
 
     #[test]
     fn create_toolchain() {
-        let toolchain = Toolchain::new(Channel::Stable, Platform::host());
+        let channel = Channel::stable(RustVersion::new(1, 2, 3));
 
-        assert_eq!(&toolchain.channel, &Channel::Stable);
+        let toolchain = Toolchain::new(channel, Platform::host());
+
+        assert!(&toolchain.channel().is_stable());
         assert_eq!(&toolchain.platform, &Platform::host());
     }
 }

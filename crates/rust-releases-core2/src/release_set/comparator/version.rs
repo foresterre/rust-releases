@@ -3,9 +3,10 @@ use std::cmp::Ordering;
 
 /// Orders releases by their version.
 ///
-/// Given an ordering of releases `a` and `b` where `version(a) cmp version(b)` and `version(a|b)` is some,
-/// then `a cmp b`. If `version(x)` is none, for any Release `x` then the ordering is strictly less
-/// than a `version(y)` where `y` is some, but otherwise undefined.
+/// Ordering follows the following rules:
+/// 1. `stable > beta > nightly`.
+/// 2. if comparing any two stable or beta releases `a` and `b`, and `version(a) > version(b)`, then `a > b`.
+/// 3. if comparing any two nightly releases `a` and `b`, and `date(a) > date(b)`, then `a > b`.
 #[derive(Clone, Debug)]
 pub struct VersionComparator(pub Release);
 

@@ -1,15 +1,8 @@
-// FIXME: This file should really be tested (with mocks), but I haven't had the time yet
-//   to look for a proper mocking library for Rust yet. No excuses of course, ..., but personal project
-//   and such 🙄. Instead, this text serves as a header of shame.
-
 use crate::errors::{AwsError, RustDistError, RustDistResult};
 use aws_config::AppName;
-use aws_sdk_s3::config::retry::RetryConfig;
 use aws_sdk_s3::config::Region;
 use aws_sdk_s3::operation::list_objects_v2::ListObjectsV2Output;
 use aws_sdk_s3::types::Object;
-use aws_sig_auth::signer::OperationSigningConfig;
-use aws_sig_auth::signer::SigningRequirements;
 use rust_releases_io::{base_cache_dir, is_stale, Document};
 use std::convert::{TryFrom, TryInto};
 use std::fs;
@@ -71,12 +64,15 @@ impl Client {
         let app_name = AppName::new("rust-releases+`github|foresterre|rust-releases`")
             .map_err(AwsError::InvalidAppName)?;
 
-        let aws_config = aws_sdk_s3::Config::builder()
-            .app_name(app_name)
-            .region(RUST_DIST_REGION)
-            .build();
+        let config = runtime.block_on(
+            aws_config::from_env()
+                .no_credentials()
+                .app_name(app_name)
+                .region(RUST_DIST_REGION)
+                .load(),
+        );
 
-        let aws_s3_client = aws_sdk_s3::Client::from_conf(aws_config);
+        let aws_s3_client = aws_sdk_s3::Client::new(&config);
 
         Ok(Self {
             aws_s3_client,
@@ -85,41 +81,19 @@ impl Client {
     }
 }
 
-// Uses workaround for using unsigned requests, since aws-sdk-s3 0.6.0 does not have an
-// anonymous credentials provider:
-// https://github.com/awslabs/aws-sdk-rust/issues/425#issuecomment-1020265854
 async fn list_objects(
     client: &aws_sdk_s3::Client,
     offset: Option<impl Into<String>>,
 ) -> Result<ListObjectsV2Output, AwsError> {
-    let operation = client
+    client
         .list_objects_v2()
         .bucket(RUST_DIST_BUCKET)
         .max_keys(REQUEST_SIZE)
         .set_start_after(offset.map(Into::into))
         .prefix(OBJECT_PREFIX)
-        .customize()
-        .await
-        .map_err(|_| AwsError::ListObjectsBuildOperationInput)?;
-
-    let customized_operation = operation
-        .map_operation(|mut op| {
-            {
-                let mut properties = op.properties_mut();
-                let signing_config = properties
-                    .get_mut::<OperationSigningConfig>()
-                    .ok_or_else(RetryConfig::standard)?;
-
-                signing_config.signing_requirements = SigningRequirements::Disabled;
-            }
-            Ok(op)
-        })
-        .map_err(|_err: RetryConfig| AwsError::DisableSigning)?;
-
-    customized_operation
         .send()
         .await
-        .map_err(|e| AwsError::ListObjectsError(Box::new(e)))
+        .map_err(|e| AwsError::ListObjectsError(Box::new(e.into_service_error())))
 }
 
 impl ChunkClient for Client {
@@ -144,7 +118,7 @@ impl ChunkClient for Client {
     fn download(&self, to: &mut impl Write) -> RustDistResult<()> {
         let mut offset = None;
 
-        while let Ok(ChunkState::Offset(next_offset)) = self.download_chunk(offset.to_owned(), to) {
+        while let ChunkState::Offset(next_offset) = self.download_chunk(offset.to_owned(), to)? {
             offset = Some(next_offset);
         }
 
@@ -288,7 +262,7 @@ fn write_objects(buffer: &mut impl Write, objects: &[Object]) -> Option<String> 
 mod tests {
     use super::*;
 
-    // @runWith cargo test --all-features --package rust-releases --lib source::rust_dist_with_cli::dl::tests::test_fetch_meta_manifest -- --exact
+    // @runWith cargo test --all-features --package rust-releases --lib source::rust_dist::fetch::tests::test_fetch_meta_manifest -- --exact
     #[test]
     fn test_fetch_meta_manifest() {
         __internal_dl_test!({

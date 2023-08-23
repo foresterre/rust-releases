@@ -1,5 +1,4 @@
 use aws_config::InvalidAppName;
-use aws_sdk_s3::error::SdkError;
 use aws_sdk_s3::operation::list_objects_v2::ListObjectsV2Error;
 use rust_releases_core::Channel;
 
@@ -66,14 +65,10 @@ pub enum AwsError {
     #[error("Could not configure AWS S3 client: {0}")]
     InvalidAppName(#[from] InvalidAppName),
 
-    /// Failed to build the input required to make an anonymous AWS S3 request.
-    #[error("Unable to build the list objects operation")]
-    ListObjectsBuildOperationInput,
-
     /// Returned when it's not possible to list the S3 objects in the Rust bucket, required to
     /// build our releases index.
     #[error("Unable to fetch Rust distribution index: {0}")]
-    ListObjectsError(Box<SdkError<ListObjectsV2Error>>),
+    ListObjectsError(Box<ListObjectsV2Error>),
 
     /// Failed to build the operation required to make an anonymous AWS S3 request.
     #[error("Unable to make list objects operation")]

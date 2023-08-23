@@ -1,6 +1,34 @@
 use super::*;
 use rust_toolchain::{Channel, Platform, ReleaseDate, RustVersion, Toolchain};
 
+mod first {
+    use super::*;
+
+    #[test]
+    fn present() {
+        let date = ReleaseDate::new(2023, 1, 1);
+        let stable = Channel::stable(RustVersion::new(1, 0, 0));
+
+        let actual_release = Release::new_without_components(
+            date.clone(),
+            Toolchain::new(stable.clone(), Platform::host()),
+        );
+
+        let mut releases = ReleaseSet::default();
+        releases.push(actual_release);
+
+        let expected_release =
+            Release::new_without_components(date, Toolchain::new(stable, Platform::host()));
+        assert_eq!(releases.first(), Some(&expected_release));
+    }
+
+    #[test]
+    fn absent() {
+        let releases = ReleaseSet::default();
+        assert!(releases.first().is_none());
+    }
+}
+
 #[test]
 fn uniqueness_on_channel() {
     let date = ReleaseDate::new(2023, 1, 1);

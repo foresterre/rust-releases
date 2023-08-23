@@ -38,7 +38,7 @@ fn from_iter_with_different_dates() {
         (rust_toolchain::Platform::host(), release2),
     ];
 
-    // let register = Register::from_iter(releases);
-    //
-    // assert_eq!(register.count_releases(), 2);
+    let register = Register::from_iter(releases);
+
+    assert_eq!(register.count_releases(), 2);
 }

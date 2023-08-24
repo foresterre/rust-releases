@@ -106,6 +106,10 @@ impl ChunkClient for Client {
             .runtime
             .block_on(list_objects(&self.aws_s3_client, offset))?;
 
+        if !raw.is_truncated() {
+            return Ok(ChunkState::Complete);
+        }
+
         let objects = raw.contents.ok_or(RustDistError::ChunkMetadataMissing)?;
         let state = match write_objects(to, &objects) {
             Some(key) => ChunkState::Offset(key),

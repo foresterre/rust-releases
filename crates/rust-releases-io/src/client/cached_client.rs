@@ -1,6 +1,5 @@
 #![cfg(feature = "http_client")]
 
-use crate::DEFAULT_MEMORY_SIZE;
 use crate::{
     is_stale, Document, IsStaleError, ResourceFile, RetrievalLocation, RetrievedDocument,
     RustReleasesClient,
@@ -9,6 +8,8 @@ use std::fs;
 use std::io::{self, BufReader, BufWriter, Read, Write};
 use std::path::{Path, PathBuf};
 use std::time::Duration;
+
+const DEFAULT_MEMORY_SIZE: usize = 4096;
 
 /// A list of errors which may be produced by [`CachedClient::fetch`].
 #[derive(Debug, thiserror::Error)]

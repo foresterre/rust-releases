@@ -17,4 +17,4 @@ internal_dl_test = []
 [dependencies]
 directories-next = "2.0.0"
 thiserror = "1.0.24"
-ureq = { version = "2.6.2", optional = true } # feature: http_client
+ureq = { version = "2.7.1", optional = true } # feature: http_client

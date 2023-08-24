@@ -5,8 +5,6 @@
 #![deny(clippy::all)]
 #![deny(unsafe_code)]
 
-const DEFAULT_MEMORY_SIZE: usize = 4096;
-
 mod client;
 mod document;
 mod io;

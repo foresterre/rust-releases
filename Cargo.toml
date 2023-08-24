@@ -13,7 +13,7 @@ exclude = [
     "/bors.toml", # CI staging bot config
     "/deny.toml" # dependency license checking config
 ]
-rust-version = "1.63"
+rust-version = "1.65"
 
 [package.metadata.release]
 tag-name = "v{{version}}"

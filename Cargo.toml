@@ -15,8 +15,6 @@ exclude = [
 ]
 rust-version = "1.67"
 
-[package.metadata.release]
-tag-name = "v{{version}}"
 
 [workspace]
 members = [

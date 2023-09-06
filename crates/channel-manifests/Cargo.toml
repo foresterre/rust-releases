@@ -11,7 +11,7 @@ rust-version = "1.63"
 
 [dependencies]
 rust-releases-core = { version = "^0.27.0", path = "../core" }
-rust-releases-io = { version = "^0.27.0", path = "../rust-releases-io", features = ["http_client"] }
+rust-releases-io = { version = "^0.27.0", path = "../io", features = ["http_client"] }
 
 thiserror = "1.0.24"
 

@@ -14,5 +14,5 @@ fn rust_releases() {
     let input = vec![];
     let register = Register::from_iter(input);
 
-    assert_eq!(register.count_releases(), 0);
+    assert_eq!(register.size(), 0);
 }

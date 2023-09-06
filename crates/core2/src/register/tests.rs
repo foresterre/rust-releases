@@ -24,7 +24,7 @@ fn from_iter_with_different_versions() {
 
     let register = Register::from_iter(releases);
 
-    assert_eq!(register.count_releases(), 2);
+    assert_eq!(register.size(), 2);
 }
 
 #[test]
@@ -40,5 +40,5 @@ fn from_iter_with_different_dates() {
 
     let register = Register::from_iter(releases);
 
-    assert_eq!(register.count_releases(), 2);
+    assert_eq!(register.size(), 2);
 }

@@ -20,7 +20,7 @@ rust-version = "1.67"
 members = [
     "crates/rust-releases-core",
     "crates/rust-releases-core2",
-    "crates/rust-releases-compact-index",
+    "crates/compact-index",
     "crates/rust-releases-io",
     "crates/channel-manifests",
     "crates/rust-releases-rust-changelog",

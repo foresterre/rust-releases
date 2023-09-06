@@ -23,7 +23,7 @@ members = [
     "crates/compact-index",
     "crates/io",
     "crates/channel-manifests",
-    "crates/rust-releases-rust-changelog",
+    "crates/rust-changelog",
     "crates/rust-releases-rust-dist",
     "crates/rust-releases-rust-dist-with-cli", # todo: remove support
     # todo: add rr-github
@@ -47,7 +47,7 @@ io-http = ["rust-releases-io/http_client"]
 rust-releases-core = { version = "^0.27.0", path = "crates/core" }
 rust-releases-io = { version = "^0.27.0", path = "crates/io", optional = true }
 rust-releases-channel-manifests = { version = "^0.27.0", path = "crates/channel-manifests", optional = true }
-rust-releases-rust-changelog = { version = "^0.27.0", path = "crates/rust-releases-rust-changelog", optional = true }
+rust-releases-rust-changelog = { version = "^0.27.0", path = "crates/rust-changelog", optional = true }
 rust-releases-rust-dist = { version = "^0.27.0", path = "crates/rust-releases-rust-dist", optional = true }
 rust-releases-rust-dist-with-cli = { version = "^0.27.0", path = "crates/rust-releases-rust-dist-with-cli", optional = true }
 

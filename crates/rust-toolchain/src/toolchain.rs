@@ -13,7 +13,10 @@ pub struct Toolchain {
 impl Toolchain {
     /// Construct a new toolchain.
     ///
-    /// A toolchain consists of a `channel`, a `release date`, a platform
+    /// A toolchain consists of a [`channel`] and a [`platform`].
+    ///
+    /// [`channel`]: Channel
+    /// [`platform`]: Platform
     pub fn new(channel: Channel, platform: Platform) -> Self {
         Self { channel, platform }
     }

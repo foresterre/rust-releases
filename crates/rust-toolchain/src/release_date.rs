@@ -31,7 +31,7 @@ impl ReleaseDate {
     ///
     /// Year, month, and day will all be pre-filled with 0's.
     /// For year, at least four numbers are shown. For
-    /// month and day, 2.
+    /// month and day, two.
     ///
     /// Note that, a representation of `9999-200-200` is still possible, while
     /// not valid as a Gregorian date.

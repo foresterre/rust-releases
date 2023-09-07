@@ -1,27 +1,27 @@
 use crate::Release;
-use comparator::VersionComparator;
 use std::collections::BTreeSet;
 
-mod comparator;
+/// Defines how releases are to be compared and ordered within a release set.
+mod compare;
 #[cfg(test)]
 mod tests;
 
 /// A set data structure for Rust releases.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct ReleaseSet {
-    releases: BTreeSet<VersionComparator>,
+    releases: BTreeSet<compare::CompareRelease>,
 }
 
 impl ReleaseSet {
     pub fn from_iter<I: IntoIterator<Item = Release>>(iterable: I) -> Self {
         Self {
-            releases: iterable.into_iter().map(VersionComparator).collect(),
+            releases: iterable.into_iter().map(compare::CompareRelease).collect(),
         }
     }
 
     /// Add a release to the register.
     pub fn push(&mut self, release: Release) {
-        self.releases.insert(VersionComparator(release));
+        self.releases.insert(compare::CompareRelease(release));
     }
 }
 

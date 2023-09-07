@@ -31,7 +31,8 @@ fn from_iter_with_different_versions() {
 fn from_iter_with_different_dates() {
     let release1 = default_test_subject();
     let mut release2 = default_test_subject();
-    *release2.date_mut() = rust_toolchain::ReleaseDate::new(2022, 1, 1);
+    release2.toolchain_mut().channel =
+        rust_toolchain::Channel::nightly(rust_toolchain::ReleaseDate::new(2022, 1, 1));
 
     let releases = vec![
         (rust_toolchain::Platform::host(), release1),

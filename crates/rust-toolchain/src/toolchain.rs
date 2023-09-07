@@ -1,5 +1,5 @@
 use crate::channel::{Beta, Stable};
-use crate::{Channel, Platform, RustVersion};
+use crate::{Channel, Nightly, Platform, ReleaseDate, RustVersion};
 
 mod rustup_toolchain;
 
@@ -26,9 +26,22 @@ impl Toolchain {
         &self.platform
     }
 
+    /// The version of the toolchain, if any.
+    ///
+    /// A nightly release is versioned by date instead of by version.
+    /// To obtain the nightly release date, see [`Toolchain::nightly_date`].
     pub fn version(&self) -> Option<&RustVersion> {
         match &self.channel {
             Channel::Stable(Stable { version }) | Channel::Beta(Beta { version }) => Some(version),
+            _ => None,
+        }
+    }
+
+    /// The 'version' of a nightly release.
+    /// Returns `None` if this is not a nightly release.
+    pub fn nightly_date(&self) -> Option<&ReleaseDate> {
+        match &self.channel {
+            Channel::Nightly(Nightly { date }) => Some(date),
             _ => None,
         }
     }

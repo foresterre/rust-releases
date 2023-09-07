@@ -43,6 +43,39 @@ impl Release {
     }
 
     /// Returns an exclusive reference to the release date.
+    ///
+    /// # A note on modifying nightly releases
+    ///
+    /// Nightly releases are versioned by their release date. As such, it
+    /// is expected that this release date, and its release version are always
+    /// equal and in sync.
+    ///
+    /// If you use this method to modify the release date, make sure you also
+    /// update the release date of the nightly toolchain:
+    ///
+    /// ```
+    /// # use rust_releases_core2::Release;
+    /// use rust_toolchain::{Channel, Platform, ReleaseDate, Toolchain};
+    ///
+    /// let date = ReleaseDate::new(2023, 1, 1);
+    /// let platform = Platform::host();
+    /// let channel = Channel::nightly(date.clone()); // <- Note that a nightly version is a date
+    /// let toolchain = Toolchain::new(channel, platform);
+    ///
+    /// let mut release = Release::new_without_components(date, toolchain); // <- Note that a release also has a date
+    ///
+    /// // Modify the date
+    /// *release.date_mut() = ReleaseDate::new(2024, 1, 1);
+    ///
+    /// // Now the dates are out of sync. This may have unintended consequences.
+    /// assert_ne!(release.date(), release.toolchain().nightly_date().unwrap());
+    ///
+    /// // Also update the nightly toolchain version by updating the channel
+    /// release.toolchain_mut().channel = Channel::nightly(ReleaseDate::new(2024, 1, 1));
+    ///
+    /// // Now the dates are back in sync.
+    /// assert_eq!(release.date(), release.toolchain().nightly_date().unwrap());
+    /// ```
     pub fn date_mut(&mut self) -> &mut rust_toolchain::ReleaseDate {
         &mut self.date
     }
@@ -90,5 +123,20 @@ impl Release {
     /// Returns an iterator over the components which are optional, and not installed by default.
     pub fn extension_components(&self) -> impl Iterator<Item = &rust_toolchain::Component> {
         self.components.iter().filter(|f| f.optional)
+    }
+
+    /// Whether this is a _stable_ release.
+    pub fn is_stable(&self) -> bool {
+        self.toolchain.channel.is_stable()
+    }
+
+    /// Whether this is a _beta_ release.
+    pub fn is_beta(&self) -> bool {
+        self.toolchain.channel.is_beta()
+    }
+
+    /// Whether this is a _nightly_ release.
+    pub fn is_nightly(&self) -> bool {
+        self.toolchain.channel.is_nightly()
     }
 }

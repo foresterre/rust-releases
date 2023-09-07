@@ -10,3 +10,6 @@ repository = "https://github.com/foresterre/rust-releases"
 
 [dependencies]
 rust-toolchain = { path = "../rust-toolchain" }
+
+[dev-dependencies]
+yare = "1"

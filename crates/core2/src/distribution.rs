@@ -4,15 +4,18 @@ mod tests;
 #[cfg(test)]
 mod tests_eq;
 
+/// A _Rust distribution_, is a combined package which includes a _Rust toolchain_,
+/// consisting of the Rust compiler (`rustc`), and usually several common tools
+/// and libraries, like the Rust package manager (`cargo`) and the Rust standard library.
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct Release {
+pub struct Distribution {
     date: rust_toolchain::ReleaseDate,
     toolchain: rust_toolchain::Toolchain,
     components: Vec<rust_toolchain::Component>,
 }
 
-impl Release {
-    /// Create a new [`Release`] instance for a given toolchain with the given components.
+impl Distribution {
+    /// Create a new [`Distribution`] for a given toolchain with the given components.
     pub fn new(
         date: rust_toolchain::ReleaseDate,
         toolchain: rust_toolchain::Toolchain,
@@ -25,7 +28,7 @@ impl Release {
         }
     }
 
-    /// Create a new [`Release`] instance for a given toolchain, without any components.
+    /// Create a new [`Distribution`] for a given toolchain, without any components.
     pub fn new_without_components(
         date: rust_toolchain::ReleaseDate,
         toolchain: rust_toolchain::Toolchain,
@@ -54,7 +57,7 @@ impl Release {
     /// update the release date of the nightly toolchain:
     ///
     /// ```
-    /// # use rust_releases_core2::Release;
+    /// # use rust_releases_core2::Distribution;
     /// use rust_toolchain::{Channel, Platform, ReleaseDate, Toolchain};
     ///
     /// let date = ReleaseDate::new(2023, 1, 1);
@@ -62,7 +65,7 @@ impl Release {
     /// let channel = Channel::nightly(date.clone()); // <- Note that a nightly version is a date
     /// let toolchain = Toolchain::new(channel, platform);
     ///
-    /// let mut release = Release::new_without_components(date, toolchain); // <- Note that a release also has a date
+    /// let mut release = Distribution::new_without_components(date, toolchain); // <- Note that a release also has a date
     ///
     /// // Modify the date
     /// *release.date_mut() = ReleaseDate::new(2024, 1, 1);
@@ -97,7 +100,7 @@ impl Release {
     /// # Example
     ///
     /// ```rust
-    /// use rust_releases_core2::Release;
+    /// use rust_releases_core2::Distribution;
     ///
     /// let release_date = rust_toolchain::ReleaseDate::new(2023, 1, 1);
     /// let version = rust_toolchain::RustVersion::new(1, 31, 1);
@@ -107,7 +110,7 @@ impl Release {
     ///
     /// let toolchain = rust_toolchain::Toolchain::new(channel, platform);
     ///
-    /// let release = Release::new(release_date, toolchain, []);
+    /// let release = Distribution::new(release_date, toolchain, []);
     /// let component = release.find_component("hello");
     ///
     /// assert!(component.is_none());
@@ -116,6 +119,7 @@ impl Release {
         self.components.iter().find(|f| f.name == name)
     }
 
+    /// Returns an iterator over the components which are enabled by default.
     pub fn default_components(&self) -> impl Iterator<Item = &rust_toolchain::Component> {
         self.components.iter().filter(|f| !f.optional)
     }

@@ -1,20 +1,20 @@
-use crate::{Release, ReleaseSet};
+use crate::{Distribution, DistributionSet};
 use std::collections::HashMap;
 use std::iter;
 
 /// The default implementation for a `Register`.
 #[derive(Clone, Debug)]
 pub struct PlatformRegister {
-    register: HashMap<rust_toolchain::Platform, ReleaseSet>,
+    register: HashMap<rust_toolchain::Platform, DistributionSet>,
 }
 
 impl PlatformRegister {
     /// Instantiate a register from a iterable (Platform, Release) tuple
-    pub fn from_iter<I: IntoIterator<Item = (rust_toolchain::Platform, Release)>>(
+    pub fn from_iter<I: IntoIterator<Item = (rust_toolchain::Platform, Distribution)>>(
         iterable: I,
     ) -> Self {
         let register = iterable.into_iter().fold(
-            HashMap::<rust_toolchain::Platform, ReleaseSet>::new(),
+            HashMap::<rust_toolchain::Platform, DistributionSet>::new(),
             |mut map, (platform, release)| {
                 map.entry(platform).or_default().push(release);
                 map
@@ -25,14 +25,14 @@ impl PlatformRegister {
     }
 
     /// Add a release to the register.
-    pub fn add_release(&mut self, release: Release) {
+    pub fn add_distribution(&mut self, release: Distribution) {
         let platform = release.toolchain().platform().clone();
 
         self.register.entry(platform).or_default().push(release)
     }
 
     /// Get the releases for a given set of releases.
-    pub fn platform(&self, id: &rust_toolchain::Platform) -> Option<&ReleaseSet> {
+    pub fn platform(&self, id: &rust_toolchain::Platform) -> Option<&DistributionSet> {
         self.register.get(id)
     }
 
@@ -42,13 +42,13 @@ impl PlatformRegister {
     }
 
     /// List all releases, regardless of platform, ordered by least- to most recent.
-    pub fn ascending(&self) -> impl IntoIterator<Item = &Release> {
+    pub fn ascending(&self) -> impl IntoIterator<Item = &Distribution> {
         //BTreeSet::from_iter(self.register.values().map(|reg| reg.ascending()).flatten())
         iter::once(todo!())
     }
 
     /// List all releases, regardless of platform, ordered by most- to least recent.
-    pub fn descending(&self) -> impl IntoIterator<Item = &Release> {
+    pub fn descending(&self) -> impl IntoIterator<Item = &Distribution> {
         // BTreeSet::from_iter(self.register.values().map(|reg| reg.descending()).flatten())
         iter::once(todo!())
     }
@@ -57,7 +57,7 @@ impl PlatformRegister {
     pub fn by_date(
         &self,
         date: &rust_toolchain::ReleaseDate,
-    ) -> impl IntoIterator<Item = &Release> {
+    ) -> impl IntoIterator<Item = &Distribution> {
         // self.platform_register
         //     .values()
         //     .map(|reg| reg.ascending().into_iter().filter(|rel| rel.date() == date))

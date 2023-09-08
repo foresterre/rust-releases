@@ -2,10 +2,10 @@
 
 use super::*;
 
-fn default_test_subject() -> Release {
+fn default_test_subject() -> Distribution {
     let date = rust_toolchain::ReleaseDate::new(2000, 1, 2);
 
-    Release::new_without_components(
+    Distribution::new_without_components(
         date,
         rust_toolchain::Toolchain::new(
             rust_toolchain::Channel::stable(rust_toolchain::RustVersion::new(1, 2, 3)),

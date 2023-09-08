@@ -1,13 +1,29 @@
-mod register;
-mod release;
-mod release_set;
+//! For the purpose of this library, a _Rust release_, refers to a new version of
+//! the Rust programming language. A _Rust distribution_, is a combined package
+//! which includes a _Rust toolchain_, consisting of the Rust compiler (`rustc`),
+//! and usually several common tools and libraries, like the Rust package
+//! manager (`cargo`) and the Rust standard libraries (`alloc`, `core` and `std`).
+//!
+//! Within this library, both "release" and "distribution" are sometimes used
+//! interchangeably to refer to, what was described in the previous paragraph
+//! as a Rust distribution.
+//!
+//! # Channels
+//!
+//! The Rust project currently produces three types of releases: stable, beta and nightly releases.
+//! These are distributed via stable, beta and nightly release channel respectively.
+//!
+//! _Stable_ and _beta_ releases can be identified by their semver version number.
+//!
+//! _Nightly_ releases can be identified by their release date.
 
-/// todo!
+mod distribution;
+mod register;
+mod set;
+
+pub use distribution::Distribution;
 pub use register::Register;
-/// todo!
-pub use release::Release;
-/// todo!
-pub use release_set::ReleaseSet;
+pub use set::DistributionSet;
 
 #[test]
 fn rust_releases() {

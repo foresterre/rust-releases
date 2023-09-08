@@ -1,4 +1,4 @@
-use crate::Release;
+use crate::Distribution;
 
 #[test]
 fn extensions() {
@@ -7,7 +7,7 @@ fn extensions() {
     let platform = rust_toolchain::Platform::host();
 
     let toolchain = rust_toolchain::Toolchain::new(channel, platform);
-    let release = Release::new(release_date, toolchain, []);
+    let release = Distribution::new(release_date, toolchain, []);
 
     let default_components = release.default_components().count();
     let extension_components = release.extension_components().count();
@@ -23,7 +23,7 @@ fn find_component_returns_none_if_release_has_no_components() {
     let platform = rust_toolchain::Platform::host();
 
     let toolchain = rust_toolchain::Toolchain::new(channel, platform);
-    let release = Release::new(release_date, toolchain, []);
+    let release = Distribution::new(release_date, toolchain, []);
 
     let component = release.find_component("hello");
     assert!(component.is_none());

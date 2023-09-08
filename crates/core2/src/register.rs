@@ -1,4 +1,4 @@
-use crate::{Release, ReleaseSet};
+use crate::{Distribution, DistributionSet};
 
 // Contains the actual implementation of the register API defined here.
 mod r#impl;
@@ -6,10 +6,8 @@ mod r#impl;
 #[cfg(test)]
 mod tests;
 
-/// A data structure consisting of the known Rust releases.
-///
-/// Whether a release is known, and how much information is known about a release,
-/// depends on the source used to build up this information.
+/// The [`Register`] data structure provides a way to store and query the available
+/// Rust distributions, known to this library.
 #[derive(Clone, Debug)]
 pub struct Register {
     platform_register: r#impl::PlatformRegister,
@@ -17,7 +15,9 @@ pub struct Register {
 
 // Instantiations
 impl Register {
-    pub fn from_iter<I: IntoIterator<Item = (rust_toolchain::Platform, Release)>>(
+    /// Create a new [`Register`] from an iterable of `([`rust_toolchain::Platform`], [`Distribution`])`
+    /// tuples.
+    pub fn from_iter<I: IntoIterator<Item = (rust_toolchain::Platform, Distribution)>>(
         iterable: I,
     ) -> Self {
         let platform_register = r#impl::PlatformRegister::from_iter(iterable);
@@ -28,15 +28,16 @@ impl Register {
 
 // Modifications
 impl Register {
-    pub fn add_release(&mut self, release: Release) {
-        self.platform_register.add_release(release)
+    /// Add a [`Distribution`] to the [`Register`].
+    pub fn add_distribution(&mut self, distribution: Distribution) {
+        self.platform_register.add_distribution(distribution)
     }
 }
 
 // Getters
 impl Register {
-    /// Get a subset of the register, where the subset contains just the releases of the given platform.
-    pub fn platform(&self, id: &rust_toolchain::Platform) -> Option<&ReleaseSet> {
+    /// Get all releases for a given platform.
+    pub fn platform(&self, id: &rust_toolchain::Platform) -> Option<&DistributionSet> {
         self.platform_register.platform(id)
     }
 

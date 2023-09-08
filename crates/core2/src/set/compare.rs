@@ -1,4 +1,4 @@
-use crate::Release;
+use crate::Distribution;
 use rust_toolchain::Channel;
 use std::cmp::Ordering;
 
@@ -10,7 +10,7 @@ use std::cmp::Ordering;
 ///     NB: Only `stable` and `beta` have a version, so a `nightly` release will always be considered "equal" by its version.
 /// 3. When comparing any releases of the same channel and version `a` and `b`, and `date(a) * date(b)`, then `a * b`.
 #[derive(Clone, Debug, Eq)]
-pub struct CompareRelease(pub Release);
+pub struct CompareRelease(pub Distribution);
 
 impl PartialEq for CompareRelease {
     fn eq(&self, other: &Self) -> bool {
@@ -38,7 +38,7 @@ impl PartialOrd for CompareRelease {
 impl Ord for CompareRelease {
     fn cmp(&self, other: &Self) -> Ordering {
         // pre: `lhs` and `rhs` must be the same channel!
-        fn compare_same_channel(lhs: &Release, rhs: &Release) -> Ordering {
+        fn compare_same_channel(lhs: &Distribution, rhs: &Distribution) -> Ordering {
             let lhs_toolchain = lhs.toolchain();
             let rhs_toolchain = rhs.toolchain();
 
@@ -60,16 +60,16 @@ impl Ord for CompareRelease {
 
 #[cfg(test)]
 mod tests_compare_release {
-    use crate::release_set::compare::CompareRelease;
-    use crate::Release;
+    use crate::set::compare::CompareRelease;
+    use crate::Distribution;
     use rust_toolchain::{Channel, Platform, ReleaseDate, RustVersion};
     use std::cmp::Ordering;
     use yare::parameterized;
 
-    fn default_test_subject() -> Release {
+    fn default_test_subject() -> Distribution {
         let date = ReleaseDate::new(0, 0, 0);
 
-        Release::new_without_components(
+        Distribution::new_without_components(
             date,
             rust_toolchain::Toolchain::new(
                 Channel::stable(RustVersion::new(1, 2, 3)),
@@ -268,7 +268,7 @@ impl Ord for CompareChannel<'_> {
 
 #[cfg(test)]
 mod tests_channel_comparator {
-    use crate::release_set::compare::CompareChannel;
+    use crate::set::compare::CompareChannel;
     use rust_toolchain::{Channel, ReleaseDate, RustVersion};
     use std::cmp::Ordering;
     use yare::parameterized;

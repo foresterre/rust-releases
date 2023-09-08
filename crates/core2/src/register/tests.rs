@@ -1,7 +1,7 @@
 use super::*;
 
-fn default_test_subject() -> Release {
-    Release::new_without_components(
+fn default_test_subject() -> Distribution {
+    Distribution::new_without_components(
         rust_toolchain::ReleaseDate::new(2023, 1, 1),
         rust_toolchain::Toolchain::new(
             rust_toolchain::Channel::stable(rust_toolchain::RustVersion::new(1, 0, 0)),

@@ -50,11 +50,11 @@ impl Distribution {
     /// # A note on modifying nightly releases
     ///
     /// Nightly releases are versioned by their release date. As such, it
-    /// is expected that this release date, and its release version are always
-    /// equal and in sync.
+    /// is usually the case that this release date, and its release version are
+    /// in sync.
     ///
     /// If you use this method to modify the release date, make sure you also
-    /// update the release date of the nightly toolchain:
+    /// (if desired, of course), update the release date of the nightly toolchain:
     ///
     /// ```
     /// # use rust_releases_core2::Distribution;

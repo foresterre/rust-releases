@@ -6,9 +6,10 @@ use std::cmp::Ordering;
 /// NB: `*` can be interpreted as any of the comparator operations: `>` or `<`.
 ///
 /// 1. `stable > beta > nightly`.
-/// 2. When comparing any releases of the same channel `a` and `b`, and `version(a) * version(b)`, then `a * b`.
-///     NB: Only `stable` and `beta` have a version, so a `nightly` release will always be considered "equal" by its version.
-/// 3. When comparing any releases of the same channel and version `a` and `b`, and `date(a) * date(b)`, then `a * b`.
+/// 2. When comparing any releases of the same channel, `a` and `b`, and `version(a) * version(b)`, then `a * b`.
+///     * Only `stable` and `beta` have a version, so two `nightly` releases will be considered equal.
+/// 3. When comparing two releases of the same channel, `a` and `b`, and `date(a) * date(b)`, then `a * b`.
+///     * Only `nightly` has a date, so if the version of two `stable` or `beta` releases match, they will be considered equal.
 #[derive(Clone, Debug, Eq)]
 pub struct CompareRelease(pub Distribution);
 

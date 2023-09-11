@@ -1,0 +1,62 @@
+------------------------------------------------------------------------
+
+/release/stable/:version => specific version
+/release/stable => latest known version
+/release/stable?since=$date&until=$date&limit=$uint&offset=$uint
+
+
+/release/beta/:version
+/release/beta
+
+/release/nightly/:date
+/release/nightly
+
+/current => latest stable, beta, nightly
+/current?at=$date
+
+```
+{
+    ...Release,
+}
+```
+
+type Release = rust_toolchain::Release;
+
+
+------------------------------------------------------------------------
+
+/channel/stable => list of all stable releases
+/channel/beta
+/channel/nightly
+
+```
+{
+    latest: { ...ShortRelease, }
+    releases: [{ ...ShortRelease, }]
+}
+```
+
+
+type ShortRelease = {
+    version: string;
+    date: Date;
+}
+
+------------------------------------------------------------------------
+
+/component/:component
+
+```
+{
+    availableOn: [
+        {
+            ...ShortRelease,
+            targets: triple[]
+        },
+    ]
+}
+```
+
+
+------------------------------------------------------------------------
+

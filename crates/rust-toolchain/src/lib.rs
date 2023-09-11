@@ -16,6 +16,20 @@
 //! [`rust-releases`]: https://github.com/foresterre/rust-releases
 //! [`cargo-msrv`]: https://github.com/foresterre/cargo-msrv
 //! [`repository`]: https://github.com/foresterre/rust-releases/issues
-#![deny(missing_docs)]
+// #![deny(missing_docs)]
 #![deny(clippy::all)]
 #![deny(unsafe_code)]
+
+mod channel;
+mod component;
+mod platform;
+mod release_date;
+mod rust_version;
+mod toolchain;
+
+pub use channel::{Beta, Channel, Nightly, Stable};
+pub use component::Component;
+pub use platform::Platform;
+pub use release_date::ReleaseDate;
+pub use rust_version::RustVersion;
+pub use toolchain::Toolchain;

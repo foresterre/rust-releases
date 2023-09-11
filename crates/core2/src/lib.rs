@@ -4,10 +4,6 @@
 //! and usually several common tools and libraries, like the Rust package
 //! manager (`cargo`) and the Rust standard libraries (`alloc`, `core` and `std`).
 //!
-//! Within this library, both "release" and "distribution" are sometimes used
-//! interchangeably to refer to, what was described in the previous paragraph
-//! as a Rust distribution.
-//!
 //! # Channels
 //!
 //! The Rust project currently produces three types of releases: stable, beta and nightly releases.

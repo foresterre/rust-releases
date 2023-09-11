@@ -11,6 +11,13 @@ fn default_test_subject() -> Distribution {
 }
 
 #[test]
+fn new_register() {
+    let register = Register::new();
+
+    assert_eq!(register.size(), 0);
+}
+
+#[test]
 fn from_iter_with_different_versions() {
     let release1 = default_test_subject();
     let mut release2 = default_test_subject();

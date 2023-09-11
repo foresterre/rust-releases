@@ -1,4 +1,5 @@
 use crate::{Distribution, DistributionSet};
+use rust_toolchain::Channel;
 use std::collections::HashMap;
 use std::iter;
 
@@ -41,8 +42,21 @@ impl PlatformRegister {
         self.register.values().map(|reg| reg.len()).sum()
     }
 
+    pub fn distributions_by_channel(
+        &self,
+        channel: &Channel,
+    ) -> impl Iterator<Item = &Distribution> {
+        // self.register.iter().filter_map(|(platform, set)| {
+        //     set.ascending()
+        //         .filter(|dist| dist.toolchain().channel() == channel)
+        //         .next()
+        // })
+
+        iter::once(todo!())
+    }
+
     /// List all releases, regardless of platform, ordered by least- to most recent.
-    pub fn ascending(&self) -> impl IntoIterator<Item = &Distribution> {
+    pub fn ascending(&self) -> impl Iterator<Item = &Distribution> {
         //BTreeSet::from_iter(self.register.values().map(|reg| reg.ascending()).flatten())
         iter::once(todo!())
     }

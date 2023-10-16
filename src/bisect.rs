@@ -232,8 +232,6 @@ mod tests {
     use super::*;
     use rust_releases_core::{semver, Release};
 
-    yare::ide!();
-
     fn narrow_by_minor(release: &Release, at_least: u64) -> Narrow {
         if release.version().minor >= at_least {
             Narrow::ToRight

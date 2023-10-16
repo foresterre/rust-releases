@@ -49,4 +49,4 @@ rust-releases-rust-dist = { version = "^0.27.0", path = "crates/rust-releases-ru
 rust-releases-rust-dist-with-cli = { version = "^0.27.0", path = "crates/rust-releases-rust-dist-with-cli", optional = true }
 
 [dev-dependencies]
-yare = "1.0.0"
+yare = "2.0.0"

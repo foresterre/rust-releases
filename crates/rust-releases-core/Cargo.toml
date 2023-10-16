@@ -14,4 +14,4 @@ thiserror = "1.0.24"
 semver = "1.0.0"
 
 [dev-dependencies]
-yare = "1.0.1"
+yare = "2.0.0"

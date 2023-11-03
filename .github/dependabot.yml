@@ -7,3 +7,11 @@ updates:
   open-pull-requests-limit: 10
   labels:
     - C-dependency-update
+  groups:
+    aws:
+      patterns:
+      - "aws-*"
+      update-types:
+      - "major"
+      - "minor"
+      - "patch"

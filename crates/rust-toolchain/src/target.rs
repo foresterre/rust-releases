@@ -11,16 +11,16 @@ use std::str::FromStr;
 // - https://doc.rust-lang.org/rustc/platform-support.html
 // - https://rust-lang.github.io/rustup/concepts/toolchains.html
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
-pub struct Platform {
-    platform: target_lexicon::Triple,
+pub struct Target {
+    target: target_lexicon::Triple,
 }
 
-impl Platform {
+impl Target {
     /// Create a new `Platform` instance which represents the `host` platform on which the compiler
     /// is ran.
     pub const fn host() -> Self {
         Self {
-            platform: target_lexicon::HOST,
+            target: target_lexicon::HOST,
         }
     }
 
@@ -32,7 +32,7 @@ impl Platform {
     pub fn try_from_target_triple(triple: &str) -> Result<Self, ()> {
         let platform = target_lexicon::Triple::from_str(triple).map_err(|_err| ())?;
 
-        Ok(Self { platform })
+        Ok(Self { target: platform })
     }
 
     /// Create a new `Platform` instance from a [`target triple`], defaults to
@@ -45,7 +45,7 @@ impl Platform {
         let platform = target_lexicon::Triple::from_str(triple)
             .unwrap_or_else(|_| target_lexicon::Triple::unknown());
 
-        Self { platform }
+        Self { target: platform }
     }
 }
 
@@ -55,10 +55,10 @@ mod tests {
 
     #[test]
     fn create_platform() {
-        let this_platform = Platform::host();
+        let this_platform = Target::host();
 
-        let expected = Platform {
-            platform: target_lexicon::HOST,
+        let expected = Target {
+            target: target_lexicon::HOST,
         };
 
         assert_eq!(this_platform, expected);

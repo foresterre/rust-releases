@@ -2,11 +2,11 @@
 //!
 //! [`distributions`]: Distribution
 
+use crate::comparable_distribution::ComparableDistribution;
 use crate::Distribution;
 use std::collections::BTreeSet;
 
 /// Defines how releases are to be compared and ordered within a release set.
-mod compare;
 #[cfg(test)]
 mod tests;
 
@@ -25,11 +25,11 @@ mod tests;
 /// [`<`]: PartialOrd::lt
 /// [`>`]: PartialOrd::gt
 #[derive(Clone, Debug, Default, PartialEq)]
-pub struct DistributionSet {
-    releases: BTreeSet<compare::CompareRelease>,
+pub struct DistributionSet<R: Ord> {
+    releases: BTreeSet<R>,
 }
 
-impl DistributionSet {
+impl<R> DistributionSet<R> {
     /// Create a new set from anything that can be turned into an owned iterator over
     /// [`Distribution`].
     ///
@@ -38,12 +38,12 @@ impl DistributionSet {
     /// ```
     /// # use std::iter;
     /// # use rust_releases_core2::{Distribution, DistributionSet};
-    /// # use rust_toolchain::{Channel, Platform, ReleaseDate, RustVersion, Toolchain};
+    /// # use rust_toolchain::{Channel, Target, ReleaseDate, RustVersion, Toolchain};
     /// #
     /// let date = ReleaseDate::new(2023, 1, 1);
     /// let version = RustVersion::new(1, 31, 0);
     ///
-    /// let toolchain = Toolchain::new(Channel::stable(version), Platform::host());
+    /// let toolchain = Toolchain::new(Channel::stable(version), Target::host());
     /// let distribution = Distribution::new_without_components(date, toolchain);
     ///
     /// let set = DistributionSet::from_iter(iter::once(distribution));
@@ -52,7 +52,7 @@ impl DistributionSet {
     /// ```
     pub fn from_iter<I: IntoIterator<Item = Distribution>>(iterable: I) -> Self {
         Self {
-            releases: iterable.into_iter().map(compare::CompareRelease).collect(),
+            releases: iterable.into_iter().map(ComparableDistribution).collect(),
         }
     }
 
@@ -63,13 +63,13 @@ impl DistributionSet {
     /// ```
     /// # use std::iter;
     /// # use rust_releases_core2::{Distribution, DistributionSet};
-    /// # use rust_toolchain::{Channel, Platform, ReleaseDate, RustVersion, Toolchain};
+    /// # use rust_toolchain::{Channel, Target, ReleaseDate, RustVersion, Toolchain};
     /// #
     /// # let date = ReleaseDate::new(2023, 1, 1);
-    /// # let toolchain = Toolchain::new(Channel::stable(RustVersion::new(1, 31, 0)), Platform::host());
+    /// # let toolchain = Toolchain::new(Channel::stable(RustVersion::new(1, 31, 0)), Target::host());
     /// # let distribution = Distribution::new_without_components(date.clone(), toolchain);
     /// #
-    /// # let different_toolchain = Toolchain::new(Channel::stable(RustVersion::new(1, 32, 0)), Platform::host());
+    /// # let different_toolchain = Toolchain::new(Channel::stable(RustVersion::new(1, 32, 0)), Target::host());
     /// # let different_distribution = Distribution::new_without_components(date.clone(), different_toolchain);
     /// #
     /// let mut set = DistributionSet::from_iter(iter::once(distribution.clone()));
@@ -87,11 +87,11 @@ impl DistributionSet {
     /// assert_eq!(set.len(), 2);
     /// ```
     pub fn push(&mut self, release: Distribution) {
-        self.releases.insert(compare::CompareRelease(release));
+        self.releases.insert(ComparableDistribution(release));
     }
 }
 
-impl DistributionSet {
+impl<R: Ord> DistributionSet<R> {
     /// Find the least recently released Rust release for the current platform.
     ///
     /// Returns `None` if no release could be found.
@@ -101,11 +101,11 @@ impl DistributionSet {
     /// ```
     /// # use std::iter;
     /// # use rust_releases_core2::{Distribution, DistributionSet};
-    /// # use rust_toolchain::{Channel, Platform, ReleaseDate, RustVersion, Toolchain};
+    /// # use rust_toolchain::{Channel, Target, ReleaseDate, RustVersion, Toolchain};
     /// #
     /// # let date = ReleaseDate::new(2023, 1, 1);
-    /// # let toolchain31 = Toolchain::new(Channel::stable(RustVersion::new(1, 31, 0)), Platform::host());
-    /// # let toolchain32 = Toolchain::new(Channel::stable(RustVersion::new(1, 32, 0)), Platform::host());
+    /// # let toolchain31 = Toolchain::new(Channel::stable(RustVersion::new(1, 31, 0)), Target::host());
+    /// # let toolchain32 = Toolchain::new(Channel::stable(RustVersion::new(1, 32, 0)), Target::host());
     /// # let distribution31 = Distribution::new_without_components(date.clone(), toolchain31);
     /// # let distribution32 = Distribution::new_without_components(date.clone(), toolchain32);
     /// #
@@ -136,11 +136,11 @@ impl DistributionSet {
     /// ```
     /// # use std::iter;
     /// # use rust_releases_core2::{Distribution, DistributionSet};
-    /// # use rust_toolchain::{Channel, Platform, ReleaseDate, RustVersion, Toolchain};
+    /// # use rust_toolchain::{Channel, Target, ReleaseDate, RustVersion, Toolchain};
     /// #
     /// # let date = ReleaseDate::new(2023, 1, 1);
-    /// # let toolchain31 = Toolchain::new(Channel::stable(RustVersion::new(1, 31, 0)), Platform::host());
-    /// # let toolchain32 = Toolchain::new(Channel::stable(RustVersion::new(1, 32, 0)), Platform::host());
+    /// # let toolchain31 = Toolchain::new(Channel::stable(RustVersion::new(1, 31, 0)), Target::host());
+    /// # let toolchain32 = Toolchain::new(Channel::stable(RustVersion::new(1, 32, 0)), Target::host());
     /// # let distribution31 = Distribution::new_without_components(date.clone(), toolchain31);
     /// # let distribution32 = Distribution::new_without_components(date.clone(), toolchain32);
     /// #
@@ -169,11 +169,11 @@ impl DistributionSet {
     /// ```
     /// # use std::iter;
     /// # use rust_releases_core2::{Distribution, DistributionSet};
-    /// # use rust_toolchain::{Channel, Platform, ReleaseDate, RustVersion, Toolchain};
+    /// # use rust_toolchain::{Channel, Target, ReleaseDate, RustVersion, Toolchain};
     /// #
     /// # let date = ReleaseDate::new(2023, 1, 1);
-    /// # let toolchain31 = Toolchain::new(Channel::stable(RustVersion::new(1, 31, 0)), Platform::host());
-    /// # let toolchain32 = Toolchain::new(Channel::stable(RustVersion::new(1, 32, 0)), Platform::host());
+    /// # let toolchain31 = Toolchain::new(Channel::stable(RustVersion::new(1, 31, 0)), Target::host());
+    /// # let toolchain32 = Toolchain::new(Channel::stable(RustVersion::new(1, 32, 0)), Target::host());
     /// # let distribution31 = Distribution::new_without_components(date.clone(), toolchain31);
     /// # let distribution32 = Distribution::new_without_components(date.clone(), toolchain32);
     /// #
@@ -201,11 +201,11 @@ impl DistributionSet {
     /// ```
     /// # use std::iter;
     /// # use rust_releases_core2::{Distribution, DistributionSet};
-    /// # use rust_toolchain::{Channel, Platform, ReleaseDate, RustVersion, Toolchain};
+    /// # use rust_toolchain::{Channel, Target, ReleaseDate, RustVersion, Toolchain};
     /// #
     /// # let date = ReleaseDate::new(2023, 1, 1);
-    /// # let toolchain31 = Toolchain::new(Channel::stable(RustVersion::new(1, 31, 0)), Platform::host());
-    /// # let toolchain32 = Toolchain::new(Channel::stable(RustVersion::new(1, 32, 0)), Platform::host());
+    /// # let toolchain31 = Toolchain::new(Channel::stable(RustVersion::new(1, 31, 0)), Target::host());
+    /// # let toolchain32 = Toolchain::new(Channel::stable(RustVersion::new(1, 32, 0)), Target::host());
     /// # let distribution31 = Distribution::new_without_components(date.clone(), toolchain31);
     /// # let distribution32 = Distribution::new_without_components(date.clone(), toolchain32);
     /// #
@@ -233,11 +233,11 @@ impl DistributionSet {
     /// ```
     /// # use std::iter;
     /// # use rust_releases_core2::{Distribution, DistributionSet};
-    /// # use rust_toolchain::{Channel, Platform, ReleaseDate, RustVersion, Toolchain};
+    /// # use rust_toolchain::{Channel, Target, ReleaseDate, RustVersion, Toolchain};
     /// #
     /// # let date = ReleaseDate::new(2023, 1, 1);
-    /// # let toolchain31 = Toolchain::new(Channel::stable(RustVersion::new(1, 31, 0)), Platform::host());
-    /// # let toolchain32 = Toolchain::new(Channel::stable(RustVersion::new(1, 32, 0)), Platform::host());
+    /// # let toolchain31 = Toolchain::new(Channel::stable(RustVersion::new(1, 31, 0)), Target::host());
+    /// # let toolchain32 = Toolchain::new(Channel::stable(RustVersion::new(1, 32, 0)), Target::host());
     /// # let distribution31 = Distribution::new_without_components(date.clone(), toolchain31);
     /// # let distribution32 = Distribution::new_without_components(date.clone(), toolchain32);
     /// #

@@ -4,7 +4,7 @@ use crate::Distribution;
 fn extensions() {
     let release_date = rust_toolchain::ReleaseDate::new(2023, 1, 1);
     let channel = rust_toolchain::Channel::nightly(release_date.clone());
-    let platform = rust_toolchain::Platform::host();
+    let platform = rust_toolchain::Target::host();
 
     let toolchain = rust_toolchain::Toolchain::new(channel, platform);
     let release = Distribution::new(release_date, toolchain, []);
@@ -20,7 +20,7 @@ fn extensions() {
 fn find_component_returns_none_if_release_has_no_components() {
     let release_date = rust_toolchain::ReleaseDate::new(2023, 1, 1);
     let channel = rust_toolchain::Channel::nightly(release_date.clone());
-    let platform = rust_toolchain::Platform::host();
+    let platform = rust_toolchain::Target::host();
 
     let toolchain = rust_toolchain::Toolchain::new(channel, platform);
     let release = Distribution::new(release_date, toolchain, []);

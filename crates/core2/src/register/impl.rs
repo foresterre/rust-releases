@@ -6,16 +6,16 @@ use std::iter;
 /// The default implementation for a `Register`.
 #[derive(Clone, Debug)]
 pub struct PlatformRegister {
-    register: HashMap<rust_toolchain::Platform, DistributionSet>,
+    register: HashMap<rust_toolchain::Target, DistributionSet>,
 }
 
 impl PlatformRegister {
     /// Instantiate a register from a iterable (Platform, Release) tuple
-    pub fn from_iter<I: IntoIterator<Item = (rust_toolchain::Platform, Distribution)>>(
+    pub fn from_iter<I: IntoIterator<Item = (rust_toolchain::Target, Distribution)>>(
         iterable: I,
     ) -> Self {
         let register = iterable.into_iter().fold(
-            HashMap::<rust_toolchain::Platform, DistributionSet>::new(),
+            HashMap::<rust_toolchain::Target, DistributionSet>::new(),
             |mut map, (platform, release)| {
                 map.entry(platform).or_default().push(release);
                 map
@@ -33,7 +33,7 @@ impl PlatformRegister {
     }
 
     /// Get the releases for a given set of releases.
-    pub fn platform(&self, id: &rust_toolchain::Platform) -> Option<&DistributionSet> {
+    pub fn platform(&self, id: &rust_toolchain::Target) -> Option<&DistributionSet> {
         self.register.get(id)
     }
 

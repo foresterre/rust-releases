@@ -11,9 +11,9 @@ use std::cmp::Ordering;
 /// 3. When comparing two releases of the same channel, `a` and `b`, and `date(a) * date(b)`, then `a * b`.
 ///     * Only `nightly` has a date, so if the version of two `stable` or `beta` releases match, they will be considered equal.
 #[derive(Clone, Debug, Eq)]
-pub struct CompareRelease(pub Distribution);
+pub struct ComparableDistribution(pub Distribution);
 
-impl PartialEq for CompareRelease {
+impl PartialEq for ComparableDistribution {
     fn eq(&self, other: &Self) -> bool {
         let lhs = &self.0;
         let rhs = &other.0;
@@ -30,13 +30,13 @@ impl PartialEq for CompareRelease {
     }
 }
 
-impl PartialOrd for CompareRelease {
+impl PartialOrd for ComparableDistribution {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(&other))
     }
 }
 
-impl Ord for CompareRelease {
+impl Ord for ComparableDistribution {
     fn cmp(&self, other: &Self) -> Ordering {
         // pre: `lhs` and `rhs` must be the same channel!
         fn compare_same_channel(lhs: &Distribution, rhs: &Distribution) -> Ordering {
@@ -61,9 +61,9 @@ impl Ord for CompareRelease {
 
 #[cfg(test)]
 mod tests_compare_release {
-    use crate::set::compare::CompareRelease;
+    use crate::comparable_distribution::ComparableDistribution;
     use crate::Distribution;
-    use rust_toolchain::{Channel, Platform, ReleaseDate, RustVersion};
+    use rust_toolchain::{Channel, ReleaseDate, RustVersion, Target};
     use std::cmp::Ordering;
     use yare::parameterized;
 
@@ -74,7 +74,7 @@ mod tests_compare_release {
             date,
             rust_toolchain::Toolchain::new(
                 Channel::stable(RustVersion::new(1, 2, 3)),
-                Platform::host(),
+                Target::host(),
             ),
         )
     }
@@ -90,8 +90,8 @@ mod tests_compare_release {
         let mut release1 = default_test_subject();
         release1.toolchain_mut().channel = channel;
 
-        let lhs = CompareRelease(release0);
-        let rhs = CompareRelease(release1);
+        let lhs = ComparableDistribution(release0);
+        let rhs = ComparableDistribution(release1);
 
         assert_eq!(lhs, rhs);
         assert_eq!(lhs.cmp(&rhs), Ordering::Equal);
@@ -104,8 +104,8 @@ mod tests_compare_release {
         let mut release1 = default_test_subject();
         release1.toolchain_mut().channel = Channel::stable(RustVersion::new(0, 0, 0));
 
-        let lhs = CompareRelease(release0);
-        let rhs = CompareRelease(release1);
+        let lhs = ComparableDistribution(release0);
+        let rhs = ComparableDistribution(release1);
 
         // lhs != rhs
         assert_ne!(lhs, rhs);
@@ -120,8 +120,8 @@ mod tests_compare_release {
         let mut release1 = default_test_subject();
         release1.toolchain_mut().channel = Channel::beta(RustVersion::new(0, 0, 0));
 
-        let stable = CompareRelease(release0);
-        let beta = CompareRelease(release1);
+        let stable = ComparableDistribution(release0);
+        let beta = ComparableDistribution(release1);
 
         // lhs != rhs
         assert_ne!(stable, beta);
@@ -136,8 +136,8 @@ mod tests_compare_release {
         let mut release1 = default_test_subject();
         release1.toolchain_mut().channel = Channel::nightly(ReleaseDate::new(0, 0, 0));
 
-        let stable = CompareRelease(release0);
-        let nightly = CompareRelease(release1);
+        let stable = ComparableDistribution(release0);
+        let nightly = ComparableDistribution(release1);
 
         // lhs != rhs
         assert_ne!(stable, nightly);
@@ -152,8 +152,8 @@ mod tests_compare_release {
         let mut release1 = default_test_subject();
         release1.toolchain_mut().channel = Channel::stable(RustVersion::new(0, 0, 0));
 
-        let lhs = CompareRelease(release0);
-        let rhs = CompareRelease(release1);
+        let lhs = ComparableDistribution(release0);
+        let rhs = ComparableDistribution(release1);
 
         // lhs != rhs
         assert_ne!(lhs, rhs);
@@ -168,8 +168,8 @@ mod tests_compare_release {
         let mut release1 = default_test_subject();
         release1.toolchain_mut().channel = Channel::stable(RustVersion::new(0, 0, 0));
 
-        let beta = CompareRelease(release0);
-        let stable = CompareRelease(release1);
+        let beta = ComparableDistribution(release0);
+        let stable = ComparableDistribution(release1);
 
         // lhs != rhs
         assert_ne!(beta, stable);
@@ -184,8 +184,8 @@ mod tests_compare_release {
         let mut release1 = default_test_subject();
         release1.toolchain_mut().channel = Channel::nightly(ReleaseDate::new(0, 0, 0));
 
-        let beta = CompareRelease(release0);
-        let nightly = CompareRelease(release1);
+        let beta = ComparableDistribution(release0);
+        let nightly = ComparableDistribution(release1);
 
         // lhs != rhs
         assert_ne!(beta, nightly);
@@ -200,8 +200,8 @@ mod tests_compare_release {
         let mut release1 = default_test_subject();
         release1.toolchain_mut().channel = Channel::nightly(ReleaseDate::new(0, 0, 0));
 
-        let lhs = CompareRelease(release0);
-        let rhs = CompareRelease(release1);
+        let lhs = ComparableDistribution(release0);
+        let rhs = ComparableDistribution(release1);
 
         // lhs != rhs
         assert_ne!(lhs, rhs);
@@ -216,8 +216,8 @@ mod tests_compare_release {
         let mut release1 = default_test_subject();
         release1.toolchain_mut().channel = Channel::stable(RustVersion::new(0, 0, 0));
 
-        let nightly = CompareRelease(release0);
-        let stable = CompareRelease(release1);
+        let nightly = ComparableDistribution(release0);
+        let stable = ComparableDistribution(release1);
 
         // lhs != rhs
         assert_ne!(nightly, stable);
@@ -232,8 +232,8 @@ mod tests_compare_release {
         let mut release1 = default_test_subject();
         release1.toolchain_mut().channel = Channel::beta(RustVersion::new(0, 0, 0));
 
-        let nightly = CompareRelease(release0);
-        let beta = CompareRelease(release1);
+        let nightly = ComparableDistribution(release0);
+        let beta = ComparableDistribution(release1);
 
         // lhs != rhs
         assert_ne!(nightly, beta);
@@ -269,7 +269,7 @@ impl Ord for CompareChannel<'_> {
 
 #[cfg(test)]
 mod tests_channel_comparator {
-    use crate::set::compare::CompareChannel;
+    use super::CompareChannel;
     use rust_toolchain::{Channel, ReleaseDate, RustVersion};
     use std::cmp::Ordering;
     use yare::parameterized;

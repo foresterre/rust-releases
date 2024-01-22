@@ -1,5 +1,5 @@
 use crate::errors::{AwsError, RustDistError, RustDistResult};
-use aws_config::AppName;
+use aws_config::{AppName, BehaviorVersion};
 use aws_sdk_s3::config::Region;
 use aws_sdk_s3::operation::list_objects_v2::ListObjectsV2Output;
 use aws_sdk_s3::types::Object;
@@ -65,7 +65,7 @@ impl Client {
             .map_err(AwsError::InvalidAppName)?;
 
         let config = runtime.block_on(
-            aws_config::from_env()
+            aws_config::defaults(BehaviorVersion::v2023_11_09())
                 .no_credentials()
                 .app_name(app_name)
                 .region(RUST_DIST_REGION)
@@ -106,8 +106,9 @@ impl ChunkClient for Client {
             .runtime
             .block_on(list_objects(&self.aws_s3_client, offset))?;
 
-        if !raw.is_truncated() {
-            return Ok(ChunkState::Complete);
+        match raw.is_truncated {
+            Some(truncated) if !truncated => return Ok(ChunkState::Complete),
+            _ => {}
         }
 
         let objects = raw.contents.ok_or(RustDistError::ChunkMetadataMissing)?;

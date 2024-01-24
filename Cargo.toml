@@ -20,10 +20,8 @@ rust-version = "1.68"
 members = [
     "crates/rust-releases-core",
     "crates/rust-releases-io",
-    "crates/rust-releases-channel-manifests",
     "crates/rust-releases-rust-changelog",
     "crates/rust-releases-rust-dist",
-    "crates/rust-releases-rust-dist-with-cli",
     "crates/rust-toolchain",
 ]
 
@@ -32,10 +30,8 @@ default = [
     "rust-changelog",
 ]
 
-channel-manifests = ["rust-releases-channel-manifests"]
 rust-changelog = ["rust-releases-rust-changelog"]
 rust-dist = ["rust-releases-rust-dist"]
-rust-dist-with-cli = ["rust-releases-rust-dist-with-cli"]
 
 io = ["rust-releases-io"]
 io-http = ["rust-releases-io/http_client"]
@@ -43,10 +39,8 @@ io-http = ["rust-releases-io/http_client"]
 [dependencies]
 rust-releases-core = { version = "^0.27.0", path = "crates/rust-releases-core" }
 rust-releases-io = { version = "^0.27.0", path = "crates/rust-releases-io", optional = true }
-rust-releases-channel-manifests = { version = "^0.27.0", path = "crates/rust-releases-channel-manifests", optional = true }
 rust-releases-rust-changelog = { version = "^0.27.0", path = "crates/rust-releases-rust-changelog", optional = true }
 rust-releases-rust-dist = { version = "^0.27.0", path = "crates/rust-releases-rust-dist", optional = true }
-rust-releases-rust-dist-with-cli = { version = "^0.27.0", path = "crates/rust-releases-rust-dist-with-cli", optional = true }
 
 [dev-dependencies]
 yare = "2.0.0"

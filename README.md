@@ -36,8 +36,7 @@ can obtain, parse and build an index from the above resources. This crate also p
 in a _linear_ fashion, or by using a _bisect_ binary search strategy.
 
 Each data source implements the [Source](https://docs.rs/rust-releases/latest/rust_releases/source/trait.Source.html) trait.  `Source` provides a `build_index` method, which can be used to
-build a catalog of released Rust versions. In addition, for all solution except `RustDistWithCLI`, it is possible to let this crate
-[fetch](https://docs.rs/rust-releases/latest/rust_releases/source/trait.FetchResources.html) the required input documents. 
+build a catalog of released Rust versions.
 
 ## Implemented options
 
@@ -83,36 +82,6 @@ build a catalog of released Rust versions. In addition, for all solution except 
           <td>✅</td>
           <td>Medium fast (~10 seconds)</td>
           <td>~1 MB</td>
-     </tr>
-     <tr>
-          <td rowspan="2"><code>RustDistWithCLI</code></td>
-          <td>Source</td>
-          <td>✅</td>
-          <td rowspan="2">Stable, <strike>Beta & Nightly</strike><sup>TBD</sup></td>
-          <td>Fast</td>
-          <td>-</td>
-          <td rowspan="2"></td>
-     </tr>
-     <tr>
-          <td>FetchResources</td>
-          <td>❌</td>
-          <td>Slow (~1 minute)</td>
-          <td>~8 MB</td>
-     </tr>
-     <tr>
-          <td rowspan="2"><code><strike>ChannelManifests</strike></code><sup>TDB</sup></td>
-          <td>Source</td>
-          <td>✅</td>
-          <td rowspan="2">Stable, <strike>Beta & Nightly</strike><sup>TBD</sup></td>
-          <td>Medium</td>
-          <td>-</td>
-          <td rowspan="2">Input data works again<sup>(<a href="https://github.com/foresterre/rust-releases/issues/9">#9</a>)</sup>. Further implementation commitments TBD<sup>5</sup></td>
-     </tr>
-     <tr>
-          <td>FetchResources</td>
-          <td>✅</td>
-          <td>Extremely slow (~1 hour)</td>
-          <td>~418 MB</td>
      </tr>
 </tbody>
 </table>

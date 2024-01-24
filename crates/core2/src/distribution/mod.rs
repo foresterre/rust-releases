@@ -15,6 +15,7 @@ pub struct Distribution {
     date: rust_toolchain::ReleaseDate,
     toolchain: rust_toolchain::Toolchain,
     components: Vec<rust_toolchain::Component>,
+    targets: Vec<()>, // TODO
 }
 
 impl Distribution {
@@ -25,10 +26,10 @@ impl Distribution {
     /// ```
     /// # use std::iter;
     /// # use rust_releases_core2::Distribution;
-    /// # use rust_toolchain::{Channel, Component, Platform, ReleaseDate, RustVersion, Toolchain};
+    /// # use rust_toolchain::{Channel, Component, Target, ReleaseDate, RustVersion, Toolchain};
     /// #
     /// let date = ReleaseDate::new(2018, 12, 6);
-    /// let toolchain = Toolchain::new(Channel::stable(RustVersion::new(1, 31, 0)), Platform::host());
+    /// let toolchain = Toolchain::new(Channel::stable(RustVersion::new(1, 31, 0)), Target::host());
     /// let component = Component::new_component("some");
     ///
     /// // Creating a Rust distribution for Rust 1.31 which was released on 2018-12-06
@@ -43,6 +44,7 @@ impl Distribution {
             date,
             toolchain,
             components: components.into_iter().collect(),
+            targets: Vec::new(), // TODO
         }
     }
 
@@ -53,10 +55,10 @@ impl Distribution {
     /// ```
     /// # use std::iter;
     /// # use rust_releases_core2::Distribution;
-    /// # use rust_toolchain::{Channel, Component, Platform, ReleaseDate, RustVersion, Toolchain};
+    /// # use rust_toolchain::{Channel, Component, Target, ReleaseDate, RustVersion, Toolchain};
     /// #
     /// let date = ReleaseDate::new(2018, 12, 6);
-    /// let toolchain = Toolchain::new(Channel::stable(RustVersion::new(1, 31, 0)), Platform::host());
+    /// let toolchain = Toolchain::new(Channel::stable(RustVersion::new(1, 31, 0)), Target::host());
     ///
     /// // Creating a Rust distribution for Rust 1.31 which was released on 2018-12-06
     /// let distribution = Distribution::new_without_components(date, toolchain);
@@ -69,6 +71,7 @@ impl Distribution {
             date,
             toolchain,
             components: Vec::with_capacity(0),
+            targets: Vec::new(), // TODO
         }
     }
 
@@ -79,10 +82,10 @@ impl Distribution {
     /// ```
     /// # use std::iter;
     /// # use rust_releases_core2::Distribution;
-    /// # use rust_toolchain::{Channel, Component, Platform, ReleaseDate, RustVersion, Toolchain};
+    /// # use rust_toolchain::{Channel, Component, Target, ReleaseDate, RustVersion, Toolchain};
     /// #
     /// # let date = ReleaseDate::new(2018, 12, 6);
-    /// # let toolchain = Toolchain::new(Channel::stable(RustVersion::new(1, 31, 0)), Platform::host());
+    /// # let toolchain = Toolchain::new(Channel::stable(RustVersion::new(1, 31, 0)), Target::host());
     /// #
     /// // Creating a Rust distribution for Rust 1.31 which was released on 2018-12-06
     /// let distribution = Distribution::new_without_components(date, toolchain);
@@ -100,10 +103,10 @@ impl Distribution {
     /// ```
     /// # use std::iter;
     /// # use rust_releases_core2::Distribution;
-    /// # use rust_toolchain::{Channel, Component, Platform, ReleaseDate, RustVersion, Toolchain};
+    /// # use rust_toolchain::{Channel, Component, Target, ReleaseDate, RustVersion, Toolchain};
     /// #
     /// let date = ReleaseDate::new(2018, 12, 6);
-    /// let toolchain = Toolchain::new(Channel::stable(RustVersion::new(1, 31, 0)), Platform::host());
+    /// let toolchain = Toolchain::new(Channel::stable(RustVersion::new(1, 31, 0)), Target::host());
     /// #
     /// // Creating a Rust distribution for Rust 1.31 which was released on 2018-12-06
     /// let mut distribution = Distribution::new_without_components(date, toolchain);
@@ -125,10 +128,10 @@ impl Distribution {
     ///
     /// ```
     /// # use rust_releases_core2::Distribution;
-    /// use rust_toolchain::{Channel, Platform, ReleaseDate, Toolchain};
+    /// use rust_toolchain::{Channel, Target, ReleaseDate, Toolchain};
     ///
     /// let date = ReleaseDate::new(2023, 1, 1);
-    /// let platform = Platform::host();
+    /// let platform = Target::host();
     /// let channel = Channel::nightly(date.clone()); // <- Note that a nightly version is a date
     /// let toolchain = Toolchain::new(channel, platform);
     ///
@@ -157,10 +160,10 @@ impl Distribution {
     /// ```
     /// # use std::iter;
     /// # use rust_releases_core2::Distribution;
-    /// # use rust_toolchain::{Channel, Component, Platform, ReleaseDate, RustVersion, Toolchain};
+    /// # use rust_toolchain::{Channel, Component, Target, ReleaseDate, RustVersion, Toolchain};
     /// #
     /// # let date = ReleaseDate::new(2018, 12, 6);
-    /// # let creation_toolchain = Toolchain::new(Channel::stable(RustVersion::new(1, 31, 0)), Platform::host());
+    /// # let creation_toolchain = Toolchain::new(Channel::stable(RustVersion::new(1, 31, 0)), Target::host());
     /// #
     /// // Creating a Rust distribution for Rust 1.31 which was released on 2018-12-06
     /// let distribution = Distribution::new_without_components(date, creation_toolchain);
@@ -189,10 +192,10 @@ impl Distribution {
     /// ```
     /// # use std::iter;
     /// # use rust_releases_core2::Distribution;
-    /// # use rust_toolchain::{Channel, Component, Platform, ReleaseDate, RustVersion, Toolchain};
+    /// # use rust_toolchain::{Channel, Component, Target, ReleaseDate, RustVersion, Toolchain};
     /// #
     /// # let date = ReleaseDate::new(2018, 12, 6);
-    /// # let toolchain = Toolchain::new(Channel::stable(RustVersion::new(1, 31, 0)), Platform::host());
+    /// # let toolchain = Toolchain::new(Channel::stable(RustVersion::new(1, 31, 0)), Target::host());
     /// #
     /// let default_component = Component::new_component("a-default-component");
     /// let optional_component = Component::new_extension("an-optional-component");
@@ -220,10 +223,10 @@ impl Distribution {
     /// ```
     /// # use std::iter;
     /// # use rust_releases_core2::Distribution;
-    /// # use rust_toolchain::{Channel, Component, Platform, ReleaseDate, RustVersion, Toolchain};
+    /// # use rust_toolchain::{Channel, Component, Target, ReleaseDate, RustVersion, Toolchain};
     /// #
     /// # let date = ReleaseDate::new(2018, 12, 6);
-    /// # let toolchain = Toolchain::new(Channel::stable(RustVersion::new(1, 31, 0)), Platform::host());
+    /// # let toolchain = Toolchain::new(Channel::stable(RustVersion::new(1, 31, 0)), Target::host());
     /// #
     /// let default_component = Component::new_component("a-default-component");
     /// let optional_component = Component::new_extension("an-optional-component");
@@ -248,10 +251,10 @@ impl Distribution {
     /// ```
     /// # use std::iter;
     /// # use rust_releases_core2::Distribution;
-    /// # use rust_toolchain::{Channel, Component, Platform, ReleaseDate, RustVersion, Toolchain};
+    /// # use rust_toolchain::{Channel, Component, Target, ReleaseDate, RustVersion, Toolchain};
     /// #
     /// # let date = ReleaseDate::new(2018, 12, 6);
-    /// # let toolchain = Toolchain::new(Channel::stable(RustVersion::new(1, 31, 0)), Platform::host());
+    /// # let toolchain = Toolchain::new(Channel::stable(RustVersion::new(1, 31, 0)), Target::host());
     /// #
     /// let default_component = Component::new_component("a-default-component");
     /// let optional_component = Component::new_extension("an-optional-component");
@@ -276,10 +279,10 @@ impl Distribution {
     /// ```
     /// # use std::iter;
     /// # use rust_releases_core2::Distribution;
-    /// # use rust_toolchain::{Channel, Component, Platform, ReleaseDate, RustVersion, Toolchain};
+    /// # use rust_toolchain::{Channel, Component, Target, ReleaseDate, RustVersion, Toolchain};
     /// #
     /// # let date = ReleaseDate::new(2018, 12, 6);
-    /// # let toolchain = Toolchain::new(Channel::stable(RustVersion::new(1, 31, 0)), Platform::host());
+    /// # let toolchain = Toolchain::new(Channel::stable(RustVersion::new(1, 31, 0)), Target::host());
     /// #
     /// // Creating a Rust distribution for Rust 1.31 which was released on 2018-12-06
     /// let distribution = Distribution::new_without_components(date, toolchain);
@@ -300,10 +303,10 @@ impl Distribution {
     /// ```
     /// # use std::iter;
     /// # use rust_releases_core2::Distribution;
-    /// # use rust_toolchain::{Channel, Component, Platform, ReleaseDate, RustVersion, Toolchain};
+    /// # use rust_toolchain::{Channel, Component, Target, ReleaseDate, RustVersion, Toolchain};
     /// #
     /// # let date = ReleaseDate::new(2018, 12, 6);
-    /// # let toolchain = Toolchain::new(Channel::beta(RustVersion::new(1, 32, 0)), Platform::host());
+    /// # let toolchain = Toolchain::new(Channel::beta(RustVersion::new(1, 32, 0)), Target::host());
     /// #
     /// // Creating a Rust distribution for Rust 1.32-beta which was released on 2018-12-06
     /// let distribution = Distribution::new_without_components(date, toolchain);
@@ -324,10 +327,10 @@ impl Distribution {
     /// ```
     /// # use std::iter;
     /// # use rust_releases_core2::Distribution;
-    /// # use rust_toolchain::{Channel, Component, Platform, ReleaseDate, RustVersion, Toolchain};
+    /// # use rust_toolchain::{Channel, Component, Target, ReleaseDate, RustVersion, Toolchain};
     /// #
     /// # let date = ReleaseDate::new(2018, 12, 6);
-    /// # let toolchain = Toolchain::new(Channel::nightly(date.clone()), Platform::host());
+    /// # let toolchain = Toolchain::new(Channel::nightly(date.clone()), Target::host());
     /// #
     /// // Creating a Rust distribution for the Rust nightly of 2018-12-06
     /// let distribution = Distribution::new_without_components(date, toolchain);

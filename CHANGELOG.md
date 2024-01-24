@@ -4,6 +4,20 @@
 
 [Unreleased]: https://github.com/foresterre/rust-releases
 
+## [0.28.0] - 2024-01-24
+
+### Removed
+
+* Removed `rust-releases-channel-manifests` crate and `channel-manifests` feature of `rust-releases` top level crate
+* Removed `rust-releases-rust-dist-with-cli` crate and `rust-dist-with-cli` feature of `rust-releases` top level crate
+
+### Dependency updates
+
+* **rust-releases-rust-dist** Updated `aws-config` to `1.1.3`
+* **rust-releases-rust-dist** Updated `aws-sdk-s3` to `1.13.0`
+
+[0.28.0]: https://github.com/foresterre/rust-releases/releases/tag/v0.28.0
+
 ## [0.26.0] - 2023-03-29
 
 ### Changed

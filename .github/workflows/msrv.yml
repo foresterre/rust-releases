@@ -39,12 +39,10 @@ jobs:
     strategy:
       matrix:
         crate: [
-          "crates/rust-releases-channel-manifests",
           "crates/rust-releases-core",
           "crates/rust-releases-io",
           "crates/rust-releases-rust-changelog",
           "crates/rust-releases-rust-dist",
-          "crates/rust-releases-rust-dist-with-cli"
         ]
     steps:
       - name: checkout_repo

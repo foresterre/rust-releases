@@ -84,22 +84,14 @@
 //! as an additional dependency or feature (see <a href="#using-rust-releases">using rust-releases</a>.
 //!
 //! The implementations are:
-//! 1) [`ChannelManifests`]: Build an index from Rust [release manifests](https://static.rust-lang.org/manifests.txt).
-//!     * Select this implementation by adding `rust-releases-channel-manifests` as a dependency
-//! 2) [`RustChangelog`]: Build an index from the [RELEASES.md](https://raw.githubusercontent.com/rust-lang/rust/master/RELEASES.md) found in the root of the Rust source code repository.
+//! 1) [`RustChangelog`]: Build an index from the [RELEASES.md](https://raw.githubusercontent.com/rust-lang/rust/master/RELEASES.md) found in the root of the Rust source code repository.
 //!     * Select this implementation by adding `rust-releases-rust-changelog` as a dependency
-//! 3) [`RustDist`]: Build an index from the AWS S3 Rust distribution bucket; input data can be obtained using the [`FetchResources`] trait.
+//! 2) [`RustDist`]: Build an index from the AWS S3 Rust distribution bucket; input data can be obtained using the [`FetchResources`] trait.
 //!     * Select this implementation by adding `rust-releases-rust-dist` as a dependency
-//! 4) [`RustDistWithCLI`]: Build an index from the AWS S3 Rust distribution bucket; obtain the input data yourself using the `aws` cli.
-//!     * Select this implementation by adding `rust-releases-rust-dist-with-cli` as a dependency
 //!
 //! # Choosing an implementation
 //!
 //! When in doubt, use the [`RustChangelog`] source for stable releases, and [`RustDist`] for anything else.
-//! [`ChannelManifests`] should usually not be used, as it's out of date (last checked April 2021;
-//! the last available input manifest is dated 2020-02-23). [`RustDistWithCLI`] requires manual input
-//! but pulls from the same data source as [`RustDist`]. The [`RustDist`] source is however more complete
-//! than the [`RustDistWithCLI`] source (as of April 2021).
 //!
 //! In the below example, we'll use one of the above sources ([`RustChangelog`]) to show you how you can
 //! use this library.
@@ -141,22 +133,6 @@
 //! </thead>
 //! <tbody>
 //!      <tr>
-//!           <td rowspan="2">ChannelManifests</td>
-//!           <td rowspan="2"><code>rust-releases-channel-manifests</code></td>
-//!           <td>Source</td>
-//!           <td>✅</td>
-//!           <td rowspan="2">Stable, <strike>Beta & Nightly</strike><sup>Won't be implemented</sup></td>
-//!           <td>Medium</td>
-//!           <td>-</td>
-//!           <td rowspan="2">Deprecated: Input data has not been updated since 2020-02-23 <sup>(<a href="https://github.com/foresterre/rust-releases/issues/9">#9</a>)</sup>. Use <code>RustDist</code> instead.</td>
-//!      </tr>
-//!      <tr>
-//!           <td>FetchResources</td>
-//!           <td>✅</td>
-//!           <td>Extremely slow (~1 hour)</td>
-//!           <td>~418 MB</td>
-//!      </tr>
-//!      <tr>
 //!           <td rowspan="2">RustChangelog</td>
 //!           <td rowspan="2"><code>rust-releases-rust-changelog</code></td>
 //!           <td>Source</td>
@@ -188,22 +164,6 @@
 //!           <td>Medium fast (~20 seconds)</td>
 //!           <td>~1 MB</td>
 //!      </tr>
-//!      <tr>
-//!           <td rowspan="2">RustDistWithCLI</td>
-//!           <td rowspan="2"><code>rust-releases-rust-dist-with-cli</code></td>
-//!           <td>Source</td>
-//!           <td>✅</td>
-//!           <td rowspan="2">Stable</td>
-//!           <td>Fast</td>
-//!           <td>-</td>
-//!           <td rowspan="2"></td>
-//!      </tr>
-//!      <tr>
-//!           <td>FetchResources</td>
-//!           <td>❌</td>
-//!           <td>Slow (~1 minute)</td>
-//!           <td>~8 MB</td>
-//!      </tr>
 //! </tbody>
 //! </table>
 //!
@@ -220,15 +180,10 @@
 //!
 //! [`FetchResources`]: rust_releases_core::FetchResources
 //! [`Source`]: rust_releases_core::Source
-//! [`ChannelManifests`]: rust_releases_channel_manifests::ChannelManifests
 //! [`RustChangelog`]: rust_releases_rust_changelog::RustChangelog
 //! [`RustDist`]: rust_releases_rust_dist::RustDist
-//! [`RustDistWithCLI`]: rust_releases_rust_dist_with_cli::RustDistWithCLI
 //! [`features`]: https://doc.rust-lang.org/cargo/reference/features.html#features
 
-/// Provides a binary search operation which is intended to be used to search for the lowest required
-/// version.
-pub mod bisect;
 /// Provides an iterator over the latest patch versions for stable releases.
 pub mod linear;
 
@@ -243,19 +198,8 @@ pub use rust_releases_io::{
     IsStaleError, RetrievedDocument, RustReleasesClient,
 };
 
-#[cfg(feature = "rust-releases-channel-manifests")]
-#[allow(deprecated)]
-pub use rust_releases_channel_manifests::{
-    ChannelManifests, ChannelManifestsError, ChannelManifestsResult,
-};
-
 #[cfg(feature = "rust-releases-rust-changelog")]
 pub use rust_releases_rust_changelog::{RustChangelog, RustChangelogError, RustChangelogResult};
 
 #[cfg(feature = "rust-releases-rust-dist")]
 pub use rust_releases_rust_dist::{RustDist, RustDistError, RustDistResult};
-
-#[cfg(feature = "rust-releases-rust-dist-with-cli")]
-pub use rust_releases_rust_dist_with_cli::{
-    RustDistWithCLI, RustDistWithCLIError, RustDistWithCLIResult,
-};

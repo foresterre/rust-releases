@@ -16,4 +16,4 @@ rust-releases-io = { version = "^0.28.0", path = "../rust-releases-io", features
 thiserror = "1.0.24"
 
 [dev-dependencies]
-yare = "2.0.0"
+yare = "3.0.0"

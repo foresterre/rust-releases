@@ -43,4 +43,4 @@ rust-releases-rust-changelog = { version = "^0.28.0", path = "crates/rust-releas
 rust-releases-rust-dist = { version = "^0.28.0", path = "crates/rust-releases-rust-dist", optional = true }
 
 [dev-dependencies]
-yare = "2.0.0"
+yare = "3.0.0"

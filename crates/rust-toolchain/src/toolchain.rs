@@ -13,7 +13,7 @@ pub struct Toolchain {
 impl Toolchain {
     /// Construct a new toolchain.
     ///
-    /// A toolchain consists of a [`channel`] and a [`platform`].
+    /// A toolchain is described by a [`channel`] and a [`platform`].
     ///
     /// [`channel`]: Channel
     /// [`platform`]: Target

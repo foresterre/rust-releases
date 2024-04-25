@@ -1,0 +1,6 @@
+[book]
+authors = ["Martijn Gribnau <garm@ilumeo.com>"]
+language = "en"
+multilingual = false
+src = "src"
+title = "rust-releases"

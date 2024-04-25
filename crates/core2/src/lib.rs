@@ -13,13 +13,15 @@
 //!
 //! _Nightly_ releases can be identified by their release date.
 
+mod api;
+mod comparable_distribution;
 mod distribution;
 mod register;
+mod release;
 mod set;
+mod storage;
 
-pub use distribution::Distribution;
-pub use register::Register;
-pub use set::DistributionSet;
+pub use api::*;
 
 #[test]
 fn rust_releases() {

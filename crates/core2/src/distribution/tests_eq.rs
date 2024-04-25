@@ -9,7 +9,7 @@ fn default_test_subject() -> Distribution {
         date,
         rust_toolchain::Toolchain::new(
             rust_toolchain::Channel::stable(rust_toolchain::RustVersion::new(1, 2, 3)),
-            rust_toolchain::Platform::host(),
+            rust_toolchain::Target::host(),
         ),
     )
 }
@@ -47,7 +47,7 @@ fn partial_neq_on_release_date() {
 fn partial_neq_on_toolchain_on_platform() {
     let mut toolchain1 = default_test_subject();
     toolchain1.toolchain.platform =
-        rust_toolchain::Platform::try_from_target_triple("x86_64-unknown-haiku").unwrap();
+        rust_toolchain::Target::try_from_target_triple("x86_64-unknown-haiku").unwrap();
 
     let toolchain2 = default_test_subject();
 

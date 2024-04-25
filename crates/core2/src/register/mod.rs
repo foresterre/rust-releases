@@ -1,8 +1,10 @@
 //! See [`Register`].
 
 use crate::{Distribution, DistributionSet};
-use rust_toolchain::Platform;
+use rust_toolchain::{Beta, Nightly, Stable, Target};
+use std::collections::HashMap;
 use std::iter;
+use std::sync::Arc;
 
 // Contains the actual implementation of the register API defined here.
 mod r#impl;
@@ -14,6 +16,20 @@ mod tests;
 /// Rust distributions, known to this library.
 #[derive(Clone, Debug)]
 pub struct Register {
+    stable: HashMap<rust_toolchain::Target, DistributionSet>,
+    beta: Arc<[Beta]>,
+    nightly: Arc<[Nightly]>,
+    // TODO:
+    //  - impl::Register with
+    //    trait Registry<Version>
+    //      fn ...
+    //
+    //  - stable: impl::Register<Index=RustVersion>
+    //  - beta: impl::Register<Index=RustVersion>
+    //  - nightly: impl::Register<Index=RustDate>
+    //
+    // map version | nightly version -> Platform
+    // see https://github.com/foresterre/cargo-msrv/issues/587#issuecomment-1793153675
     platform_register: r#impl::PlatformRegister,
 }
 
@@ -36,7 +52,7 @@ impl Register {
 
     /// Create a new [`Register`] from an iterable of `([`rust_toolchain::Platform`], [`Distribution`])`
     /// tuples.
-    pub fn from_iter<I: IntoIterator<Item = (rust_toolchain::Platform, Distribution)>>(
+    pub fn from_iter<I: IntoIterator<Item = (rust_toolchain::Target, Distribution)>>(
         iterable: I,
     ) -> Self {
         let platform_register = r#impl::PlatformRegister::from_iter(iterable);
@@ -66,7 +82,7 @@ impl Register {
     // }
 
     /// Get all releases for a given platform.
-    pub fn platform(&self, id: &rust_toolchain::Platform) -> Option<&DistributionSet> {
+    pub fn platform(&self, id: &rust_toolchain::Target) -> Option<&DistributionSet> {
         self.platform_register.platform(id)
     }
 

@@ -5,7 +5,7 @@ fn default_test_subject() -> Distribution {
         rust_toolchain::ReleaseDate::new(2023, 1, 1),
         rust_toolchain::Toolchain::new(
             rust_toolchain::Channel::stable(rust_toolchain::RustVersion::new(1, 0, 0)),
-            rust_toolchain::Platform::host(),
+            rust_toolchain::Target::host(),
         ),
     )
 }
@@ -25,8 +25,8 @@ fn from_iter_with_different_versions() {
         rust_toolchain::Channel::stable(rust_toolchain::RustVersion::new(1, 2, 3));
 
     let releases = vec![
-        (rust_toolchain::Platform::host(), release1),
-        (rust_toolchain::Platform::host(), release2),
+        (rust_toolchain::Target::host(), release1),
+        (rust_toolchain::Target::host(), release2),
     ];
 
     let register = Register::from_iter(releases);
@@ -42,8 +42,8 @@ fn from_iter_with_different_dates() {
         rust_toolchain::Channel::nightly(rust_toolchain::ReleaseDate::new(2022, 1, 1));
 
     let releases = vec![
-        (rust_toolchain::Platform::host(), release1),
-        (rust_toolchain::Platform::host(), release2),
+        (rust_toolchain::Target::host(), release1),
+        (rust_toolchain::Target::host(), release2),
     ];
 
     let register = Register::from_iter(releases);

@@ -1,5 +1,5 @@
 use crate::channel::{Beta, Stable};
-use crate::{Channel, Nightly, Platform, ReleaseDate, RustVersion};
+use crate::{Channel, Nightly, ReleaseDate, RustVersion, Target};
 
 mod rustup_toolchain;
 
@@ -7,7 +7,7 @@ mod rustup_toolchain;
 #[non_exhaustive]
 pub struct Toolchain {
     pub channel: Channel,
-    pub platform: Platform,
+    pub platform: Target,
 }
 
 impl Toolchain {
@@ -16,8 +16,8 @@ impl Toolchain {
     /// A toolchain consists of a [`channel`] and a [`platform`].
     ///
     /// [`channel`]: Channel
-    /// [`platform`]: Platform
-    pub fn new(channel: Channel, platform: Platform) -> Self {
+    /// [`platform`]: Target
+    pub fn new(channel: Channel, platform: Target) -> Self {
         Self { channel, platform }
     }
 
@@ -25,7 +25,7 @@ impl Toolchain {
         &self.channel
     }
 
-    pub fn platform(&self) -> &Platform {
+    pub fn platform(&self) -> &Target {
         &self.platform
     }
 
@@ -58,9 +58,9 @@ mod tests {
     fn create_toolchain() {
         let channel = Channel::stable(RustVersion::new(1, 2, 3));
 
-        let toolchain = Toolchain::new(channel, Platform::host());
+        let toolchain = Toolchain::new(channel, Target::host());
 
         assert!(&toolchain.channel().is_stable());
-        assert_eq!(&toolchain.platform, &Platform::host());
+        assert_eq!(&toolchain.platform, &Target::host());
     }
 }

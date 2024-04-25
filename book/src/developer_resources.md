@@ -17,8 +17,10 @@
 ## Rust on GitHub
 
 - [RELEASES.md: Rust changelog](https://raw.githubusercontent.com/rust-lang/rust/master/RELEASES.md)
+- [RFC 0131: target specification](https://github.com/rust-lang/rfcs/blob/master/text/0131-target-specification.md#detailed-design)
 
 ## Misc
 
+- [Rust Platform Support](https://doc.rust-lang.org/rustc/platform-support.html)
 - [Rustup Components History](https://rust-lang.github.io/rustup-components-history/index.html) by Nightly version and
   target

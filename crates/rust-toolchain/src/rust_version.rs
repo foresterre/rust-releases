@@ -1,3 +1,5 @@
+use version_number::FullVersion;
+
 /// A three component, `major.minor.patch` version number.
 ///
 /// This version number is a subset of [semver](https://semver.org/spec/v2.0.0.html), except that
@@ -5,18 +7,24 @@
 /// metadata, and other labels, are rejected.
 #[derive(Clone, Debug, Hash, Eq, PartialEq, Ord, PartialOrd)]
 pub struct RustVersion {
-    version: version_number::FullVersion,
+    version: FullVersion,
 }
 
 impl RustVersion {
     pub fn new(major: u64, minor: u64, patch: u64) -> Self {
         Self {
-            version: version_number::FullVersion {
+            version: FullVersion {
                 major,
                 minor,
                 patch,
             },
         }
+    }
+
+    pub fn try_from_str(input: &str) -> Result<Self, ()> {
+        let version = FullVersion::parse(input).map_err(|_| ())?;
+
+        Ok(Self { version })
     }
 }
 

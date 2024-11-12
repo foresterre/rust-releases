@@ -17,7 +17,7 @@ pub struct Target {
 
 impl Target {
     /// Create a new `Platform` instance which represents the `host` platform on which the compiler
-    /// is ran.
+    /// is run.
     pub const fn host() -> Self {
         Self {
             target: target_lexicon::HOST,

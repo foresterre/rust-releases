@@ -14,7 +14,8 @@ pub use stable::Stable;
 ///
 /// # Variants
 ///
-/// See also: [`Stable`], [`Beta`] and [`Nightly`].
+/// See also: [`Stable`], [`Beta`] and [`Nightly`], and [`ChannelKind`] which can be used
+/// if the channel needs only be described by its identifier.
 ///
 /// [`release channel`]: https://forge.rust-lang.org/#current-release-versions
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
@@ -56,6 +57,45 @@ impl Channel {
     /// Whether the given [`Channel`] is of the [`Nightly`] variant.
     pub fn is_nightly(&self) -> bool {
         matches!(self, Self::Nightly(_))
+    }
+}
+
+/// A description of a channel, only describing a channel by its name.
+///
+/// See also: [`Channel`] which includes version information.
+#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
+pub enum ChannelKind {
+    Stable,
+    Beta,
+    Nightly,
+}
+
+impl ChannelKind {
+    /// Create a new instance from a given str.
+    ///
+    /// Must be lowercase 'stable', 'beta' or 'nightly'.
+    pub fn try_from_str(channel: &str) -> Result<Self, ()> {
+        match channel {
+            "stable" => Ok(Self::Stable),
+            "beta" => Ok(Self::Beta),
+            "nightly" => Ok(Self::Nightly),
+            _ => Err(()),
+        }
+    }
+
+    /// Whether the given [`ChannelKind`] is of the `Stable` variant.
+    pub fn is_stable(&self) -> bool {
+        matches!(self, Self::Stable)
+    }
+
+    /// Whether the given [`ChannelKind`] is of the `Beta` variant.
+    pub fn is_beta(&self) -> bool {
+        matches!(self, Self::Beta)
+    }
+
+    /// Whether the given [`ChannelKind`] is of the `Nightly` variant.
+    pub fn is_nightly(&self) -> bool {
+        matches!(self, Self::Nightly)
     }
 }
 

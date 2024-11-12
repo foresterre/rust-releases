@@ -14,7 +14,7 @@ repository = "https://github.com/foresterre/rust-releases"
 # does not support labels, but does support conversions between the two and three
 # components, where semver is three components only.
 # For this library we do not need the labels, so something more minimal is desirable.
-version-number = "0.3.0"
+version-number = "0.4.0"
 
 # A dependency which describes a "platform" via its target triple.
 # There are two crates which are almost equal in support: `platforms` and
@@ -24,6 +24,9 @@ version-number = "0.3.0"
 # that manually (e.g. using the cfg! macro) is a bit of a pain, and already done
 # by this package.
 target-lexicon = "0.12.6"
+
+# Error handling macro's
+thiserror = "1"
 
 [dev-dependencies]
 yare = "1"

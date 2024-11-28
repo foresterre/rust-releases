@@ -170,15 +170,13 @@ fn setup_cache_folder(manifest_path: &Path) -> Result<(), CachedClientError> {
 }
 
 fn fetch_file(url: &str) -> Result<Box<dyn Read + Send + Sync>, CachedClientError> {
-    let response = ureq::get(url)
-        .set(
-            "User-Agent",
-            "rust-releases (github.com/foresterre/rust-releases/issues)",
-        )
-        .call()
-        .map_err(|err| HttpError {
-            error: Box::new(err),
-        })?;
+    let agent = ureq::AgentBuilder::new()
+        .user_agent("rust-releases (github.com/foresterre/rust-releases/issues)")
+        .try_proxy_from_env(true)
+        .build();
+    let response = agent.get(url).call().map_err(|err| HttpError {
+        error: Box::new(err),
+    })?;
 
     Ok(response.into_reader())
 }

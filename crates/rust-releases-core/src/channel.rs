@@ -13,10 +13,10 @@ pub enum Channel {
     Stable,
 }
 
-impl<'a> TryFrom<&'a str> for Channel {
+impl TryFrom<&str> for Channel {
     type Error = CoreError;
 
-    fn try_from(item: &'a str) -> Result<Self, Self::Error> {
+    fn try_from(item: &str) -> Result<Self, Self::Error> {
         Ok(match item {
             "beta" => Self::Beta,
             "nightly" => Self::Nightly,
@@ -26,7 +26,7 @@ impl<'a> TryFrom<&'a str> for Channel {
     }
 }
 
-impl<'a> From<Channel> for &'a str {
+impl From<Channel> for &str {
     fn from(channel: Channel) -> Self {
         match channel {
             Channel::Beta => "beta",

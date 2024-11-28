@@ -7,7 +7,7 @@ description = "RustDist source implementation for rust-releases"
 license = "MIT OR Apache-2.0"
 documentation = "https://docs.rs/rust-releases-rust-dist"
 repository = "https://github.com/foresterre/rust-releases"
-rust-version = "1.68"
+rust-version = "1.70"
 
 [dependencies]
 rust-releases-core = { version = "^0.28.0", path = "../rust-releases-core" }

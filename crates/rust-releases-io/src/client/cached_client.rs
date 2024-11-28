@@ -1,5 +1,3 @@
-#![cfg(feature = "http_client")]
-
 use crate::{
     is_stale, Document, IsStaleError, ResourceFile, RetrievalLocation, RetrievedDocument,
     RustReleasesClient,

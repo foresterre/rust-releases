@@ -1,6 +1,7 @@
+[advisories]
+ignore = []
+
 [licenses]
-unlicensed = "deny"
-copyleft = "deny"
 confidence-threshold = 0.925
 allow = [
     "Apache-2.0",
@@ -8,10 +9,9 @@ allow = [
     "ISC",
     "MIT",
     "MPL-2.0",
-    "Unlicense",
     "Zlib",
     "OpenSSL",
-    "Unicode-DFS-2016"
+    "Unicode-3.0",
 ]
 
 [[licenses.clarify]]
@@ -35,9 +35,3 @@ license-files = [
     { path = "LICENSE", hash = 0x001c7e6c }
 ]
 
-[advisories]
-vulnerability = "deny"
-unmaintained = "deny"
-notice = "deny"
-
-ignore = []

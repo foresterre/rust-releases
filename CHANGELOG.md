@@ -4,8 +4,11 @@
 
 [Unreleased]: https://github.com/foresterre/rust-releases
 
+## [0.29.0] - 2024-11-29
+
 ### Changed
 
+* **rust-releases-io** Detect proxy settings from the environment (HTTP_PROXY)
 * **rust-releases** MSRV is now 1.78
 * **rust-releases-rust-dist** MSRV is now 1.78
 

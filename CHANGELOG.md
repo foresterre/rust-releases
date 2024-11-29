@@ -4,6 +4,11 @@
 
 [Unreleased]: https://github.com/foresterre/rust-releases
 
+### Changed
+
+* **rust-releases** MSRV is now 1.78
+* **rust-releases-rust-dist** MSRV is now 1.78
+
 ## [0.28.0] - 2024-01-24
 
 ### Removed

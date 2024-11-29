@@ -17,6 +17,7 @@ impl<I: Iterator<Item = Release>> Iterator for LatestStableReleasesIterator<I> {
     fn next(&mut self) -> Option<Self::Item> {
         let current = self.iter.next();
 
+        #[allow(clippy::manual_inspect)]
         current.map(|it| {
             let minor = it.version().minor;
 

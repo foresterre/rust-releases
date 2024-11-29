@@ -1,6 +1,6 @@
 [package]
 name = "rust-releases-io"
-version = "0.28.0"
+version = "0.29.0"
 authors = ["Martijn Gribnau <garm@ilumeo.com>"]
 edition = "2018"
 description = "I/O helper crate for rust-releases"

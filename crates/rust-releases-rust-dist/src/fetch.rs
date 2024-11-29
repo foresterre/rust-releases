@@ -65,7 +65,7 @@ impl Client {
             .map_err(AwsError::InvalidAppName)?;
 
         let config = runtime.block_on(
-            aws_config::defaults(BehaviorVersion::v2023_11_09())
+            aws_config::defaults(BehaviorVersion::v2024_03_28())
                 .no_credentials()
                 .app_name(app_name)
                 .region(RUST_DIST_REGION)

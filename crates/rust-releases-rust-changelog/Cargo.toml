@@ -13,7 +13,7 @@ rust-version = "1.67"
 time = { version = "0.3.7", features = ["macros", "parsing"] }
 rust-releases-core = { version = "^0.28.0", path = "../rust-releases-core" }
 rust-releases-io = { version = "^0.28.0", path = "../rust-releases-io", features = ["http_client"] }
-thiserror = "1.0.24"
+thiserror = "2.0.3"
 
 [dev-dependencies]
 yare = "3.0.0"

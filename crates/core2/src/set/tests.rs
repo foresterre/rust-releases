@@ -1,5 +1,5 @@
 use super::*;
-use rust_toolchain::{Channel, Platform, ReleaseDate, RustVersion, Toolchain};
+use rust_toolchain::{Channel, ReleaseDate, RustVersion, Target, Toolchain};
 
 mod first {
     use super::*;
@@ -11,14 +11,14 @@ mod first {
 
         let actual_release = Distribution::new_without_components(
             date.clone(),
-            Toolchain::new(stable.clone(), Platform::host()),
+            Toolchain::new(stable.clone(), Target::host()),
         );
 
         let mut releases = DistributionSet::default();
         releases.push(actual_release);
 
         let expected_release =
-            Distribution::new_without_components(date, Toolchain::new(stable, Platform::host()));
+            Distribution::new_without_components(date, Toolchain::new(stable, Target::host()));
         assert_eq!(releases.first(), Some(&expected_release));
     }
 
@@ -35,11 +35,9 @@ fn uniqueness_on_channel() {
     let stable = Channel::stable(RustVersion::new(1, 0, 0));
     let beta = Channel::beta(RustVersion::new(1, 0, 0));
 
-    let r1 = Distribution::new_without_components(
-        date.clone(),
-        Toolchain::new(stable, Platform::host()),
-    );
-    let r2 = Distribution::new_without_components(date, Toolchain::new(beta, Platform::host()));
+    let r1 =
+        Distribution::new_without_components(date.clone(), Toolchain::new(stable, Target::host()));
+    let r2 = Distribution::new_without_components(date, Toolchain::new(beta, Target::host()));
 
     let set = DistributionSet::from_iter([r1, r2]);
     assert_eq!(set.len(), 2);
@@ -53,10 +51,10 @@ fn uniqueness_on_release_date() {
 
     let r1 = Distribution::new_without_components(
         date1,
-        Toolchain::new(channel.clone(), Platform::host()),
+        Toolchain::new(channel.clone(), Target::host()),
     );
 
-    let r2 = Distribution::new_without_components(date2, Toolchain::new(channel, Platform::host()));
+    let r2 = Distribution::new_without_components(date2, Toolchain::new(channel, Target::host()));
 
     let set = DistributionSet::from_iter([r1, r2]);
 
@@ -75,9 +73,9 @@ fn uniqueness_on_version() {
 
     let r1 = Distribution::new_without_components(
         date.clone(),
-        Toolchain::new(channel1, Platform::host()),
+        Toolchain::new(channel1, Target::host()),
     );
-    let r2 = Distribution::new_without_components(date, Toolchain::new(channel2, Platform::host()));
+    let r2 = Distribution::new_without_components(date, Toolchain::new(channel2, Target::host()));
 
     let set = DistributionSet::from_iter([r1, r2]);
     assert_eq!(set.len(), 2);

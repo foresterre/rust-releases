@@ -1,8 +1,22 @@
+mod beta;
+mod nightly;
+mod stable;
+
 use crate::{ReleaseDate, RustVersion};
 
-/// A Rust release channel
+pub use beta::Beta;
+pub use nightly::Nightly;
+pub use stable::Stable;
+
+/// A Rust [`release channel`].
 ///
-/// Alpha releases, which are no longer used, are unsupported.
+/// Does not include the once used `Alpha` release channel, which has not been used post `1.0.0`.
+///
+/// # Variants
+///
+/// See also: [`Stable`], [`Beta`] and [`Nightly`].
+///
+/// [`release channel`]: https://forge.rust-lang.org/#current-release-versions
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub enum Channel {
     /// The stable release channel
@@ -14,49 +28,35 @@ pub enum Channel {
 }
 
 impl Channel {
-    /// Create a new stable channel instance.
+    /// Create a new [`Stable`] channel instance.
     pub fn stable(version: RustVersion) -> Self {
         Channel::Stable(Stable { version })
     }
 
-    /// Create a new beta channel instance.
+    /// Create a new [`Beta`] channel instance.
     pub fn beta(version: RustVersion) -> Self {
         Channel::Beta(Beta { version })
     }
 
-    /// Create a new nightly channel instance.
+    /// Create a new [`Nightly`] channel instance.
     pub fn nightly(date: ReleaseDate) -> Self {
         Channel::Nightly(Nightly { date })
     }
-}
 
-impl Channel {
+    /// Whether the given [`Channel`] is of the [`Stable`] variant.
     pub fn is_stable(&self) -> bool {
         matches!(self, Self::Stable(_))
     }
 
+    /// Whether the given [`Channel`] is of the [`Beta`] variant.
     pub fn is_beta(&self) -> bool {
         matches!(self, Self::Beta(_))
     }
 
+    /// Whether the given [`Channel`] is of the [`Nightly`] variant.
     pub fn is_nightly(&self) -> bool {
         matches!(self, Self::Nightly(_))
     }
-}
-
-#[derive(Clone, Debug, Eq, Hash, PartialEq)]
-pub struct Stable {
-    pub version: RustVersion,
-}
-
-#[derive(Clone, Debug, Eq, Hash, PartialEq)]
-pub struct Beta {
-    pub version: RustVersion,
-}
-
-#[derive(Clone, Debug, Eq, Hash, PartialEq)]
-pub struct Nightly {
-    pub date: ReleaseDate,
 }
 
 #[cfg(test)]

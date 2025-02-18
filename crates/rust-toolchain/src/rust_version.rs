@@ -124,10 +124,7 @@ mod tests {
                 a, b,
                 "PartialOrd should hold for equality: 'a == b' must hold"
             );
-            assert!(
-                a.partial_cmp(&b) == Some(Ordering::Equal),
-                "PartialOrd should hold for equality: 'a.partial_cmp(&b) == Ordering::Equal' must hold"
-            );
+            assert_eq!(a.partial_cmp(&b), Some(Ordering::Equal), "PartialOrd should hold for equality: 'a.partial_cmp(&b) == Ordering::Equal' must hold");
         }
 
         #[test]

@@ -1,15 +1,31 @@
 [package]
 name = "rust-toolchain"
-version = "0.21.1"
+version = "0.22.0"
 authors = ["Martijn Gribnau <garm@ilumeo.com>"]
-edition = "2018"
-description = "Types which define a Rust toolchain"
+edition = "2021"
+description = "Types to model a Rust toolchain"
 license = "MIT OR Apache-2.0"
 
 documentation = "https://docs.rs/rust-toolchain"
 repository = "https://github.com/foresterre/rust-releases"
 
 [dependencies]
+# A dependency to describe two- and three component version numbers. Unlike `semver`
+# does not support labels, but does support conversions between the two and three
+# components, where semver is three components only.
+# For this library we do not need the labels, so something more minimal is desirable.
+version-number = "0.4.0"
+
+# A dependency which describes a "platform" via its target triple.
+# There are two crates which are almost equal in support: `platforms` and
+# `target-lexicon`. Both are at the time of writing almost equivalent in features,
+# supported and well documented. For this library, currently we use target-lexicon,
+# only because it has some convenience function to get the current host, and handling
+# that manually (e.g. using the cfg! macro) is a bit of a pain, and already done
+# by this package.
+target-lexicon = "0.13.2"
+
+thiserror = "2"
 
 [dev-dependencies]
-
+yare = "3.0.0"

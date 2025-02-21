@@ -1,6 +1,13 @@
 use crate::{Channel, Component, Date, Target};
 use std::collections::HashSet;
 
+/// A Rust toolchain
+///
+/// # Reading materials
+///
+/// - [`rustup concepts: toolchains`]
+///
+/// [`rustup concepts: toolchains`]: https://rust-lang.github.io/rustup/concepts/toolchains.html
 #[derive(Clone, Debug, PartialEq, Eq)]
 #[non_exhaustive]
 pub struct Toolchain {

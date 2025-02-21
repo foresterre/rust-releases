@@ -1,23 +1,23 @@
-use crate::ToolchainDate;
+use crate::Date;
 
 #[derive(Clone, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 pub struct Nightly {
-    pub date: ToolchainDate,
+    pub date: Date,
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::{Nightly, ToolchainDate};
+    use crate::{Date, Nightly};
 
     #[yare::parameterized(
-        patch1 = { ToolchainDate::new(0, 0, 0), ToolchainDate::new(0, 0, 1) },
-        minor1 = { ToolchainDate::new(0, 0, 0), ToolchainDate::new(0, 1, 0) },
-        major1 = { ToolchainDate::new(0, 0, 0), ToolchainDate::new(1, 0, 0) },
-        minor_trumps_patch = { ToolchainDate::new(0, 0, 99), ToolchainDate::new(0, 1, 0) },
-        major_trumps_patch = { ToolchainDate::new(0, 0, 99), ToolchainDate::new(1, 0, 0) },
-        major_trumps_minor = { ToolchainDate::new(0, 99, 0), ToolchainDate::new(1, 0, 0) },
+        patch1 = { Date::new(0, 0, 0), Date::new(0, 0, 1) },
+        minor1 = { Date::new(0, 0, 0), Date::new(0, 1, 0) },
+        major1 = { Date::new(0, 0, 0), Date::new(1, 0, 0) },
+        minor_trumps_patch = { Date::new(0, 0, 99), Date::new(0, 1, 0) },
+        major_trumps_patch = { Date::new(0, 0, 99), Date::new(1, 0, 0) },
+        major_trumps_minor = { Date::new(0, 99, 0), Date::new(1, 0, 0) },
     )]
-    fn ord(left: ToolchainDate, right: ToolchainDate) {
+    fn ord(left: Date, right: Date) {
         let left = Nightly { date: left };
         let right = Nightly { date: right };
 

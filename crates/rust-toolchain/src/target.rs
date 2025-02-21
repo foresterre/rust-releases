@@ -1,12 +1,21 @@
 use std::str::FromStr;
 
-/// The platform of a toolchain.
+/// A Rust toolchain
 ///
 /// Commonly represented as a [`target triple`]. A target triple consists of three (or four) components: the
 /// architecture component, the vendor component, the operating system component and optionally
 /// a fourth component representing the environment (e.g. gnu or msvc).
 ///
+/// # Reading materials
+///
+/// - [`RFC 0131: target specification`]
+/// - [`rustup concepts: toolchains`]
+/// - [`rustup component history`]
+///
 /// [`target triple`]: https://github.com/rust-lang/rfcs/blob/master/text/0131-target-specification.md#detailed-design
+/// [`RFC 0131: target specification`]: https://github.com/rust-lang/rfcs/blob/master/text/0131-target-specification.md#detailed-design
+/// [`rustup concepts: toolchains`]: https://rust-lang.github.io/rustup/concepts/toolchains.html
+/// [`rustup component history`]: https://rust-lang.github.io/rustup-components-history/
 // Extra information may be found here:
 // - https://doc.rust-lang.org/rustc/platform-support.html
 // - https://rust-lang.github.io/rustup/concepts/toolchains.html

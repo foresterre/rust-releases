@@ -27,7 +27,7 @@ mod rust_version;
 mod target;
 mod toolchain;
 
-pub use channel::{Beta, Channel, Nightly, Stable};
+pub use channel::{Channel, *};
 pub use component::Component;
 pub use date::ToolchainDate;
 pub use rust_version::RustVersion;

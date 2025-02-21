@@ -13,6 +13,7 @@ use std::str::FromStr;
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct Target {
     target: target_lexicon::Triple,
+    tier: Option<Tier>,
 }
 
 impl Target {
@@ -21,6 +22,7 @@ impl Target {
     pub const fn host() -> Self {
         Self {
             target: target_lexicon::HOST,
+            tier: None,
         }
     }
 
@@ -32,7 +34,10 @@ impl Target {
     pub fn try_from_target_triple(triple: &str) -> Result<Self, ParseError> {
         let platform = target_lexicon::Triple::from_str(triple).map_err(ParseError::from)?;
 
-        Ok(Self { target: platform })
+        Ok(Self {
+            target: platform,
+            tier: None,
+        })
     }
 
     /// Create a new `Target` instance from a [`target triple`], defaults to
@@ -45,7 +50,10 @@ impl Target {
         let platform = target_lexicon::Triple::from_str(triple)
             .unwrap_or_else(|_| target_lexicon::Triple::unknown());
 
-        Self { target: platform }
+        Self {
+            target: platform,
+            tier: None,
+        }
     }
 }
 
@@ -81,6 +89,15 @@ impl From<target_lexicon::ParseError> for ParseError {
     }
 }
 
+/// Support tier for the target
+#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
+pub enum Tier {
+    T1,
+    T2,
+    T2_5,
+    T3,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -91,6 +108,7 @@ mod tests {
 
         let expected = Target {
             target: target_lexicon::HOST,
+            tier: None,
         };
 
         assert_eq!(this_platform, expected);

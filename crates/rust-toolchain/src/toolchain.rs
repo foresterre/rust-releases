@@ -1,11 +1,11 @@
-use crate::{Channel, Component, Target, ToolchainDate};
+use crate::{Channel, Component, ShortDate, Target};
 use std::collections::HashSet;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 #[non_exhaustive]
 pub struct Toolchain {
     channel: Channel,
-    date: Option<ToolchainDate>,
+    date: Option<ShortDate>,
     host: Target,
 
     components: HashSet<Component>,
@@ -15,7 +15,7 @@ pub struct Toolchain {
 impl Toolchain {
     pub fn new(
         channel: Channel,
-        date: Option<ToolchainDate>,
+        date: Option<ShortDate>,
         host: Target,
         components: HashSet<Component>,
         targets: HashSet<Target>,
@@ -33,7 +33,7 @@ impl Toolchain {
         &self.channel
     }
 
-    pub fn date(&self) -> &Option<ToolchainDate> {
+    pub fn date(&self) -> &Option<ShortDate> {
         &self.date
     }
 

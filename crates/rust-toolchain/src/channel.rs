@@ -2,7 +2,7 @@ mod beta;
 mod nightly;
 mod stable;
 
-use crate::{RustVersion, ToolchainDate};
+use crate::{RustVersion, ShortDate};
 
 pub use beta::Beta;
 pub use nightly::Nightly;
@@ -42,7 +42,7 @@ impl Channel {
     }
 
     /// Create a new [`Nightly`] channel instance.
-    pub fn nightly(date: ToolchainDate) -> Self {
+    pub fn nightly(date: ShortDate) -> Self {
         Channel::Nightly(Nightly { date })
     }
 
@@ -86,7 +86,7 @@ mod tests {
 
     #[test]
     fn create_channel_nightly() {
-        let stable = Channel::nightly(ToolchainDate::new(1, 1, 1));
+        let stable = Channel::nightly(ShortDate::new(1, 1, 1));
 
         assert!(!stable.is_stable());
         assert!(!stable.is_beta());

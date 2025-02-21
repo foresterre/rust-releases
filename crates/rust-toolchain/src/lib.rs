@@ -29,7 +29,7 @@ mod toolchain;
 
 pub use channel::{Beta, Channel, Nightly, Stable};
 pub use component::Component;
-pub use date::ToolchainDate;
+pub use date::ShortDate;
 pub use rust_version::RustVersion;
-pub use target::Target;
+pub use target::{Target, Tier};
 pub use toolchain::Toolchain;

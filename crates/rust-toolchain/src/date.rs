@@ -2,11 +2,11 @@ use std::fmt;
 
 /// A release date for a Rust release.
 #[derive(Clone, Debug, Eq, Hash, PartialEq, Ord, PartialOrd)]
-pub struct ToolchainDate {
+pub struct ShortDate {
     date: DateImpl,
 }
 
-impl ToolchainDate {
+impl ShortDate {
     /// Create a new `ToolchainDate` instance.
     ///
     /// While it is called a `date`, it is merely a shallow representation of
@@ -26,7 +26,7 @@ impl ToolchainDate {
 
     /// Prints a yyyy-mm-dd representation of a release date.
     ///
-    /// This representation may, just like [`ToolchainDate`], be not a valid date
+    /// This representation may, just like [`ShortDate`], be not a valid date
     /// in the Gregorian calendar. The date is merely a representation.
     ///
     /// Year, month, and day will all be pre-filled with 0's.
@@ -65,8 +65,8 @@ mod tests {
         one_two_three = { ToolchainDate::new(1, 2, 3), 1, 2, 3 },
         max = { ToolchainDate::new(u16::MAX, u8::MAX, u8::MAX), u16::MAX, u8::MAX, u8::MAX },
     )]
-    fn create_release_date(date: ToolchainDate, year: u16, month: u8, day: u8) {
-        let expected = ToolchainDate {
+    fn create_release_date(date: ShortDate, year: u16, month: u8, day: u8) {
+        let expected = ShortDate {
             date: DateImpl { year, month, day },
         };
 
@@ -75,8 +75,8 @@ mod tests {
 
     #[test]
     fn compare_year() {
-        let smaller = ToolchainDate::new(2000, 1, 1);
-        let bigger = ToolchainDate::new(2001, 1, 1);
+        let smaller = ShortDate::new(2000, 1, 1);
+        let bigger = ShortDate::new(2001, 1, 1);
 
         assert!(smaller < bigger);
         assert!(smaller <= bigger);
@@ -84,8 +84,8 @@ mod tests {
 
     #[test]
     fn compare_month() {
-        let smaller = ToolchainDate::new(2000, 1, 1);
-        let bigger = ToolchainDate::new(2000, 2, 1);
+        let smaller = ShortDate::new(2000, 1, 1);
+        let bigger = ShortDate::new(2000, 2, 1);
 
         assert!(smaller < bigger);
         assert!(smaller <= bigger);
@@ -93,8 +93,8 @@ mod tests {
 
     #[test]
     fn compare_day() {
-        let smaller = ToolchainDate::new(2000, 1, 1);
-        let bigger = ToolchainDate::new(2000, 1, 2);
+        let smaller = ShortDate::new(2000, 1, 1);
+        let bigger = ShortDate::new(2000, 1, 2);
 
         assert!(smaller < bigger);
         assert!(smaller <= bigger);
@@ -108,14 +108,14 @@ mod tests {
         invalid_month_is_not_rejected = { ToolchainDate::new(1000, 100, 1), "1000-100-01"  },
         invalid_day_is_not_rejected = { ToolchainDate::new(1000, 1, 100), "1000-01-100"  },
     )]
-    fn to_string(date: ToolchainDate, expected: &str) {
+    fn to_string(date: ShortDate, expected: &str) {
         assert_eq!(date.ymd().to_string(), expected.to_string());
     }
 
     #[test]
     fn newer_date() {
-        let newer = ToolchainDate::new(2000, 1, 1);
-        let older = ToolchainDate::new(1999, 1, 1);
+        let newer = ShortDate::new(2000, 1, 1);
+        let older = ShortDate::new(1999, 1, 1);
 
         assert_eq!(newer.cmp(&older), Ordering::Greater);
     }

@@ -23,13 +23,13 @@
 mod channel;
 mod component;
 mod date;
-mod rust_version;
 mod target;
 mod toolchain;
+mod version;
 
 pub use channel::{Channel, *};
 pub use component::Component;
 pub use date::Date;
-pub use rust_version::RustVersion;
 pub use target::Target;
 pub use toolchain::Toolchain;
+pub use version::RustVersion;

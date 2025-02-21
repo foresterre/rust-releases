@@ -8,7 +8,7 @@ pub use beta::Beta;
 pub use nightly::Nightly;
 pub use stable::Stable;
 
-/// A Rust [`release channel`].
+/// A Rust release [`channel`].
 ///
 /// Does not include the once used `Alpha` release channel, which has not been used post `1.0.0`.
 ///
@@ -16,7 +16,19 @@ pub use stable::Stable;
 ///
 /// See also: [`Stable`], [`Beta`] and [`Nightly`].
 ///
-/// [`release channel`]: https://forge.rust-lang.org/#current-release-versions
+/// # Reading materials
+///
+/// - [`rustup concepts: channels`]
+/// - [`rust book: how rust is made`]
+/// - [`rust forge: rust release channel layout`]
+/// - [`rust forge: current rust release versions`]
+///
+///
+/// [`channel`]: https://forge.rust-lang.org/#current-release-versions
+/// [`rustup concepts: channels`]: https://rust-lang.github.io/rustup/concepts/channels.html
+/// [`rust book: how rust is made`]: https://doc.rust-lang.org/book/appendix-07-nightly-rust.html
+/// [`rust forge: rust release channel layout`]: https://forge.rust-lang.org/infra/channel-layout.html#the-rust-release-channel-layout
+/// [`rust forge: current rust release versions`]: https://forge.rust-lang.org/#current-release-versions
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub enum Channel {
     /// The stable release channel

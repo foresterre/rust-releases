@@ -1,5 +1,8 @@
 use crate::RustVersion;
 
+/// The `Beta` release [`channel`]
+///
+/// [`channel`]: https://rust-lang.github.io/rustup/concepts/channels.html
 #[derive(Clone, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 pub struct Beta {
     pub version: RustVersion,

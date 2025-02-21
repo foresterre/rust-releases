@@ -1,5 +1,14 @@
+use crate::{Beta, Nightly, Stable};
 use std::borrow::Cow;
 
+/// A toolchain component
+///
+/// # Reading materials
+///
+/// - [`rustup component history`]
+///
+/// [`rustup concepts: components`]: https://rust-lang.github.io/rustup/concepts/components.html
+/// [`rustup component history`]: https://rust-lang.github.io/rustup-components-history/
 #[derive(Clone, Debug, Hash, Eq, PartialEq)]
 pub struct Component {
     name: Cow<'static, str>,

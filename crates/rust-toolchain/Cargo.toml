@@ -1,8 +1,9 @@
 [package]
 name = "rust-toolchain"
-version = "0.22.0"
+version = "1.0.0"
 authors = ["Martijn Gribnau <garm@ilumeo.com>"]
 edition = "2021"
+rust-version = "1.61"
 description = "Types to model a Rust toolchain"
 license = "MIT OR Apache-2.0"
 

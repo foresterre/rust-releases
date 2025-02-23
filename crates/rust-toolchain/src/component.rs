@@ -1,4 +1,3 @@
-use crate::{Beta, Nightly, Stable};
 use std::borrow::Cow;
 
 /// A toolchain component
@@ -15,10 +14,12 @@ pub struct Component {
 }
 
 impl Component {
+    /// Create a new Component instance
     pub fn new(name: impl Into<Cow<'static, str>>) -> Self {
         Self { name: name.into() }
     }
 
+    /// The name of the component
     pub fn name(&self) -> &str {
         self.name.as_ref()
     }

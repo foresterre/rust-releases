@@ -72,11 +72,31 @@ impl Channel {
     pub fn is_nightly(&self) -> bool {
         matches!(self, Self::Nightly(_))
     }
+
+    /// Returns the release version, or None, if it's a nightly release.
+    pub fn version(&self) -> Option<RustVersion> {
+        match self {
+            Channel::Stable(v) => Some(v.version),
+            Channel::Beta(v) => Some(v.version),
+            Channel::Nightly(_) => None,
+        }
+    }
+
+    /// Returns the release date, or
+    pub fn date(&self) -> Option<Date> {
+        match self {
+            Channel::Stable(_) => None,
+            Channel::Beta(_) => None,
+            Channel::Nightly(v) => Some(v.date.clone()),
+        }
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::{Date, RustVersion};
+    use yare::parameterized;
 
     #[test]
     fn create_channel_stable() {
@@ -103,5 +123,14 @@ mod tests {
         assert!(!stable.is_stable());
         assert!(!stable.is_beta());
         assert!(stable.is_nightly());
+    }
+
+    #[parameterized(
+        stable = { Channel::stable("1.2.3".parse().unwrap()), Some(RustVersion::new(1,2,3)) },
+        beta = { Channel::beta("1.2.3".parse().unwrap()), Some(RustVersion::new(1,2,3)) },
+        nightly = { Channel::nightly(Date::new(2024, 1, 1)), None }
+    )]
+    fn version(c: Channel, expected: Option<RustVersion>) {
+        assert_eq!(c.version(), expected)
     }
 }

@@ -1,6 +1,7 @@
+use std::fmt;
 use std::str::FromStr;
 
-/// A Rust toolchain
+/// A target platform
 ///
 /// Commonly represented as a [`target triple`]. A target triple consists of three (or four) components: the
 /// architecture component, the vendor component, the operating system component and optionally
@@ -11,22 +12,22 @@ use std::str::FromStr;
 /// - [`RFC 0131: target specification`]
 /// - [`rustup concepts: toolchains`]
 /// - [`rustup component history`]
+/// - [`rustc platform support`]
 ///
 /// [`target triple`]: https://github.com/rust-lang/rfcs/blob/master/text/0131-target-specification.md#detailed-design
 /// [`RFC 0131: target specification`]: https://github.com/rust-lang/rfcs/blob/master/text/0131-target-specification.md#detailed-design
 /// [`rustup concepts: toolchains`]: https://rust-lang.github.io/rustup/concepts/toolchains.html
 /// [`rustup component history`]: https://rust-lang.github.io/rustup-components-history/
-// Extra information may be found here:
-// - https://doc.rust-lang.org/rustc/platform-support.html
-// - https://rust-lang.github.io/rustup/concepts/toolchains.html
+/// [`rustc platform support`]: https://doc.rust-lang.org/rustc/platform-support.html
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct Target {
     target: target_lexicon::Triple,
 }
 
 impl Target {
-    /// Create a new `Target` instance which represents the `host` platform on which the compiler
-    /// runs.
+    /// Create a new `Target` instance which represents the `host` platform.
+    ///
+    /// The platform on which this library is compiled, will be the `host` platform.
     pub const fn host() -> Self {
         Self {
             target: target_lexicon::HOST,
@@ -58,6 +59,13 @@ impl Target {
     }
 }
 
+impl fmt::Display for Target {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.target)
+    }
+}
+
+/// Errors which may occur while parsing a [`Target`].
 #[derive(Debug, thiserror::Error)]
 #[non_exhaustive]
 pub enum ParseError {
@@ -103,5 +111,12 @@ mod tests {
         };
 
         assert_eq!(this_platform, expected);
+    }
+
+    #[test]
+    fn to_string() {
+        let target = Target::try_from_target_triple("x86_64-unknown-linux-gnu").unwrap();
+
+        assert_eq!(target.to_string(), "x86_64-unknown-linux-gnu");
     }
 }

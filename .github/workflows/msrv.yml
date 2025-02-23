@@ -43,12 +43,13 @@ jobs:
           "rust-releases-io",
           "rust-releases-rust-changelog",
           "rust-releases-rust-dist",
+          "rust-toolchain"
         ]
     steps:
       - name: checkout_repo
         uses: actions/checkout@v2
       - name: install_rust
-        uses:  dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@stable
       - name: install_cargo_msrv
         run: cargo install cargo-msrv
       - name: version_of_cargo_msrv

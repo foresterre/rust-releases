@@ -1,6 +1,16 @@
 use std::fmt;
 
-/// A release date for a Rust release.
+/// A release date for a Rust toolchain.
+///
+/// Nightly toolchains use a date as version instead of a semver number.
+/// This Date should be regarded as a form of a version number, just like semver.
+///
+/// For full-featured dates, it is recommended to use a dedicated library
+/// like [`time`], [`chrono`] or [`jiff`].
+///
+/// [`time`]: https://docs.rs/time/latest/time/
+/// [`chrono`]: https://docs.rs/chrono/latest/chrono/
+/// [`jiff`]:https://docs.rs/jiff/latest/jiff/
 #[derive(Clone, Debug, Eq, Hash, PartialEq, Ord, PartialOrd)]
 pub struct Date {
     date: DateImpl,
@@ -22,6 +32,21 @@ impl Date {
         Self {
             date: DateImpl { year, month, day },
         }
+    }
+
+    /// The year
+    pub fn year(&self) -> u16 {
+        self.date.year
+    }
+
+    /// The month
+    pub fn month(&self) -> u8 {
+        self.date.month
+    }
+
+    /// The day
+    pub fn day(&self) -> u8 {
+        self.date.day
     }
 
     /// Prints a yyyy-mm-dd representation of a release date.

@@ -1,3 +1,5 @@
+use std::fmt;
+use std::fmt::Formatter;
 use std::str::FromStr;
 
 /// A three component, `major.minor.patch` version number.
@@ -68,6 +70,12 @@ impl FromStr for RustVersion {
     }
 }
 
+impl fmt::Display for RustVersion {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.version)
+    }
+}
+
 #[derive(Clone, Debug, Eq, PartialEq, thiserror::Error)]
 pub enum ParseError {
     #[error("Expected '{0}' but got '{got}'", got = .1.map(|c| c.to_string()).unwrap_or_default())]
@@ -92,6 +100,13 @@ mod tests {
         assert_eq!(version.major(), 1);
         assert_eq!(version.minor(), 2);
         assert_eq!(version.patch(), 3);
+    }
+
+    #[test]
+    fn display() {
+        let version = RustVersion::new(12, 2, 24);
+
+        assert_eq!(&format!("{version}"), "12.2.24");
     }
 
     #[test]

@@ -39,6 +39,7 @@ jobs:
     strategy:
       matrix:
         crate: [
+          "rust-release",
           "rust-releases-core",
           "rust-releases-io",
           "rust-releases-rust-changelog",

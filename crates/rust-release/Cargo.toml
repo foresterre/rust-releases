@@ -1,0 +1,17 @@
+[package]
+name = "rust-release"
+version = "0.0.1"
+authors = ["Martijn Gribnau <garm@ilumeo.com>"]
+edition = "2021"
+rust-version = "1.61"
+description = "Types to model a Rust release"
+license = "MIT OR Apache-2.0"
+
+documentation = "https://docs.rs/rust-toolchain"
+repository = "https://github.com/foresterre/rust-releases"
+
+[dependencies]
+rust-toolchain = "1.1.0"
+
+[dev-dependencies]
+yare = "3.0.0"

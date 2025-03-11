@@ -13,13 +13,21 @@ rust-version = "1.78"
 rust-releases-core = { version = "^0.29.0", path = "../rust-releases-core" }
 rust-releases-io = { version = "^0.29.0", path = "../rust-releases-io" }
 
+# Async runtime
+# minimum is set because of RUSTSEC-2021-0124 advisory: https://rustsec.org/advisories/RUSTSEC-2021-0124
+# full required by aws-sdk-s3
+tokio = { version = "1.28.0", features = ["full"] }
+
+# S3 SDK
 aws-config = "1.1.3"
 aws-sdk-s3 = "1.13.0"
 
+# Regex parser and matcher, and lazy_static to precompile the regex
 lazy_static = "1.4.0"
 regex = "1.8.1"
+
+# Declarative error handling
 thiserror = { workspace = true }
 
-[dependencies.tokio]
-version = "1.28.0" # minimum is set because of RUSTSEC-2021-0124 advisory: https://rustsec.org/advisories/RUSTSEC-2021-0124
-features = ["full"] # full required by aws-sdk-s3
+[dev-dependencies]
+yare = { workspace = true }

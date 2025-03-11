@@ -44,7 +44,11 @@ rust-releases-rust-changelog = { version = "^0.29.0", path = "crates/rust-releas
 rust-releases-rust-dist = { version = "^0.29.0", path = "crates/rust-releases-rust-dist", optional = true }
 
 [dev-dependencies]
-yare = "3.0.0"
+yare = { workspace = true }
 
 [workspace.dependencies]
+# Declarative error handling
 thiserror = "2.0.12"
+
+# Parameterized tests
+yare = "3.0.0"

@@ -30,4 +30,4 @@ target-lexicon = "0.13.2"
 thiserror = { workspace = true }
 
 [dev-dependencies]
-yare = "3.0.0"
+yare = { workspace = true }

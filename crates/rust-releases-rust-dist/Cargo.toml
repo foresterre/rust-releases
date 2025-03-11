@@ -18,7 +18,7 @@ aws-sdk-s3 = "1.13.0"
 
 lazy_static = "1.4.0"
 regex = "1.8.1"
-thiserror = "2.0.3"
+thiserror = { workspace = true }
 
 [dependencies.tokio]
 version = "1.28.0" # minimum is set because of RUSTSEC-2021-0124 advisory: https://rustsec.org/advisories/RUSTSEC-2021-0124

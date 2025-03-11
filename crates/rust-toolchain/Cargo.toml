@@ -26,7 +26,8 @@ version-number = "0.4.0"
 # by this package.
 target-lexicon = "0.13.2"
 
-thiserror = "2"
+# Declarative error handling
+thiserror = { workspace = true }
 
 [dev-dependencies]
 yare = "3.0.0"

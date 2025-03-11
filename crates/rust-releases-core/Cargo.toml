@@ -10,7 +10,7 @@ repository = "https://github.com/foresterre/rust-releases"
 rust-version = "1.63"
 
 [dependencies]
-thiserror = "2.0.3"
+thiserror = { workspace = true }
 semver = "1.0.0"
 
 [dev-dependencies]

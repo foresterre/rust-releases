@@ -42,12 +42,13 @@ deny:
 
 cargo_release_args := "--dependent-version upgrade  --execute --no-tag --no-push --no-verify"
 
-# publish the rust-releases workspace, excludes rust-release and rust-toolchain which are to be released separately
+# publish the rust-releases* workspace, excludes rust-release and rust-toolchain which are to be released separately
 publish-workspace version:
     just publish-core {{ version }}
     just publish-io {{ version }}
     just publish-rust-changelog {{ version }}
     just publish-rust-dist {{ version }}
+    just publish-top {{ version }}
 
 # publish 'rust-releases-core'
 publish-core version:
@@ -61,6 +62,18 @@ publish-io version:
 publish-rust-changelog version:
     cargo release -p rust-releases-rust-changelog {{ cargo_release_args }} {{ version }}
 
-# publish 'rust-releases-rust-changelog'
+# publish 'rust-releases-rust-dist'
 publish-rust-dist version:
     cargo release -p rust-releases-rust-dist {{ cargo_release_args }} {{ version }}
+
+# publish 'rust-releases'
+publish-top version:
+    cargo release -p rust-releases {{ cargo_release_args }} {{ version }}
+
+# publish 'rust-release' (not included in 'publish-workspace')
+publish-rust-release version:
+    cargo release -p rust-release {{ cargo_release_args }} {{ version }}
+
+# publish 'rust-toolchain' (not included in 'publish-workspace')
+publish-rust-toolchain version:
+    cargo release -p rust-toolchain {{ cargo_release_args }} {{ version }}

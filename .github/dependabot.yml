@@ -1,17 +1,22 @@
 version: 2
 updates:
-- package-ecosystem: cargo
-  directory: "/"
-  schedule:
-    interval: daily
-  open-pull-requests-limit: 10
-  labels:
-    - C-dependency-update
-  groups:
-    aws:
-      patterns:
-      - "aws-*"
-      update-types:
-      - "major"
-      - "minor"
-      - "patch"
+  - package-ecosystem: cargo
+    directory: "/"
+    schedule:
+      interval: daily
+    open-pull-requests-limit: 10
+    labels:
+      - C-dependency-update
+    groups:
+      aws:
+        patterns:
+          - "aws-*"
+        update-types:
+          - "major"
+          - "minor"
+          - "patch"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"

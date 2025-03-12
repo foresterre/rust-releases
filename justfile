@@ -47,6 +47,7 @@ publish-workspace version:
     just publish-core {{ version }}
     just publish-io {{ version }}
     just publish-rust-changelog {{ version }}
+    just publish-rust-dist {{ version }}
 
 # publish 'rust-releases-core'
 publish-core version:
@@ -59,3 +60,7 @@ publish-io version:
 # publish 'rust-releases-rust-changelog'
 publish-rust-changelog version:
     cargo release -p rust-releases-rust-changelog {{ cargo_release_args }} {{ version }}
+
+# publish 'rust-releases-rust-changelog'
+publish-rust-dist version:
+    cargo release -p rust-releases-rust-dist {{ cargo_release_args }} {{ version }}

@@ -5,6 +5,7 @@ authors = ["Martijn Gribnau <garm@ilumeo.com>"]
 description = "Find, index and obtain all officially available Rust releases"
 license = "MIT OR Apache-2.0"
 edition = "2018"
+rust-version = "1.85"
 documentation = "https://docs.rs/rust-releases"
 repository = "https://github.com/foresterre/rust-releases"
 exclude = [
@@ -13,7 +14,6 @@ exclude = [
     "/bors.toml", # CI staging bot config
     "/deny.toml" # dependency license checking config
 ]
-rust-version = "1.81"
 
 
 [workspace]

@@ -19,8 +19,8 @@ rust-releases-io = { version = "^0.29.0", path = "../rust-releases-io" }
 tokio = { version = "1.28.0", features = ["full"] }
 
 # S3 SDK
-aws-config = "1.1.3"
-aws-sdk-s3 = "1.13.0"
+aws-config = "1.6.0"
+aws-sdk-s3 = "1.79.0"
 
 # Regex parser and matcher, and lazy_static to precompile the regex
 lazy_static = "1.4.0"

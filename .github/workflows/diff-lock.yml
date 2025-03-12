@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout_repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: install_rust
         uses: dtolnay/rust-toolchain@stable
       - name: generate_lockfile

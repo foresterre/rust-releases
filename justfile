@@ -40,15 +40,22 @@ test:
 deny:
     cargo deny --all-features check
 
+cargo_release_args := "--dependent-version upgrade  --execute --no-tag --no-push"
+
 # publish the rust-releases workspace, excludes rust-release and rust-toolchain which are to be released separately
 publish-workspace version:
     just publish-core {{ version }}
     just publish-io {{ version }}
+    just publish-rust-changelog {{ version }}
 
 # publish 'rust-releases-core'
 publish-core version:
-    cargo release -p rust-releases-core --dependent-version upgrade  --execute --no-tag --no-push {{ version }}
+    cargo release -p rust-releases-core {{ cargo_release_args }} {{ version }}
 
 # publish 'rust-releases-io'
 publish-io version:
-    cargo release -p rust-releases-io --dependent-version upgrade  --execute --no-tag --no-push {{ version }}
+    cargo release -p rust-releases-io {{ cargo_release_args }} {{ version }}
+
+# publish 'rust-releases-rust-changelog'
+publish-rust-changelog version:
+    cargo release -p rust-releases-rust-changelog {{ cargo_release_args }} {{ version }}

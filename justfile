@@ -43,7 +43,12 @@ deny:
 # publish the rust-releases workspace, excludes rust-release and rust-toolchain which are to be released separately
 publish-workspace version:
     just publish-core {{ version }}
+    just publish-io {{ version }}
 
 # publish 'rust-releases-core'
 publish-core version:
-    cargo release -p rust-releases-core --dependent-version upgrade  --execute --no-push {{ version }}
+    cargo release -p rust-releases-core --dependent-version upgrade  --execute --no-tag --no-push {{ version }}
+
+# publish 'rust-releases-io'
+publish-io version:
+    cargo release -p rust-releases-io --dependent-version upgrade  --execute --no-tag --no-push {{ version }}

@@ -40,7 +40,7 @@ test:
 deny:
     cargo deny --all-features check
 
-cargo_release_args := "--dependent-version upgrade  --execute --no-tag --no-push"
+cargo_release_args := "--dependent-version upgrade  --execute --no-tag --no-push --no-verify"
 
 # publish the rust-releases workspace, excludes rust-release and rust-toolchain which are to be released separately
 publish-workspace version:

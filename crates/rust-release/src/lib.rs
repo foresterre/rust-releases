@@ -16,12 +16,20 @@
 #![deny(unsafe_code)]
 #![deny(missing_docs)]
 
+use crate::toolchain::ReleaseToolchain;
+
+/// Describes toolchains in so far they're relevant to a release
+pub mod toolchain;
+
+/// Describes the version of a release
+pub mod version;
+
 /// Type to model a Rust release.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct RustRelease {
     version: ReleaseVersion,
     release_date: Option<rust_toolchain::Date>,
-    toolchains: Vec<ExtendedToolchain>,
+    toolchains: Vec<ReleaseToolchain>,
 }
 
 impl RustRelease {
@@ -30,7 +38,7 @@ impl RustRelease {
     pub fn new(
         version: ReleaseVersion,
         release_date: Option<rust_toolchain::Date>,
-        toolchains: impl IntoIterator<Item = ExtendedToolchain>,
+        toolchains: impl IntoIterator<Item = ReleaseToolchain>,
     ) -> Self {
         Self {
             version,
@@ -50,7 +58,7 @@ impl RustRelease {
     }
 
     /// Toolchains associated with the release
-    pub fn toolchains(&self) -> impl Iterator<Item = &ExtendedToolchain> {
+    pub fn toolchains(&self) -> impl Iterator<Item = &ReleaseToolchain> {
         self.toolchains.iter()
     }
 }
@@ -69,46 +77,6 @@ pub enum ReleaseVersion {
     Nightly(rust_toolchain::channel::Nightly),
 }
 
-/// Type to model a Rust toolchain, with additional metadata relevant to a
-/// release.
-#[derive(Clone, Debug, Eq, PartialEq)]
-pub struct ExtendedToolchain {
-    toolchain: rust_toolchain::Toolchain,
-    tier: TargetTier,
-}
-
-impl ExtendedToolchain {
-    /// Create an ExtendedToolchain from a rust_toolchain::Toolchain
-    pub fn new(toolchain: rust_toolchain::Toolchain, tier: TargetTier) -> Self {
-        Self { toolchain, tier }
-    }
-
-    /// Get the toolchain
-    pub fn toolchain(&self) -> &rust_toolchain::Toolchain {
-        &self.toolchain
-    }
-
-    /// Get the toolchain tier
-    pub fn tier(&self) -> TargetTier {
-        self.tier
-    }
-}
-
-/// Support tier for a target
-#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
-pub enum TargetTier {
-    /// Tier 1 target
-    T1,
-    /// Tier 2 target
-    T2,
-    /// Tier 2.5 target
-    T2_5,
-    /// Tier 3 target
-    T3,
-    /// Tier is unknown
-    Unknown,
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -124,7 +92,7 @@ mod tests {
         let release = RustRelease::new(
             version,
             None,
-            vec![ExtendedToolchain::new(
+            vec![ReleaseToolchain::new(
                 rust_toolchain::Toolchain::new(
                     rust_toolchain::Channel::Stable(stable_version.clone()),
                     None,
@@ -132,7 +100,7 @@ mod tests {
                     HashSet::new(),
                     HashSet::new(),
                 ),
-                TargetTier::Unknown,
+                toolchain::TargetTier::Unknown,
             )],
         );
 
@@ -153,7 +121,7 @@ mod tests {
         let release = RustRelease::new(
             version,
             date.clone(),
-            vec![ExtendedToolchain::new(
+            vec![ReleaseToolchain::new(
                 rust_toolchain::Toolchain::new(
                     rust_toolchain::Channel::Stable(stable_version.clone()),
                     date,
@@ -161,7 +129,7 @@ mod tests {
                     HashSet::new(),
                     HashSet::new(),
                 ),
-                TargetTier::Unknown,
+                toolchain::TargetTier::Unknown,
             )],
         );
 

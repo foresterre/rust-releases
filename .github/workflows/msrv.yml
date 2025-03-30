@@ -16,7 +16,7 @@ jobs:
     continue-on-error: true
     steps:
       - name: checkout_repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: install_rust
         uses: actions-rs/toolchain@v1
         with:
@@ -48,7 +48,7 @@ jobs:
         ]
     steps:
       - name: checkout_repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: install_rust
         uses: dtolnay/rust-toolchain@stable
       - name: install_cargo_msrv

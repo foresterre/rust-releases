@@ -35,15 +35,3 @@ pub trait Source {
     /// Build a release index from a data set.
     fn build_index(&self) -> Result<ReleaseIndex, Self::Error>;
 }
-
-/// With `FetchResources`, the set of inputs required to build a release index can be fetched.
-pub trait FetchResources
-where
-    Self: Sized,
-{
-    /// The error to be returned when a resource can not be fetched.
-    type Error;
-
-    /// Fetch a set of inputs for a release channel.
-    fn fetch_channel(channel: Channel) -> Result<Self, Self::Error>;
-}

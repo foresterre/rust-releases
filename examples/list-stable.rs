@@ -1,4 +1,3 @@
-use rust_releases::FetchResources;
 use rust_releases_core::{Channel, ReleaseIndex};
 use rust_releases_rust_changelog::RustChangelog;
 #[cfg(feature = "rust-dist")]

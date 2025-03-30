@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## Changed
+
+* **rust-releases-core** Remove `FetchResources` trait (breaking)
+* **rust-releases-rust-changelog** Implement fetching of release information directly instead of via `FetchResources` trait (breaking)
+* **rust-releases-rust-dist** Implement fetching of release information directly instead of via `FetchResources` trait (breaking)
+
 [Unreleased]: https://github.com/foresterre/rust-releases
 
 ## [0.30.0] - 2025-03-12

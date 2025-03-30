@@ -4,7 +4,7 @@
 //! Please, see the [`rust-releases`] for additional documentation on how this crate can be used.
 //!
 //! [`rust-releases`]: https://docs.rs/rust-releases
-use rust_releases_core::{semver, Channel, FetchResources, Release, ReleaseIndex, Source};
+use rust_releases_core::{semver, Channel, Release, ReleaseIndex, Source};
 use rust_releases_io::Document;
 #[cfg(test)]
 #[macro_use]
@@ -100,10 +100,9 @@ fn create_release(line: &str, today: &ReleaseDate) -> Option<RustChangelogResult
     }
 }
 
-impl FetchResources for RustChangelog {
-    type Error = RustChangelogError;
-
-    fn fetch_channel(channel: Channel) -> Result<Self, Self::Error> {
+impl RustChangelog {
+    /// Fetch all known releases from the official rust changelog
+    pub fn fetch_channel(channel: Channel) -> Result<Self, RustChangelogError> {
         if let Channel::Stable = channel {
             let document = fetch()?;
             Ok(Self::from_document(document))
@@ -167,7 +166,7 @@ impl FromStr for ReleaseDate {
 mod tests {
     use super::ReleaseDate;
     use crate::RustChangelog;
-    use rust_releases_core::{semver, Channel, FetchResources, Release, ReleaseIndex};
+    use rust_releases_core::{semver, Channel, Release, ReleaseIndex};
     use rust_releases_io::Document;
     use std::fs;
     use time::macros::date;

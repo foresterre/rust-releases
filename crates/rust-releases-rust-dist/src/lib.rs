@@ -11,7 +11,7 @@
 extern crate rust_releases_io;
 
 use regex::{Captures, Regex};
-use rust_releases_core::{semver, Channel, FetchResources, Release, ReleaseIndex, Source};
+use rust_releases_core::{semver, Channel, Release, ReleaseIndex, Source};
 use rust_releases_io::Document;
 use std::collections::BTreeSet;
 use std::iter::FromIterator;
@@ -76,10 +76,9 @@ fn parse_release(capture: Captures) -> RustDistResult<Release> {
     )))
 }
 
-impl FetchResources for RustDist {
-    type Error = RustDistError;
-
-    fn fetch_channel(channel: Channel) -> Result<Self, Self::Error> {
+impl RustDist {
+    /// Fetch all known releases from the rust S3 distribution bucket
+    pub fn fetch_channel(channel: Channel) -> Result<Self, RustDistError> {
         if let Channel::Stable = channel {
             let source = fetch::fetch()?;
             Ok(Self { source })

@@ -16,7 +16,10 @@ pub use crate::{
 };
 
 #[cfg(feature = "http_client")]
-pub use crate::client::cached_client::{CachedClient, CachedClientError};
+pub use crate::client::{
+    cached_client::CachedClient, cached_client::CachedClientError, client::Client,
+    client::ClientError,
+};
 
 /// A macro used to feature gate tests which fetch resources from third party services.
 ///

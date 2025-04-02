@@ -3,6 +3,13 @@ use crate::document::RetrievedDocument;
 #[cfg(feature = "http_client")]
 pub mod cached_client;
 
+#[cfg(feature = "http_client")]
+#[allow(clippy::module_inception)]
+pub mod client;
+
+#[cfg(feature = "http_client")]
+pub mod errors;
+
 /// Fetch a document, given a `resource` description.
 pub trait RustReleasesClient {
     /// The type of error returned by the client implementation.

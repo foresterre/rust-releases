@@ -25,6 +25,11 @@ impl RetrievedDocument {
     pub fn retrieval_location(&self) -> &RetrievalLocation {
         &self.retrieval_location
     }
+
+    /// Exclusive access to the document
+    pub fn mut_document(&mut self) -> &mut Document {
+        &mut self.document
+    }
 }
 
 /// A `Document` represents a resource which can be used as an input to construct a `ReleaseIndex`.

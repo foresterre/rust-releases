@@ -1,5 +1,4 @@
 use crate::release::Release;
-use crate::Source;
 use std::iter::FromIterator;
 
 /// A release index is a data structure holding known Rust releases.
@@ -13,12 +12,6 @@ pub struct ReleaseIndex {
 }
 
 impl ReleaseIndex {
-    /// Create a new `ReleaseIndex` from a given source.
-    /// Releases available in the index may vary based on the type of `Source`.
-    pub fn from_source<S: Source>(source: S) -> Result<Self, <S as Source>::Error> {
-        source.build_index()
-    }
-
     /// Returns a slice of releases.
     pub fn releases(&self) -> &[Release] {
         &self.index

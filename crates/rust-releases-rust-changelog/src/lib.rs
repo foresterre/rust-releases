@@ -4,20 +4,34 @@
 //! Please, see the [`rust-releases`] for additional documentation on how this crate can be used.
 //!
 //! [`rust-releases`]: https://docs.rs/rust-releases
-use rust_releases_core::{semver, Channel, Release, ReleaseIndex, Source};
+
+use rust_releases_core::{semver, Channel, Release, ReleaseIndex};
 use rust_releases_io::Document;
+use std::path::{Path, PathBuf};
 #[cfg(test)]
 #[macro_use]
 extern crate rust_releases_io;
 
-pub(crate) mod errors;
-pub(crate) mod fetch;
+mod errors;
+mod fetch;
 
 use crate::fetch::fetch;
 
 pub use errors::{RustChangelogError, RustChangelogResult};
 use std::str::FromStr;
 use time::macros::format_description;
+
+/// Used to fetch
+pub struct Client {
+    cache_dir: Option<PathBuf>,
+}
+
+impl Client {
+    /// TODO
+    pub fn new(cache_dir: Option<PathBuf>) -> Self {
+        Self { cache_dir }
+    }
+}
 
 /// A [`Source`] which obtains release data from the official Rust changelog.
 ///
@@ -48,10 +62,8 @@ impl RustChangelog {
     }
 }
 
-impl Source for RustChangelog {
-    type Error = RustChangelogError;
-
-    fn build_index(&self) -> Result<ReleaseIndex, Self::Error> {
+impl RustChangelog {
+    fn build_index(&self) -> Result<ReleaseIndex, RustChangelogError> {
         let buffer = self.source.buffer();
         let content = std::str::from_utf8(buffer).map_err(RustChangelogError::UnrecognizedText)?;
 
@@ -59,7 +71,7 @@ impl Source for RustChangelog {
             .lines()
             .filter(|s| s.starts_with("Version"))
             .filter_map(|line| create_release(line, &self.today))
-            .collect::<Result<ReleaseIndex, Self::Error>>()?;
+            .collect::<Result<_, _>>()?;
 
         Ok(releases)
     }
@@ -104,7 +116,7 @@ impl RustChangelog {
     /// Fetch all known releases from the official rust changelog
     pub fn fetch_channel(channel: Channel) -> Result<Self, RustChangelogError> {
         if let Channel::Stable = channel {
-            let document = fetch()?;
+            let document = fetch(None::<&Path>)?;
             Ok(Self::from_document(document))
         } else {
             Err(RustChangelogError::ChannelNotAvailable(channel))

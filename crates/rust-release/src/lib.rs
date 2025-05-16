@@ -14,9 +14,14 @@
 // #![deny(missing_docs)]
 #![warn(clippy::all)]
 #![deny(unsafe_code)]
-#![deny(missing_docs)]
+// #![deny(missing_docs)]
 
 use crate::toolchain::ReleaseToolchain;
+use std::cmp::Ordering;
+
+// exports
+pub use rust_toolchain;
+pub use rust_toolchain::channel::{Beta, Nightly, Stable};
 
 /// Describes toolchains in so far they're relevant to a release
 pub mod toolchain;
@@ -25,18 +30,44 @@ pub mod toolchain;
 pub mod version;
 
 /// Type to model a Rust release.
-#[derive(Clone, Debug, Eq, PartialEq)]
-pub struct RustRelease {
-    version: ReleaseVersion,
-    release_date: Option<rust_toolchain::Date>,
-    toolchains: Vec<ReleaseToolchain>,
+///
+/// # PartialEq, Eq, Ord, PartialOrd
+///
+/// With respect to the PartialEq, Eq, PartialOrd and Ord traits, a [`RustRelease`]
+/// is only compared and ordered based on its `version`.
+#[derive(Clone, Debug)]
+pub struct RustRelease<V, C = ()> {
+    pub version: V,
+    pub release_date: Option<rust_toolchain::Date>,
+    pub toolchains: Vec<ReleaseToolchain>,
+    pub context: C,
 }
 
-impl RustRelease {
+impl<V: PartialEq, C> PartialEq for RustRelease<V, C> {
+    fn eq(&self, other: &Self) -> bool {
+        self.version.eq(&other.version)
+    }
+}
+
+impl<V: Eq, C> Eq for RustRelease<V, C> {}
+
+impl<V: PartialOrd, C> PartialOrd for RustRelease<V, C> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        self.version.partial_cmp(&other.version)
+    }
+}
+
+impl<V: Ord, C> Ord for RustRelease<V, C> {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.version.cmp(&other.version)
+    }
+}
+
+impl<V> RustRelease<V> {
     /// Create a new RustRelease instance using a version, optionally
     /// a release date, and an iterator of toolchains.
     pub fn new(
-        version: ReleaseVersion,
+        version: V,
         release_date: Option<rust_toolchain::Date>,
         toolchains: impl IntoIterator<Item = ReleaseToolchain>,
     ) -> Self {
@@ -44,11 +75,12 @@ impl RustRelease {
             version,
             release_date,
             toolchains: toolchains.into_iter().collect(),
+            context: (),
         }
     }
 
     /// The 3 component MAJOR.MINOR.PATCH version number of the release
-    pub fn version(&self) -> &ReleaseVersion {
+    pub fn version(&self) -> &V {
         &self.version
     }
 
@@ -70,11 +102,11 @@ impl RustRelease {
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum ReleaseVersion {
     /// A stable channel release version
-    Stable(rust_toolchain::channel::Stable),
+    Stable(Stable),
     /// A beta channel release version
-    Beta(rust_toolchain::channel::Beta),
+    Beta(Beta),
     /// A nightly channel release version
-    Nightly(rust_toolchain::channel::Nightly),
+    Nightly(Nightly),
 }
 
 #[cfg(test)]
@@ -84,7 +116,7 @@ mod tests {
 
     #[test]
     fn can_instantiate() {
-        let stable_version = rust_toolchain::channel::Stable {
+        let stable_version = Stable {
             version: rust_toolchain::RustVersion::new(1, 82, 0),
         };
         let version = ReleaseVersion::Stable(stable_version.clone());

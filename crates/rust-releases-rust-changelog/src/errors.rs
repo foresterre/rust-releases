@@ -15,6 +15,9 @@ pub enum RustChangelogError {
     #[error("Unable to parse release date in a release entry '{0}': {1}")]
     TimeParseError(String, time::error::Parse),
 
+    #[error("Unable to parse version '{0}")]
+    VersionParseError(String),
+
     /// Returned in a case a release entry does not contain a recognizable release date
     #[error("Unable to find a valid release date in a release entry")]
     NoDateInChangelogItem,
@@ -34,10 +37,6 @@ pub enum RustChangelogError {
     /// Returned in case a staleness check error is returned
     #[error(transparent)]
     IsStale(#[from] rust_releases_io::IsStaleError),
-
-    /// Returned in case of semver error on the hot path
-    #[error("{0}, input was: {1}")]
-    SemverError(rust_releases_core::semver::Error, String),
 
     /// Returned in case a input resource cannot be parsed as UTF-8
     #[error(transparent)]

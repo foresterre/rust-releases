@@ -14,6 +14,7 @@ time = { version = "0.3.7", features = ["macros", "parsing"] }
 rust-releases-core = { version = "^0.31.0", path = "../rust-releases-core" }
 rust-releases-io = { version = "^0.32.0", path = "../rust-releases-io", features = ["http_client"] }
 thiserror = { workspace = true }
+semver = "1"
 
 [dev-dependencies]
 yare = "3.0.0"

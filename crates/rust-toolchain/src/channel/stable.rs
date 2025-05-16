@@ -9,6 +9,27 @@ pub struct Stable {
     pub version: RustVersion,
 }
 
+impl Stable {
+    /// Instantiate a new `Stable` struct, representing the version of a release channel.
+    pub fn new(major: u64, minor: u64, patch: u64) -> Self {
+        Self {
+            version: RustVersion::new(major, minor, patch),
+        }
+    }
+}
+
+impl From<RustVersion> for Stable {
+    fn from(version: RustVersion) -> Self {
+        Self { version }
+    }
+}
+
+impl From<(u64, u64, u64)> for Stable {
+    fn from((major, minor, patch): (u64, u64, u64)) -> Self {
+        Self::new(major, minor, patch)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::{channel::Stable, RustVersion};

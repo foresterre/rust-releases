@@ -1,7 +1,6 @@
 use crate::merge::{Merge, MergeCandidate};
-use crate::releases::StableReleases;
 use rust_release::rust_toolchain::channel::Beta;
-use rust_release::{ReleaseVersion, RustRelease};
+use rust_release::RustRelease;
 use std::collections::{BTreeMap, BTreeSet};
 
 pub struct BetaReleases<C = ()> {

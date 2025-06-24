@@ -1,6 +1,5 @@
 use crate::merge::{Merge, MergeCandidate};
-use rust_release::rust_toolchain::channel::{Beta, Nightly, Stable};
-use rust_release::{ReleaseVersion, RustRelease};
+use rust_release::RustRelease;
 use std::collections::{BTreeMap, BTreeSet};
 
 mod beta;
@@ -11,6 +10,7 @@ pub use beta::BetaReleases;
 pub use nightly::NightlyReleases;
 pub use stable::StableReleases;
 
+// shared implementation for StableReleases, BetaReleases and NightlyReleases (implementation detail)
 pub(in crate::releases) mod impls {
     use super::*;
 
@@ -30,10 +30,6 @@ pub(in crate::releases) mod impls {
     where
         V: Clone + Ord,
     {
-        pub fn add(&mut self, release: RustRelease<V, C>) {
-            self.releases.insert(release);
-        }
-
         /// Merge two sets of releases.
         ///
         /// # Generic Context
@@ -98,16 +94,6 @@ pub(in crate::releases) mod impls {
             out
         }
 
-        /// Returns true if there are no releases, and false otherwise.
-        pub fn is_empty(&self) -> bool {
-            self.releases.is_empty()
-        }
-
-        /// Iterate over the releases.
-        pub fn iter_releases(&self) -> impl Iterator<Item = &RustRelease<V, C>> {
-            self.releases.iter()
-        }
-
         /// Merges two merge candidates with a matching version into a single merged Release.
         fn apply_merge<C2, C3, F>(
             out: &mut ReleasesImpl<V, C3>,
@@ -127,6 +113,31 @@ pub(in crate::releases) mod impls {
             };
 
             out.releases.insert(merged_release);
+        }
+    }
+
+    impl<V, C> ReleasesImpl<V, C>
+    where
+        V: Ord,
+    {
+        /// Add a release to the collection
+        pub fn add(&mut self, release: RustRelease<V, C>) {
+            self.releases.insert(release);
+        }
+
+        /// Returns the amount of releases
+        pub fn len(&self) -> usize {
+            self.releases.len()
+        }
+
+        /// Returns true if there are no releases, and false otherwise.
+        pub fn is_empty(&self) -> bool {
+            self.releases.is_empty()
+        }
+
+        /// Iterate over the releases.
+        pub fn iter(&self) -> impl Iterator<Item = &RustRelease<V, C>> {
+            self.releases.iter()
         }
     }
 }

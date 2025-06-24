@@ -38,34 +38,21 @@ impl<Cs: Default, Cb: Default, Cn: Default> Default for RustReleases<Cs, Cb, Cn>
 }
 
 impl RustReleases {
-    /// Iterate over the fetched stable releases.
+    /// Iterate over set of stable releases
     pub fn stable(&self) -> impl IntoIterator<Item = &RustRelease<Stable>> {
         self.stable.iter()
     }
 
-    /// TODO
+    /// Iterate over set of beta releases
     pub fn beta(&self) -> impl IntoIterator<Item = &RustRelease<Beta>> {
-        self.beta.iter_releases()
+        self.beta.iter()
     }
 
-    /// TODO
+    /// Iterate over set of nightly releases
     pub fn nightly(&self) -> impl IntoIterator<Item = &RustRelease<Nightly>> {
-        self.nightly.iter_releases()
+        self.nightly.iter()
     }
 }
-
-// pub trait MergeMut {
-//     /// TODO
-//     ///
-//     /// Probably <V: Into<rust_release::ReleaseVersion>> or similar, for now simpler variant
-//     fn merge_mut<V: Into<rust_release::ReleaseVersion>>(&mut self, f: impl Fn(V));
-// }
-
-// impl<Cs, Cb, Cn> RustReleases<Cs, Cb, Cn> {
-//     pub fn merge_mut(&mut self, other: RustReleases<Cs, Cb, Cn>, f: impl Fn(ReleaseVersion)) {
-//         todo!()
-//     }
-// }
 
 #[cfg(test)]
 mod tests {

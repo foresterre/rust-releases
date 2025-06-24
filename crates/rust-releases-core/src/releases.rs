@@ -142,7 +142,7 @@ struct ReleasesImpl<V, C = ()> {
     releases: BTreeSet<RustRelease<V, C>>,
 }
 
-impl<C> Default for ReleasesImpl<C> {
+impl<V, C> Default for ReleasesImpl<V, C> {
     fn default() -> Self {
         Self {
             releases: BTreeSet::default(),
@@ -150,8 +150,8 @@ impl<C> Default for ReleasesImpl<C> {
     }
 }
 
-impl<V: Clone + Ord, C> ReleasesImpl<V, C> {
-    pub fn add(&mut self, release: RustRelease<V, C>) {
+impl<V: Clone + Ord, CtxSelf> ReleasesImpl<V, CtxSelf> {
+    pub fn add(&mut self, release: RustRelease<V, CtxSelf>) {
         self.releases.insert(release);
     }
 
@@ -162,46 +162,47 @@ impl<V: Clone + Ord, C> ReleasesImpl<V, C> {
     /// The generic parameters `C`, `C2` and `C3` can be used to attach arbitrary metadata,
     /// possibly relevant for merging, to a release.
     ///
-    /// - `C` is the attached data of `self`
-    /// - `C2` is the attached data of `rhs`
-    /// - `C3` is the data merged from `C` and `C2`.
-    pub fn merge_with<C2, F, C3>(
+    /// - `CtxSelf` is the attached data of `self`
+    /// - `CtxOther` is the attached data of `rhs`
+    /// - `CtxMerged` is the data merged from `C` and `C2`.
+    pub fn merge_with<CtxOther, F, CtxMerged>(
         &self,
-        other: &ReleasesImpl<C2>,
+        other: &ReleasesImpl<V, CtxOther>,
         resolver: F,
-    ) -> ReleasesImpl<V, C3>
+    ) -> ReleasesImpl<V, CtxMerged>
     where
-        F: Fn(&V, MergeCandidate<C>, MergeCandidate<C2>) -> RustRelease<V, C3>,
+        F: Fn(&V, MergeCandidate<CtxSelf>, MergeCandidate<CtxOther>) -> Merge<CtxMerged>,
     {
         // TODO
         //      1. making it generic to be used by StableReleases<C>, BetaReleases<C> and NightlyReleases<C>
         //      2. I changed F: -> Merge<C3> to RustRelease<V, C3> and the self.releases.'into btree map' to simply use its own internal BTreeSet
         //      3. also experimenting with whether to use self, mut self, &self as the receiver type; with consideration that since we create a new merged (i.e. mutated) version anyways and are would move all versions by removing them from self, there is likely no need to take ownership of self.
 
-        let mut out = ReleasesImpl::<C3>::default();
+        let mut out = ReleasesImpl::<CtxMerged>::default();
 
         for rhs in other.releases() {
-            let version = rhs.version();
-            let lhs = self.releases.remove(version);
+            let version = rhs.version.clone();
+            // This works because the RustRelease is compared solely by its version
+            let lhs = self.releases.get(rhs); // TODO Map<Version, RustRelease> ?
 
             if let Some(self_result) = lhs {
                 // Exists in both
-                let lhs = Into::<MergeCandidate<C>>::into(&self_result);
-                let rhs = Into::<MergeCandidate<C2>>::into(&rhs);
+                let lhs = Into::<MergeCandidate<CtxSelf>>::into(&self_result);
+                let rhs = Into::<MergeCandidate<CtxOther>>::into(&rhs);
 
                 Self::apply_merge(&mut out, version, lhs, rhs, &resolver);
             } else {
                 // Only exists in other
                 let lhs = MergeCandidate::default();
-                let rhs = Into::<MergeCandidate<C2>>::into(&rhs);
+                let rhs = Into::<MergeCandidate<CtxOther>>::into(&rhs);
 
                 Self::apply_merge(&mut out, version, lhs, rhs, &resolver);
             }
         }
 
         // Process remaining versions from self
-        for (version, candidate) in map {
-            let lhs = Into::<MergeCandidate<C>>::into(&candidate);
+        for candidate in self.releases {
+            let lhs = Into::<MergeCandidate<CtxSelf>>::into(&candidate);
             let rhs = MergeCandidate::default();
 
             Self::apply_merge(&mut out, &version, lhs, rhs, &resolver);
@@ -216,25 +217,23 @@ impl<V: Clone + Ord, C> ReleasesImpl<V, C> {
     }
 
     /// Iterate over the releases.
-    pub fn iter_releases(&self) -> impl Iterator<Item = &RustRelease<V, C>> {
+    pub fn iter_releases(&self) -> impl Iterator<Item = &RustRelease<V, CtxSelf>> {
         self.releases.iter()
     }
 
     /// Merges two merge candidates with a matching version into a single merged
     /// Release.
-    fn apply_merge<C2, C3, F>(
-        out: &mut ReleasesImpl<C3>,
+    fn apply_merge<CtxOther, CtxMerged, F>(
+        out: &mut ReleasesImpl<V, CtxMerged>,
         version: &V,
-        lhs: MergeCandidate<C>,
-        rhs: MergeCandidate<C2>,
-        resolver: F,
+        lhs: MergeCandidate<CtxSelf>,
+        rhs: MergeCandidate<CtxOther>,
+        resolver: &F,
     ) where
-        F: Fn(&V, MergeCandidate<C>, MergeCandidate<C2>) -> Merge<C3>,
+        F: Fn(&V, MergeCandidate<CtxSelf>, MergeCandidate<CtxOther>) -> Merge<CtxMerged>,
     {
         let merged = resolver(version, lhs, rhs);
-        let merged_release: RustRelease<V, C3> = merged.to_version(version);
-
-        out.releases.insert(merged_release);
+        out.releases.insert(merged.to_version(version));
     }
 }
 

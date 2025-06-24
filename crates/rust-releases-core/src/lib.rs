@@ -40,7 +40,7 @@ impl<Cs: Default, Cb: Default, Cn: Default> Default for RustReleases<Cs, Cb, Cn>
 impl RustReleases {
     /// Iterate over the fetched stable releases.
     pub fn stable(&self) -> impl IntoIterator<Item = &RustRelease<Stable>> {
-        self.stable.iter_releases()
+        self.stable.iter()
     }
 
     /// TODO

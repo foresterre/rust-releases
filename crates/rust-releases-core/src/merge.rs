@@ -29,8 +29,8 @@ impl<'a, C> From<&'a Merge<C>> for MergeCandidate<'a, C> {
     }
 }
 
-impl<'a, C> From<&'a RustRelease<Stable, C>> for MergeCandidate<'a, C> {
-    fn from(rr: &'a RustRelease<Stable, C>) -> Self {
+impl<'a, V, C> From<&'a RustRelease<V, C>> for MergeCandidate<'a, C> {
+    fn from(rr: &'a RustRelease<V, C>) -> Self {
         Self {
             release_date: Some(rr.release_date.as_ref()),
             toolchains: Some(rr.toolchains.as_ref()),

@@ -1,7 +1,19 @@
-use rust_release::rust_toolchain::channel::Stable;
 use rust_release::toolchain::ReleaseToolchain;
 use rust_release::{rust_toolchain, RustRelease};
 
+/// A merge candidate is a [`RustRelease`] minus the version, and all fields are optional
+/// because they may not be present for a specific release source type.
+/// E.g. if the releases are constructed from the GitHub releases repo, there may
+/// be insufficient information about the available toolchains, while that information
+/// does exist in the Rust release S3 bucket.
+///
+/// For example, if releases from these two sources are merged into one, the
+/// release metadata obtained from Rust's S3 bucket may be used to fill out that
+/// missing piece of release information.
+///
+/// For TypeScript developers, this type is essentially `Partial<Omit<MergeCandidate, 'version'>>` ;).
+///
+/// [`RustRelease`]: RustRelease
 pub struct MergeCandidate<'a, C> {
     // Double option because a RustRelease release_date is already an option, and it may be absent here
     pub release_date: Option<Option<&'a rust_toolchain::Date>>,
@@ -39,6 +51,11 @@ impl<'a, V, C> From<&'a RustRelease<V, C>> for MergeCandidate<'a, C> {
     }
 }
 
+/// A merge candidate is a [`RustRelease`] minus the version.
+///
+/// For TypeScript developers, this type is essentially `Omit<MergeCandidate, 'version'>` ;).
+///
+/// [`RustRelease`]: RustRelease
 pub struct Merge<C> {
     pub release_date: Option<rust_toolchain::Date>,
     pub toolchains: Vec<ReleaseToolchain>,

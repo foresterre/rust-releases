@@ -3,7 +3,7 @@ use crate::releases::impls;
 use crate::Beta;
 use rust_release::RustRelease;
 
-#[derive(Default)]
+#[derive(Debug, Default)]
 pub struct BetaReleases<C = ()>(impls::ReleasesImpl<Beta, C>);
 
 impl<C> BetaReleases<C> {

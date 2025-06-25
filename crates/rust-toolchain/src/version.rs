@@ -46,6 +46,12 @@ impl RustVersion {
     }
 }
 
+impl From<(u64, u64, u64)> for RustVersion {
+    fn from((major, minor, patch): (u64, u64, u64)) -> Self {
+        Self::new(major, minor, patch)
+    }
+}
+
 impl FromStr for RustVersion {
     type Err = ParseError;
 

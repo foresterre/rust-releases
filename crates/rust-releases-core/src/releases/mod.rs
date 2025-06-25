@@ -14,6 +14,7 @@ pub use stable::StableReleases;
 pub(in crate::releases) mod impls {
     use super::*;
 
+    #[derive(Debug)]
     pub struct ReleasesImpl<V, C = ()> {
         releases: BTreeSet<RustRelease<V, C>>,
     }
@@ -66,26 +67,26 @@ pub(in crate::releases) mod impls {
                 .collect();
 
             for other_release in other.releases {
-                let version = &other_release.version;
+                let version = other_release.version.clone();
 
-                if let Some(self_result) = map.remove(version) {
+                if let Some(self_result) = map.remove(&version) {
                     // Exists in both
-                    let lhs = MergeCandidate::from(&self_result);
-                    let rhs = MergeCandidate::from(&other_release);
+                    let lhs = MergeCandidate::from(self_result);
+                    let rhs = MergeCandidate::from(other_release);
 
-                    Self::apply_merge(&mut out, version, lhs, rhs, &resolver);
+                    Self::apply_merge(&mut out, &version, lhs, rhs, &resolver);
                 } else {
                     // Only exists in other
                     let lhs = MergeCandidate::default();
-                    let rhs = MergeCandidate::from(&other_release);
+                    let rhs = MergeCandidate::from(other_release);
 
-                    Self::apply_merge(&mut out, version, lhs, rhs, &resolver);
+                    Self::apply_merge(&mut out, &version, lhs, rhs, &resolver);
                 }
             }
 
             // Process remaining versions from self
             for (version, candidate) in map {
-                let lhs = MergeCandidate::from(&candidate);
+                let lhs = MergeCandidate::from(candidate);
                 let rhs = MergeCandidate::default();
 
                 Self::apply_merge(&mut out, &version, lhs, rhs, &resolver);

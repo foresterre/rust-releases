@@ -3,7 +3,7 @@ use crate::releases::impls;
 use crate::Nightly;
 use rust_release::RustRelease;
 
-#[derive(Default)]
+#[derive(Debug, Default)]
 pub struct NightlyReleases<C = ()>(impls::ReleasesImpl<Nightly, C>);
 
 impl<C> NightlyReleases<C> {

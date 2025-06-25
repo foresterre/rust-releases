@@ -33,7 +33,7 @@ impl<C> Default for MergeCandidate<C> {
     }
 }
 
-impl<'a, C> From<Merge<C>> for MergeCandidate<C> {
+impl<C> From<Merge<C>> for MergeCandidate<C> {
     fn from(mr: Merge<C>) -> Self {
         Self {
             release_date: Some(mr.release_date),

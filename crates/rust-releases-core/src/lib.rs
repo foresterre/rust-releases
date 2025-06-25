@@ -57,7 +57,7 @@ impl RustReleases {
 #[cfg(test)]
 mod tests {
     use crate::merge::Merge;
-    use crate::resolver::prefer_self;
+    use crate::resolver::combine;
     use crate::StableReleases;
     use rust_release::RustRelease;
     use rust_release::Stable;
@@ -82,11 +82,17 @@ mod tests {
     fn base() {
         let mut left = StableReleases::default();
         left.add(RustRelease::new(Stable::new(1, 2, 0), None, []));
-
         let right = StableReleases::<()>::default();
 
-        let out = left.merge_with(right, prefer_self);
+        let out = left.merge_with(right, combine);
 
-        assert!(out.is_empty());
+        assert_eq!(out.len(), 1);
+
+        let first = out.iter().next().unwrap();
+
+        assert_eq!(first.version(), &Stable::new(1, 2, 0));
+        assert_eq!(first.release_date(), None);
+        assert_eq!(first.toolchains.len(), 0);
+        assert_eq!(first.context, ());
     }
 }

@@ -3,12 +3,12 @@
 /// Type to model a Rust toolchain, with additional metadata relevant to a
 /// release.
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct ReleaseToolchain {
+pub struct TargetToolchain {
     toolchain: rust_toolchain::Toolchain,
     tier: TargetTier,
 }
 
-impl ReleaseToolchain {
+impl TargetToolchain {
     /// Create an ExtendedToolchain from a rust_toolchain::Toolchain
     pub fn new(toolchain: rust_toolchain::Toolchain, tier: TargetTier) -> Self {
         Self { toolchain, tier }

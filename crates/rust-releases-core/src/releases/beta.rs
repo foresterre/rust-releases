@@ -1,24 +1,24 @@
-use crate::merge::{Merge, MergeCandidate};
+use crate::merge::PartialRustRelease;
 use crate::releases::impls;
 use crate::Beta;
 use rust_release::RustRelease;
 
 #[derive(Debug, Default)]
-pub struct BetaReleases<C = ()>(impls::ReleasesImpl<Beta, C>);
+pub struct BetaReleases(impls::ReleasesImpl<Beta>);
 
-impl<C> BetaReleases<C> {
+impl BetaReleases {
     /// Merge with another set of stable releases
-    pub fn merge_with<C2, F, C3>(self, other: BetaReleases<C2>, resolver: F) -> BetaReleases<C3>
+    pub fn merge_with<F>(self, other: BetaReleases, resolver: F) -> BetaReleases
     where
-        F: Fn(&Beta, MergeCandidate<C>, MergeCandidate<C2>) -> Merge<C3>,
+        F: Fn(Beta, PartialRustRelease, PartialRustRelease) -> RustRelease<Beta>,
     {
         BetaReleases(self.0.merge_with(other.0, resolver))
     }
 }
 
-impl<C> BetaReleases<C> {
+impl BetaReleases {
     /// Add a stable release
-    pub fn add(&mut self, release: RustRelease<Beta, C>) {
+    pub fn add(&mut self, release: RustRelease<Beta>) {
         self.0.add(release);
     }
 
@@ -33,7 +33,7 @@ impl<C> BetaReleases<C> {
     }
 
     /// Iterate over the releases
-    pub fn iter(&self) -> impl Iterator<Item = &RustRelease<Beta, C>> {
+    pub fn iter(&self) -> impl Iterator<Item = &RustRelease<Beta>> {
         self.0.iter()
     }
 }

@@ -21,13 +21,13 @@ pub mod merge;
 pub mod releases;
 pub mod resolver;
 
-pub struct RustReleases<Cs = (), Cb = (), Cn = ()> {
-    stable: StableReleases<Cs>,
-    beta: BetaReleases<Cb>,
-    nightly: NightlyReleases<Cn>,
+pub struct RustReleases {
+    stable: StableReleases,
+    beta: BetaReleases,
+    nightly: NightlyReleases,
 }
 
-impl<Cs: Default, Cb: Default, Cn: Default> Default for RustReleases<Cs, Cb, Cn> {
+impl Default for RustReleases {
     fn default() -> Self {
         Self {
             stable: StableReleases::default(),
@@ -56,21 +56,20 @@ impl RustReleases {
 
 #[cfg(test)]
 mod tests {
-    use crate::merge::Merge;
-    use crate::resolver::combine;
+    use crate::resolver::{ConflictResolutionBuilder, ReleaseDateResolver, ToolchainsResolver};
     use crate::StableReleases;
     use rust_release::RustRelease;
     use rust_release::Stable;
 
     #[test]
     fn empty_merge_is_empty() {
-        let left = StableReleases::<()>::default();
-        let right = StableReleases::<()>::default();
+        let left = StableReleases::default();
+        let right = StableReleases::default();
 
-        let merge = left.merge_with(right, |_version, _lhs, _rhs| Merge {
+        let merge = left.merge_with(right, |version, _lhs, _rhs| RustRelease {
+            version,
             release_date: None,
             toolchains: vec![],
-            context: (),
         });
 
         assert!(merge.is_empty());
@@ -82,8 +81,12 @@ mod tests {
     fn base() {
         let mut left = StableReleases::default();
         left.add(RustRelease::new(Stable::new(1, 2, 0), None, []));
-        let right = StableReleases::<()>::default();
+        let right = StableReleases::default();
 
+        let combine = ConflictResolutionBuilder::default()
+            .with_release_date_resolver(ReleaseDateResolver::most_recent())
+            .with_toolchains_resolver(ToolchainsResolver::chain())
+            .build_or_default();
         let out = left.merge_with(right, combine);
 
         assert_eq!(out.len(), 1);
@@ -93,6 +96,5 @@ mod tests {
         assert_eq!(first.version(), &Stable::new(1, 2, 0));
         assert_eq!(first.release_date(), None);
         assert_eq!(first.toolchains.len(), 0);
-        assert_eq!(first.context, ());
     }
 }

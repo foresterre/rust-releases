@@ -11,10 +11,9 @@
 //! [`rust-releases`]: https://github.com/foresterre/rust-releases
 //! [`cargo-msrv`]: https://github.com/foresterre/cargo-msrv
 //! [`repository`]: https://github.com/foresterre/rust-releases/issues
-// #![deny(missing_docs)]
 #![warn(clippy::all)]
+#![deny(missing_docs)]
 #![deny(unsafe_code)]
-// #![deny(missing_docs)]
 
 use crate::toolchain::TargetToolchain;
 use std::cmp::Ordering;
@@ -34,12 +33,26 @@ pub mod version;
 /// # PartialEq, Eq, Ord, PartialOrd
 ///
 /// With respect to the PartialEq, Eq, PartialOrd and Ord traits, a [`RustRelease`]
-/// is only compared and ordered based on its `version`.
+/// `a` is equal, less, or greater than a [`RustRelease`] `b` iff respectively the
+/// `a.version` field is equal, less, or greater than `b.version`.
 #[derive(Clone, Debug)]
 pub struct RustRelease<V> {
-    // C = ()
+    /// The version of a [`RustRelease`].
+    ///
+    /// The versioning scheme depends on the channel, which is why the version
+    /// type is a generic. In this library, the `V` is always substituted by one
+    /// of the following types: [`Stable`], [`Beta`] or [`Nightly`].
+    ///
+    /// [`Stable`] and [`Beta`] carry a semver version number, while [`Nightly`]
+    /// is version by a date.
     pub version: V,
+    /// The release date of the release.
+    ///
+    /// The field is optional, because the value may be absent from a data source.
     pub release_date: Option<rust_toolchain::Date>,
+    /// The toolchains associated with the release.
+    ///
+    /// The field may be empty if toolchains were absent from a data source.
     pub toolchains: Vec<TargetToolchain>,
     // pub context: C, // Eventually, I want to add this again which can be used to tag the release with arbitrary data
 }
@@ -79,6 +92,8 @@ impl<V> RustRelease<V> {
         }
     }
 
+    /// The version of a release.
+    ///
     /// The 3 component MAJOR.MINOR.PATCH version number of the release
     pub fn version(&self) -> &V {
         &self.version

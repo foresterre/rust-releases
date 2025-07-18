@@ -15,13 +15,17 @@
 #![deny(missing_docs)]
 #![deny(unsafe_code)]
 
-use crate::toolchain::TargetToolchain;
 use std::cmp::Ordering;
 
 // exports
-pub use rust_toolchain;
 pub use rust_toolchain::channel::{Beta, Nightly, Stable};
 
+/// A module for an unrefined Date type, solely used as a version number.
+///
+/// Do not use as your date type!
+pub mod date {
+    pub use rust_toolchain::Date;
+}
 /// Describes toolchains in so far they're relevant to a release
 pub mod toolchain;
 
@@ -49,11 +53,11 @@ pub struct RustRelease<V> {
     /// The release date of the release.
     ///
     /// The field is optional, because the value may be absent from a data source.
-    pub release_date: Option<rust_toolchain::Date>,
+    pub release_date: Option<date::Date>,
     /// The toolchains associated with the release.
     ///
     /// The field may be empty if toolchains were absent from a data source.
-    pub toolchains: Vec<TargetToolchain>,
+    pub toolchains: Vec<toolchain::TargetToolchain>,
     // pub context: C, // Eventually, I want to add this again which can be used to tag the release with arbitrary data
 }
 
@@ -83,7 +87,7 @@ impl<V> RustRelease<V> {
     pub fn new(
         version: V,
         release_date: Option<rust_toolchain::Date>,
-        toolchains: impl IntoIterator<Item = TargetToolchain>,
+        toolchains: impl IntoIterator<Item = toolchain::TargetToolchain>,
     ) -> Self {
         Self {
             version,
@@ -100,12 +104,12 @@ impl<V> RustRelease<V> {
     }
 
     /// Release date of the Rust release, if known
-    pub fn release_date(&self) -> Option<&rust_toolchain::Date> {
+    pub fn release_date(&self) -> Option<&date::Date> {
         self.release_date.as_ref()
     }
 
     /// Toolchains associated with the release
-    pub fn toolchains(&self) -> impl Iterator<Item = &TargetToolchain> {
+    pub fn toolchains(&self) -> impl Iterator<Item = &toolchain::TargetToolchain> {
         self.toolchains.iter()
     }
 }
@@ -129,6 +133,7 @@ mod tests {
     use super::*;
     use rust_toolchain::RustVersion;
     use std::collections::HashSet;
+    use toolchain::TargetToolchain;
 
     fn fake(stable: Stable, date: Option<rust_toolchain::Date>) -> TargetToolchain {
         TargetToolchain::new(

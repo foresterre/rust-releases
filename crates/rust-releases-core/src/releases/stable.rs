@@ -42,9 +42,10 @@ impl StableReleases {
 mod tests {
     use super::*;
     use crate::resolver::{ConflictResolutionBuilder, ReleaseDateResolver, ToolchainsResolver};
-    use rust_release::rust_toolchain::{Channel, RustVersion, Toolchain};
-    use rust_release::rust_toolchain::{Date, Target};
-    use rust_release::toolchain::{TargetTier, TargetToolchain};
+    use rust_release::date::Date;
+    use rust_release::toolchain::{
+        Channel, RustVersion, Target, TargetTier, TargetToolchain, Toolchain,
+    };
     use std::collections::HashSet;
 
     fn make_release(v: impl Into<RustVersion>, d: Option<Date>) -> RustRelease<Stable> {

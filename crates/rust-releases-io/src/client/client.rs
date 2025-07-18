@@ -58,7 +58,7 @@ impl RustReleasesClient for Client {
 
         Ok(RetrievedDocument::new(
             document,
-            RetrievalLocation::RemoteUrl(resource.url.to_string()),
+            RetrievalLocation::Url(resource.url.to_string()),
         ))
     }
 }

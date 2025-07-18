@@ -59,7 +59,7 @@ impl Document {
 #[derive(Debug, Eq, PartialEq)]
 pub enum RetrievalLocation {
     /// A document retrieved from a remote URL.
-    RemoteUrl(String),
+    Url(String),
     /// A document retrieved from a cache.
-    Cache(PathBuf),
+    Path(PathBuf),
 }

@@ -9,9 +9,8 @@
 #![deny(unsafe_code)]
 
 pub use crate::releases::{BetaReleases, NightlyReleases, StableReleases};
-pub use rust_release::rust_toolchain::{channel::Beta, channel::Nightly, channel::Stable};
 /// Defines release channels, such as the stable, beta and nightly release channels.
-pub use rust_release::{self, RustRelease};
+pub use rust_release::{self, Beta, Nightly, RustRelease, Stable};
 
 pub mod channel;
 pub mod merge;

@@ -1,21 +1,24 @@
 //! Types for working with Rust toolchains in so far they're relevant to a Rust release.
 
+// exports
+pub use rust_toolchain::*;
+
 /// Type to model a Rust toolchain, with additional metadata relevant to a
 /// release.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct TargetToolchain {
-    toolchain: rust_toolchain::Toolchain,
+    toolchain: Toolchain,
     tier: TargetTier,
 }
 
 impl TargetToolchain {
     /// Create an ExtendedToolchain from a rust_toolchain::Toolchain
-    pub fn new(toolchain: rust_toolchain::Toolchain, tier: TargetTier) -> Self {
+    pub fn new(toolchain: Toolchain, tier: TargetTier) -> Self {
         Self { toolchain, tier }
     }
 
     /// Get the toolchain
-    pub fn toolchain(&self) -> &rust_toolchain::Toolchain {
+    pub fn toolchain(&self) -> &Toolchain {
         &self.toolchain
     }
 

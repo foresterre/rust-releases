@@ -1,5 +1,5 @@
 use crate::merge::PartialRustRelease;
-use rust_release::rust_toolchain::Date;
+use rust_release::date::Date;
 use rust_release::toolchain::TargetToolchain;
 use rust_release::RustRelease;
 use std::cmp;

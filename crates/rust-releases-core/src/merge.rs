@@ -1,5 +1,6 @@
+use rust_release::date::Date;
 use rust_release::toolchain::TargetToolchain;
-use rust_release::{rust_toolchain, RustRelease};
+use rust_release::RustRelease;
 
 /// A `PartialRustRelease` is like a [`RustRelease`] minus the version, and all fields are optional
 /// because they may not be present for a specific release source type.
@@ -16,7 +17,7 @@ use rust_release::{rust_toolchain, RustRelease};
 /// [`RustRelease`]: RustRelease
 #[derive(Debug, Default)]
 pub struct PartialRustRelease {
-    pub release_date: Option<rust_toolchain::Date>,
+    pub release_date: Option<Date>,
     pub toolchains: Option<Vec<TargetToolchain>>,
 }
 

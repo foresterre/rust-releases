@@ -1,5 +1,5 @@
-use crate::client::client::Client;
 use crate::client::errors::{HttpError, IoError};
+use crate::client::remote_client::RemoteClient;
 use crate::{
     is_stale, ClientError, Document, IsStaleError, ResourceFile, RetrievalLocation,
     RetrievedDocument, RustReleasesClient,
@@ -19,6 +19,7 @@ const DEFAULT_TIMEOUT: Duration = Duration::from_secs(150);
 /// the client will download a new copy of the given resource and store it to the `cache_folder`.
 /// If a cached file is present, and the copy is not outdated, the cached file will be returned
 /// instead.
+#[derive(Debug)]
 pub struct CachedClient {
     cache_folder: PathBuf,
     cache_timeout: Duration,
@@ -66,7 +67,7 @@ impl RustReleasesClient for CachedClient {
             setup_cache_folder(&path)?;
         }
 
-        let client = Client::new(DEFAULT_TIMEOUT);
+        let client = RemoteClient::new(DEFAULT_TIMEOUT);
         let mut retrieved = client.fetch(resource).map_err(CachedClientError::from)?;
 
         let document = retrieved.mut_document();

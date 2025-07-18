@@ -5,7 +5,7 @@ pub mod cached_client;
 
 #[cfg(feature = "http_client")]
 #[allow(clippy::module_inception)]
-pub mod client;
+pub mod remote_client;
 
 #[cfg(feature = "http_client")]
 pub mod errors;

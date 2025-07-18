@@ -1,16 +1,18 @@
 use crate::client::errors::IoError;
 use crate::{
-    CachedClient, Document, IsStaleError, ResourceFile, RetrievalLocation, RetrievedDocument,
-    RustReleasesClient,
+    Document, IsStaleError, ResourceFile, RetrievalLocation, RetrievedDocument, RustReleasesClient,
 };
-use std::path::PathBuf;
+use std::path::Path;
 use std::{fs, io};
 
 const DEFAULT_MEMORY_SIZE: usize = 4096;
 
-pub struct FsClient {
-    folder: PathBuf,
-}
+/// A client to fetch resources from the local file system.
+///
+/// The full file path of the resource to be fetched must be given to
+/// [`FsClient::fetch`].
+#[derive(Debug, Default)]
+pub struct FsClient;
 
 impl RustReleasesClient for FsClient {
     type Error = FsClientError;
@@ -18,22 +20,17 @@ impl RustReleasesClient for FsClient {
     fn fetch(&self, resource: ResourceFile) -> Result<RetrievedDocument, Self::Error> {
         // disadvantage of the current API is that the resource file will require the path to
         // be representable as a &str.
-
-        // maybe we should in this case let the resource url be the full file path,
-        // instead of joining it to the stem folder? However, this is consistent
-        // with our other clients.
-
-        let path = self.folder.join(resource.url);
+        let path = Path::new(resource.url);
 
         let file =
-            fs::File::open(&path).map_err(|e| IoError::inaccessible(e, path.to_path_buf()))?;
+            fs::File::open(path).map_err(|e| IoError::inaccessible(e, path.to_path_buf()))?;
         let mut reader = io::BufReader::new(file);
 
         let document = read_document(&mut reader)?;
 
         Ok(RetrievedDocument::new(
             document,
-            RetrievalLocation::Path(path),
+            RetrievalLocation::Path(path.to_path_buf()),
         ))
     }
 }

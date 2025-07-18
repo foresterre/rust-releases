@@ -7,38 +7,39 @@ const DEFAULT_MEMORY_SIZE: usize = 4096;
 
 const DEFAULT_TIMEOUT: Duration = Duration::from_secs(150);
 
-/// The client to download and cache rust releases.
+/// A client to download rust releases data.
 ///
 /// If a cached file is not present, or if a cached file is present, but the copy is outdated,
 /// the client will download a new copy of the given resource and store it to the `cache_folder`.
 /// If a cached file is present, and the copy is not outdated, the cached file will be returned
 /// instead.
-pub struct Client {
+#[derive(Debug)]
+pub struct RemoteClient {
     timeout: Duration,
 }
 
-impl Client {
-    /// Create a new [`Client`].
+impl RemoteClient {
+    /// Create a new [`RemoteClient`].
     ///
     /// ```
     /// use std::time::Duration;
-    /// use rust_releases_io::Client;
+    /// use rust_releases_io::RemoteClient;
     /// let timeout = Duration::from_secs(86_400);
     ///
-    /// let _client = Client::new(timeout);
+    /// let _client = RemoteClient::new(timeout);
     /// ```
     pub fn new(timeout: Duration) -> Self {
         Self { timeout }
     }
 }
 
-impl Default for Client {
-    /// Create a new [`Client`].
+impl Default for RemoteClient {
+    /// Create a new [`RemoteClient`].
     ///
     /// ```
-    /// use rust_releases_io::Client;
+    /// use rust_releases_io::RemoteClient;
     ///
-    /// let _client = Client::default();
+    /// let _client = RemoteClient::default();
     /// ```
     fn default() -> Self {
         Self {
@@ -47,7 +48,7 @@ impl Default for Client {
     }
 }
 
-impl RustReleasesClient for Client {
+impl RustReleasesClient for RemoteClient {
     type Error = ClientError;
 
     fn fetch(&self, resource: ResourceFile) -> Result<RetrievedDocument, Self::Error> {
@@ -95,7 +96,7 @@ fn write_document(reader: &mut Box<dyn Read + Send + Sync>) -> Result<Document, 
     Ok(Document::new(buffer))
 }
 
-/// A list of errors which may be produced by [`Client::fetch`].
+/// A list of errors which may be produced by [`RemoteClient::fetch`].
 #[derive(Debug, thiserror::Error)]
 #[non_exhaustive]
 pub enum ClientError {

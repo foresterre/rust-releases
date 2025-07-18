@@ -5,8 +5,11 @@
 //!
 //! [`rust-releases`]: https://docs.rs/rust-releases
 
-use rust_releases_core::{semver, Channel, Release, ReleaseIndex};
+use rust_releases_core::{
+    semver, Channel, Release, ReleaseIndex, RustRelease, RustReleases, Stable, StableReleases,
+};
 use rust_releases_io::Document;
+use std::collections::HashSet;
 use std::path::{Path, PathBuf};
 #[cfg(test)]
 #[macro_use]
@@ -15,54 +18,91 @@ extern crate rust_releases_io;
 mod errors;
 mod fetch;
 
-use crate::fetch::fetch;
-
 pub use errors::{RustChangelogError, RustChangelogResult};
 use std::str::FromStr;
 use time::macros::format_description;
+use time::Duration;
 
-/// Used to fetch
+const URL: &str = "https://raw.githubusercontent.com/rust-lang/rust/master/RELEASES.md";
+
 pub struct Client {
-    cache_dir: Option<PathBuf>,
+    cache: Cache,
+    timeout: Duration,
 }
 
 impl Client {
-    /// TODO
-    pub fn new(cache_dir: Option<PathBuf>) -> Self {
-        Self { cache_dir }
+    fn from_path(path: impl AsRef<Path>) -> Self {
+        todo!()
+    }
+
+    fn remote(remote: RemoteUrl) -> Self {
+        todo!()
+    }
+
+    // fn with_cache_dir(self, cache_dir: Option<PathBuf>) -> Self {
+    //     Self { cache_dir }
+    // }
+
+    fn get() -> RustChangelog {
+        todo!()
     }
 }
 
-/// A [`Source`] which obtains release data from the official Rust changelog.
-///
-/// [`Source`]: rust_releases_core::Source
+#[derive(Debug)]
+struct Cache {
+    dir: PathBuf,
+    expiry: Duration,
+}
+
+#[derive(Debug)]
+enum Location {
+    Path(PathBuf),
+    Http(RemoteUrl),
+}
+
+#[derive(Debug, Default)]
+enum RemoteUrl {
+    #[default]
+    GitHub,
+    HttpUrl(String),
+}
+
+impl RemoteUrl {
+    pub fn url(&self) -> &str {
+        match self {
+            Self::GitHub => URL,
+            Self::HttpUrl(url) => &url,
+        }
+    }
+}
+
 pub struct RustChangelog {
-    source: Document,
-
-    /// Used to compare against the date of an unreleased version which does already exist in the
-    /// changelog. If this date is at least as late as the time found in a release registration, we
-    /// will say that such a version is released (i.e. published).
-    today: ReleaseDate,
+    releases: RustReleases,
+    /// Filters can be used to limit the returned results, for example to compare
+    /// against the date of an unreleased version which does already exist in the
+    /// changelog. If this date is at least as late as the time found in a
+    /// release registration, we will say that such a version is released (i.e. published).
+    filters: HashSet<Filter>,
 }
 
 impl RustChangelog {
-    pub(crate) fn from_document(source: Document) -> Self {
+    pub fn new(today: ReleaseDate) -> Self {
+        let mut default_filters = HashSet::new();
+        default_filters.insert(Filter::Date(today));
+
         Self {
-            source,
-            today: ReleaseDate::today(),
+            releases: RustReleases::default(),
+            filters: default_filters,
         }
     }
 
-    #[cfg(test)]
-    pub(crate) fn from_document_with_date(source: Document, date: ReleaseDate) -> Self {
-        Self {
-            source,
-            today: date,
-        }
+    pub fn stable(&self) -> impl IntoIterator<Item = &RustRelease<Stable>> {
+        self.releases
+            .stable()
+            .into_iter()
+            .filter(|release| release.release_date().is_some_and(|dt| todo!(dt)))
     }
-}
 
-impl RustChangelog {
     fn build_index(&self) -> Result<ReleaseIndex, RustChangelogError> {
         let buffer = self.source.buffer();
         let content = std::str::from_utf8(buffer).map_err(RustChangelogError::UnrecognizedText)?;
@@ -75,6 +115,11 @@ impl RustChangelog {
 
         Ok(releases)
     }
+}
+
+#[derive(Debug, Eq, Hash, PartialOrd, PartialEq)]
+pub enum Filter {
+    Date(ReleaseDate),
 }
 
 /// Create a release from a `Version ...` header in the Rust changelog file (`RELEASES.md`).
@@ -142,7 +187,7 @@ fn parse_release<'line>(
     Ok((version, date))
 }
 
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialOrd, PartialEq, Hash)]
 struct ReleaseDate(time::Date);
 
 impl ReleaseDate {

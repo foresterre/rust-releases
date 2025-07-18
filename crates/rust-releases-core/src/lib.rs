@@ -8,13 +8,10 @@
 #![deny(clippy::all)]
 #![deny(unsafe_code)]
 
-/// Defines release channels, such as the stable, beta and nightly release channels.
-pub use rust_release;
-
-use crate::releases::{BetaReleases, NightlyReleases, StableReleases};
-use rust_release::RustRelease;
-
+pub use crate::releases::{BetaReleases, NightlyReleases, StableReleases};
 pub use rust_release::rust_toolchain::{channel::Beta, channel::Nightly, channel::Stable};
+/// Defines release channels, such as the stable, beta and nightly release channels.
+pub use rust_release::{self, RustRelease};
 
 pub mod channel;
 pub mod merge;

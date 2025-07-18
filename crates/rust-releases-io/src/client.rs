@@ -9,6 +9,7 @@ pub mod client;
 
 #[cfg(feature = "http_client")]
 pub mod errors;
+pub mod fs_client;
 
 /// Fetch a document, given a `resource` description.
 pub trait RustReleasesClient {

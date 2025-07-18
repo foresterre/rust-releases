@@ -57,7 +57,7 @@ impl RustReleasesClient for CachedClient {
 
             return Ok(RetrievedDocument::new(
                 document,
-                RetrievalLocation::Cache(path),
+                RetrievalLocation::Path(path),
             ));
         }
 

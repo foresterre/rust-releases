@@ -27,7 +27,9 @@ pub mod date {
     pub use rust_toolchain::Date;
 }
 /// Describes toolchains in so far they're relevant to a release
-pub mod toolchain;
+pub mod toolchain {
+    pub use rust_toolchain::{Channel, Component, RustVersion, Target, Toolchain};
+}
 
 /// Describes the version of a release
 pub mod version;
@@ -48,7 +50,7 @@ pub struct RustRelease<V> {
     /// of the following types: [`Stable`], [`Beta`] or [`Nightly`].
     ///
     /// [`Stable`] and [`Beta`] carry a semver version number, while [`Nightly`]
-    /// is version by a date.
+    /// is versioned by a date.
     pub version: V,
     /// The release date of the release.
     ///
@@ -57,7 +59,7 @@ pub struct RustRelease<V> {
     /// The toolchains associated with the release.
     ///
     /// The field may be empty if toolchains were absent from a data source.
-    pub toolchains: Vec<toolchain::TargetToolchain>,
+    pub toolchains: Vec<toolchain::Toolchain>,
     // pub context: C, // Eventually, I want to add this again which can be used to tag the release with arbitrary data
 }
 
@@ -87,7 +89,7 @@ impl<V> RustRelease<V> {
     pub fn new(
         version: V,
         release_date: Option<rust_toolchain::Date>,
-        toolchains: impl IntoIterator<Item = toolchain::TargetToolchain>,
+        toolchains: impl IntoIterator<Item = toolchain::Toolchain>,
     ) -> Self {
         Self {
             version,
@@ -109,7 +111,7 @@ impl<V> RustRelease<V> {
     }
 
     /// Toolchains associated with the release
-    pub fn toolchains(&self) -> impl Iterator<Item = &toolchain::TargetToolchain> {
+    pub fn toolchains(&self) -> impl Iterator<Item = &toolchain::Toolchain> {
         self.toolchains.iter()
     }
 }
@@ -131,20 +133,17 @@ pub enum ReleaseVersion {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::toolchain::Toolchain;
     use rust_toolchain::RustVersion;
     use std::collections::HashSet;
-    use toolchain::TargetToolchain;
 
-    fn fake(stable: Stable, date: Option<rust_toolchain::Date>) -> TargetToolchain {
-        TargetToolchain::new(
-            rust_toolchain::Toolchain::new(
-                rust_toolchain::Channel::Stable(stable),
-                date,
-                rust_toolchain::Target::host(),
-                HashSet::new(),
-                HashSet::new(),
-            ),
-            toolchain::TargetTier::Unknown,
+    fn fake(stable: Stable, date: Option<rust_toolchain::Date>) -> Toolchain {
+        Toolchain::new(
+            rust_toolchain::Channel::Stable(stable),
+            date,
+            rust_toolchain::Target::host(),
+            HashSet::new(),
+            HashSet::new(),
         )
     }
 
@@ -170,7 +169,7 @@ mod tests {
         let version = ReleaseVersion::Stable(stable.clone());
         let release = RustRelease::new(version, date.clone(), vec![fake(stable, date)]);
 
-        let target_date = release.toolchains().next().unwrap().toolchain().date();
+        let target_date = release.toolchains().next().unwrap().date();
 
         assert_eq!(release.release_date(), target_date);
     }

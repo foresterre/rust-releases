@@ -5,7 +5,6 @@ use rust_release::RustRelease;
 use std::cmp;
 use std::hash::{DefaultHasher, Hash, Hasher};
 use std::marker::PhantomData;
-// TODO: provide a builder to build suitable resolvers?
 
 pub struct ConflictResolutionBuilder<V> {
     version: PhantomData<V>,

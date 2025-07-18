@@ -42,9 +42,9 @@ impl StableReleases {
 mod tests {
     use super::*;
     use crate::resolver::{ConflictResolutionBuilder, ReleaseDateResolver, ToolchainsResolver};
-    use rust_release::date::Date;
-    use rust_release::toolchain::{
-        Channel, RustVersion, Target, TargetTier, TargetToolchain, Toolchain,
+    use rust_release::{
+        date::Date,
+        toolchain::{Channel, RustVersion, Target, Toolchain},
     };
     use std::collections::HashSet;
 
@@ -58,16 +58,13 @@ mod tests {
         }
     }
 
-    fn make_toolchain(v: impl Into<RustVersion>, d: Option<Date>) -> TargetToolchain {
-        TargetToolchain::new(
-            Toolchain::new(
-                Channel::stable(v.into()),
-                d,
-                Target::host(),
-                HashSet::new(),
-                HashSet::new(),
-            ),
-            TargetTier::T1,
+    fn make_toolchain(v: impl Into<RustVersion>, d: Option<Date>) -> Toolchain {
+        Toolchain::new(
+            Channel::stable(v.into()),
+            d,
+            Target::host(),
+            HashSet::new(),
+            HashSet::new(),
         )
     }
 

@@ -1,6 +1,6 @@
 use crate::merge::PartialRustRelease;
 use rust_release::date::Date;
-use rust_release::toolchain::TargetToolchain;
+use rust_release::toolchain::Toolchain;
 use rust_release::RustRelease;
 use std::cmp;
 use std::hash::{DefaultHasher, Hash, Hasher};
@@ -54,11 +54,7 @@ impl<V> ConflictResolutionBuilder<V> {
 
     pub fn with_toolchains_fn(
         self,
-        f: fn(
-            V,
-            Option<Vec<TargetToolchain>>,
-            Option<Vec<TargetToolchain>>,
-        ) -> Vec<TargetToolchain>,
+        f: fn(V, Option<Vec<Toolchain>>, Option<Vec<Toolchain>>) -> Vec<Toolchain>,
     ) -> ConflictResolutionBuilder<V> {
         self.with_toolchains_resolver(ToolchainsResolver::new(f))
     }
@@ -115,7 +111,7 @@ impl<V> ReleaseDateResolver<V> {
 }
 
 pub struct ToolchainsResolver<V> {
-    f: fn(V, Option<Vec<TargetToolchain>>, Option<Vec<TargetToolchain>>) -> Vec<TargetToolchain>,
+    f: fn(V, Option<Vec<Toolchain>>, Option<Vec<Toolchain>>) -> Vec<Toolchain>,
 }
 
 impl<V> Default for ToolchainsResolver<V> {
@@ -125,21 +121,15 @@ impl<V> Default for ToolchainsResolver<V> {
 }
 
 impl<V> ToolchainsResolver<V> {
-    pub fn new(
-        f: fn(
-            V,
-            Option<Vec<TargetToolchain>>,
-            Option<Vec<TargetToolchain>>,
-        ) -> Vec<TargetToolchain>,
-    ) -> Self {
+    pub fn new(f: fn(V, Option<Vec<Toolchain>>, Option<Vec<Toolchain>>) -> Vec<Toolchain>) -> Self {
         Self { f }
     }
     pub fn call(
         &self,
         version: V,
-        lhs: Option<Vec<TargetToolchain>>,
-        rhs: Option<Vec<TargetToolchain>>,
-    ) -> Vec<TargetToolchain> {
+        lhs: Option<Vec<Toolchain>>,
+        rhs: Option<Vec<Toolchain>>,
+    ) -> Vec<Toolchain> {
         (self.f)(version, lhs, rhs)
     }
 
@@ -158,11 +148,11 @@ impl<V> ToolchainsResolver<V> {
         Self::new(|_v, lhs, rhs| {
             match (lhs, rhs) {
                 (Some(l), Some(r)) => {
-                    fn hash_toolchain(rt: &TargetToolchain) -> u64 {
+                    fn hash_toolchain(rt: &Toolchain) -> u64 {
                         let mut hasher = DefaultHasher::new();
-                        rt.toolchain().host().hash(&mut hasher);
-                        rt.toolchain().date().hash(&mut hasher);
-                        rt.toolchain().channel().hash(&mut hasher);
+                        rt.host().hash(&mut hasher);
+                        rt.date().hash(&mut hasher);
+                        rt.channel().hash(&mut hasher);
                         hasher.finish()
                     }
 

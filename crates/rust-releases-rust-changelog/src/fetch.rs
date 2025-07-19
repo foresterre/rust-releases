@@ -1,6 +1,6 @@
 use crate::RustChangelogResult;
 use rust_releases_io::base_cache_dir;
-use rust_releases_io::{CachedClient, Document, ResourceFile, RustReleasesClient};
+use rust_releases_io::{Document, HttpCachedClient, ResourceFile, RustReleasesClient};
 use std::path::Path;
 use std::time::Duration;
 
@@ -16,7 +16,7 @@ pub fn fetch(cache_dir: Option<impl AsRef<Path>>) -> RustChangelogResult<Documen
         base_cache_dir()?.join(SOURCE_CACHE_DIR)
     };
 
-    let client = CachedClient::new(cache, TIMEOUT);
+    let client = HttpCachedClient::new(cache, TIMEOUT);
     let source = client.fetch(ResourceFile::new(URL, RESOURCE_NAME))?;
 
     Ok(source.into_document())

@@ -5,12 +5,15 @@
 //!
 //! [`rust-releases`]: https://docs.rs/rust-releases
 
-use rust_releases_core::{
-    semver, Channel, Release, ReleaseIndex, RustRelease, RustReleases, Stable, StableReleases,
-};
-use rust_releases_io::Document;
+use rust_releases_core::{RustRelease, RustReleases, Stable};
+use rust_releases_io::{FsClient, HttpCachedClient, HttpClient};
 use std::collections::HashSet;
+use std::convert::TryFrom;
 use std::path::{Path, PathBuf};
+use std::str::FromStr;
+use std::time::Duration;
+use time::macros::format_description;
+
 #[cfg(test)]
 #[macro_use]
 extern crate rust_releases_io;
@@ -19,45 +22,39 @@ mod errors;
 mod fetch;
 
 pub use errors::{RustChangelogError, RustChangelogResult};
-use std::str::FromStr;
-use time::macros::format_description;
-use time::Duration;
 
 const URL: &str = "https://raw.githubusercontent.com/rust-lang/rust/master/RELEASES.md";
 
-pub struct Client {
-    cache: Cache,
-    timeout: Duration,
+#[derive(Debug)]
+pub struct RemoteClient {
+    client: ClientImpl,
 }
 
-impl Client {
-    fn from_path(path: impl AsRef<Path>) -> Self {
-        todo!()
+impl RemoteClient {
+    /// A client where files are fetched from a remote server over http.
+    pub fn http_client() -> Self {
+        Self {
+            client: ClientImpl::Http(HttpClient::default()),
+        }
     }
 
-    fn remote(remote: RemoteUrl) -> Self {
-        todo!()
+    /// A client where files are fetched from a remote server over http,
+    /// or from the client if they're present and not expired.
+    pub fn cached_http_client(folder: PathBuf, expiry: Duration) -> Self {
+        Self {
+            client: ClientImpl::CachedHttp(HttpCachedClient::new(folder, expiry)),
+        }
     }
 
-    // fn with_cache_dir(self, cache_dir: Option<PathBuf>) -> Self {
-    //     Self { cache_dir }
-    // }
-
-    fn get() -> RustChangelog {
+    pub fn exec(&mut self) -> Result<RustChangelog, ()> {
         todo!()
     }
 }
 
 #[derive(Debug)]
-struct Cache {
-    dir: PathBuf,
-    expiry: Duration,
-}
-
-#[derive(Debug)]
-enum Location {
-    Path(PathBuf),
-    Http(RemoteUrl),
+enum ClientImpl {
+    Http(HttpClient),
+    CachedHttp(HttpCachedClient),
 }
 
 #[derive(Debug, Default)]
@@ -96,30 +93,21 @@ impl RustChangelog {
         }
     }
 
-    pub fn stable(&self) -> impl IntoIterator<Item = &RustRelease<Stable>> {
-        self.releases
-            .stable()
-            .into_iter()
-            .filter(|release| release.release_date().is_some_and(|dt| todo!(dt)))
+    pub fn stable_releases(&self) -> impl IntoIterator<Item = &RustRelease<Stable>> {
+        self.releases.stable().into_iter().filter(move |release| {
+            release.release_date().is_some_and(|dt| {
+                // Check if the release date passes all date filters
+                self.filters.iter().all(|filter| match filter {
+                    Filter::Date(before_dt) => {
+                        dt.year() <= before_dt.0.year() as u16
+                            && dt.month() <= before_dt.0.month().into()
+                            && dt.day() <= before_dt.0.day()
+                    }
+                    _ => true,
+                })
+            })
+        })
     }
-
-    fn build_index(&self) -> Result<ReleaseIndex, RustChangelogError> {
-        let buffer = self.source.buffer();
-        let content = std::str::from_utf8(buffer).map_err(RustChangelogError::UnrecognizedText)?;
-
-        let releases = content
-            .lines()
-            .filter(|s| s.starts_with("Version"))
-            .filter_map(|line| create_release(line, &self.today))
-            .collect::<Result<_, _>>()?;
-
-        Ok(releases)
-    }
-}
-
-#[derive(Debug, Eq, Hash, PartialOrd, PartialEq)]
-pub enum Filter {
-    Date(ReleaseDate),
 }
 
 /// Create a release from a `Version ...` header in the Rust changelog file (`RELEASES.md`).
@@ -155,6 +143,12 @@ fn create_release(line: &str, today: &ReleaseDate) -> Option<RustChangelogResult
         // In any ony other error case, we forward the error
         Err(err) => Some(Err(err)),
     }
+}
+
+#[derive(Debug, Eq, Hash, PartialOrd, PartialEq)]
+#[non_exhaustive]
+pub enum Filter {
+    Date(ReleaseDate),
 }
 
 impl RustChangelog {

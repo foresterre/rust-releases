@@ -14,32 +14,32 @@ const DEFAULT_TIMEOUT: Duration = Duration::from_secs(150);
 /// If a cached file is present, and the copy is not outdated, the cached file will be returned
 /// instead.
 #[derive(Debug)]
-pub struct RemoteClient {
+pub struct HttpClient {
     timeout: Duration,
 }
 
-impl RemoteClient {
-    /// Create a new [`RemoteClient`].
+impl HttpClient {
+    /// Create a new [`HttpClient`].
     ///
     /// ```
     /// use std::time::Duration;
-    /// use rust_releases_io::RemoteClient;
+    /// use rust_releases_io::HttpClient;
     /// let timeout = Duration::from_secs(86_400);
     ///
-    /// let _client = RemoteClient::new(timeout);
+    /// let _client = HttpClient::new(timeout);
     /// ```
     pub fn new(timeout: Duration) -> Self {
         Self { timeout }
     }
 }
 
-impl Default for RemoteClient {
-    /// Create a new [`RemoteClient`].
+impl Default for HttpClient {
+    /// Create a new [`HttpClient`].
     ///
     /// ```
-    /// use rust_releases_io::RemoteClient;
+    /// use rust_releases_io::HttpClient;
     ///
-    /// let _client = RemoteClient::default();
+    /// let _client = HttpClient::default();
     /// ```
     fn default() -> Self {
         Self {
@@ -48,7 +48,7 @@ impl Default for RemoteClient {
     }
 }
 
-impl RustReleasesClient for RemoteClient {
+impl RustReleasesClient for HttpClient {
     type Error = ClientError;
 
     fn fetch(&self, resource: ResourceFile) -> Result<RetrievedDocument, Self::Error> {
@@ -96,7 +96,7 @@ fn write_document(reader: &mut Box<dyn Read + Send + Sync>) -> Result<Document, 
     Ok(Document::new(buffer))
 }
 
-/// A list of errors which may be produced by [`RemoteClient::fetch`].
+/// A list of errors which may be produced by [`HttpClient::fetch`].
 #[derive(Debug, thiserror::Error)]
 #[non_exhaustive]
 pub enum ClientError {

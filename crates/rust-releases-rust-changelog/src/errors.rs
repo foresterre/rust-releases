@@ -32,7 +32,7 @@ pub enum RustChangelogError {
 
     /// Returned in case a cached client error is returned
     #[error(transparent)]
-    CachedClient(#[from] rust_releases_io::CachedClientError),
+    CachedClient(#[from] rust_releases_io::HttpCachedClientError),
 
     /// Returned in case a staleness check error is returned
     #[error(transparent)]

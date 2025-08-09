@@ -1,15 +1,9 @@
 use crate::document::RetrievedDocument;
 
-#[cfg(feature = "http_client")]
 pub mod cached_client;
-
-#[cfg(feature = "http_client")]
-#[allow(clippy::module_inception)]
-pub mod remote_client;
-
-#[cfg(feature = "http_client")]
 pub mod errors;
 pub mod fs_client;
+pub mod remote_client;
 
 /// Fetch a document, given a `resource` description.
 pub trait RustReleasesClient {

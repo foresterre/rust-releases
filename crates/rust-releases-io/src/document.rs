@@ -32,7 +32,8 @@ impl RetrievedDocument {
     }
 }
 
-/// A `Document` represents a resource which can be used as an input to construct a `ReleaseIndex`.
+/// A `Document` represents a single resource file, usually used to construct
+/// a release index.
 #[derive(Debug, Eq, PartialEq)]
 pub struct Document {
     buffer: Vec<u8>,

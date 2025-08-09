@@ -12,9 +12,9 @@ repository = "https://github.com/foresterre/rust-releases"
 [dependencies]
 time = { version = "0.3.7", features = ["macros", "parsing"] }
 rust-releases-core = { workspace = true }
-rust-releases-io = { workspace = true, features = ["http_client"] }
+rust-releases-io = { workspace = true }
 thiserror = { workspace = true }
-semver = "1"
+semver = { version = "1" }
 
 [dev-dependencies]
 yare = "3.0.0"

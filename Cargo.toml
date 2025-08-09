@@ -39,9 +39,6 @@ github = ["rust-releases-github"]
 rust-changelog = ["rust-releases-rust-changelog"]
 rust-dist = ["rust-releases-rust-dist"]
 
-io = ["rust-releases-io"]
-io-http = ["rust-releases-io/http_client"]
-
 [dependencies]
 # types and shared impl's
 rust-releases-core = { workspace = true }

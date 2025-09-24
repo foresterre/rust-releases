@@ -1,3 +1,5 @@
+#![allow(clippy::type_complexity)]
+
 use crate::merge::PartialRustRelease;
 use rust_release::date::Date;
 use rust_release::toolchain::Toolchain;

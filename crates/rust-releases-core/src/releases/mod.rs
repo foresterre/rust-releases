@@ -13,6 +13,7 @@ pub use stable::StableReleases;
 // shared implementation for StableReleases, BetaReleases and NightlyReleases (implementation detail)
 pub(in crate::releases) mod impls {
     use super::*;
+    use crate::merge::Merge;
 
     #[derive(Debug)]
     pub struct ReleasesImpl<V> {
@@ -27,13 +28,12 @@ pub(in crate::releases) mod impls {
         }
     }
 
-    impl<V> ReleasesImpl<V>
-    where
-        V: Clone + Ord,
-    {
+    impl<V: Clone + Ord> Merge for ReleasesImpl<V> {
+        type Channel = V;
+
         /// Merge two sets of releases.
         ///
-        // # Generic Context `TODO: removed from current version`
+        // # Generic Context `TODO(foresterre): removed from current version`
         //
         // The generic parameters `C`, `C2` and `C3` can be used to attach arbitrary metadata,
         // possibly relevant for merging, to a release.
@@ -41,9 +41,13 @@ pub(in crate::releases) mod impls {
         // - `C` is the metadata of `self`
         // - `C2` is the metadata of `other`
         // - `C3` is the merged metadata.
-        pub fn merge_with<F>(self, other: ReleasesImpl<V>, resolver: F) -> ReleasesImpl<V>
+        fn merge_with<F>(self, other: Self, resolver: F) -> Self
         where
-            F: Fn(V, PartialRustRelease, PartialRustRelease) -> RustRelease<V>,
+            F: Fn(
+                Self::Channel,
+                PartialRustRelease,
+                PartialRustRelease,
+            ) -> RustRelease<Self::Channel>,
         {
             let mut out = ReleasesImpl::<V>::default();
 
@@ -61,27 +65,25 @@ pub(in crate::releases) mod impls {
                 })
                 .collect();
 
-            for other_release in other.releases {
-                let version = other_release.version.clone();
+            for rhs in other.releases {
+                let version = rhs.version.clone();
 
-                if let Some(self_result) = map.remove(&version) {
+                if let Some(lhs) = map.remove(&version) {
                     // Exists in both
-                    let lhs = PartialRustRelease::from(self_result);
-                    let rhs = PartialRustRelease::from(other_release);
+                    let rhs = PartialRustRelease::from(rhs);
 
                     Self::apply_merge(&mut out, version, lhs, rhs, &resolver);
                 } else {
                     // Only exists in other
                     let lhs = PartialRustRelease::default();
-                    let rhs = PartialRustRelease::from(other_release);
+                    let rhs = PartialRustRelease::from(rhs);
 
                     Self::apply_merge(&mut out, version, lhs, rhs, &resolver);
                 }
             }
 
             // Process remaining versions from self
-            for (version, candidate) in map {
-                let lhs = PartialRustRelease::from(candidate);
+            for (version, lhs) in map {
                 let rhs = PartialRustRelease::default();
 
                 Self::apply_merge(&mut out, version, lhs, rhs, &resolver);
@@ -89,7 +91,12 @@ pub(in crate::releases) mod impls {
 
             out
         }
+    }
 
+    impl<V> ReleasesImpl<V>
+    where
+        V: Clone + Ord,
+    {
         /// Merges two merge candidates with a matching version into a single merged Release.
         fn apply_merge<F>(
             out: &mut ReleasesImpl<V>,

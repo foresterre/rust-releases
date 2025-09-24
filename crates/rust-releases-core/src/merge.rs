@@ -2,6 +2,15 @@ use rust_release::date::Date;
 use rust_release::toolchain::Toolchain;
 use rust_release::RustRelease;
 
+pub trait Merge {
+    type Channel;
+
+    /// Merge with another set of stable releases
+    fn merge_with<F>(self, other: Self, resolver: F) -> Self
+    where
+        F: Fn(Self::Channel, PartialRustRelease, PartialRustRelease) -> RustRelease<Self::Channel>;
+}
+
 /// A `PartialRustRelease` is like a [`RustRelease`] minus the version, and all fields are optional
 /// because they may not be present for a specific release source type.
 /// E.g. if the releases are constructed from the GitHub releases repo, there may

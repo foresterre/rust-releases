@@ -1,3 +1,4 @@
+use crate::merge::Merge;
 use crate::merge::PartialRustRelease;
 use crate::releases::impls;
 use crate::Stable;
@@ -6,11 +7,13 @@ use rust_release::RustRelease;
 #[derive(Debug, Default)]
 pub struct StableReleases(impls::ReleasesImpl<Stable>);
 
-impl StableReleases {
+impl Merge for StableReleases {
+    type Channel = Stable;
+
     /// Merge with another set of stable releases
-    pub fn merge_with<F>(self, other: StableReleases, resolver: F) -> StableReleases
+    fn merge_with<F>(self, other: StableReleases, resolver: F) -> StableReleases
     where
-        F: Fn(Stable, PartialRustRelease, PartialRustRelease) -> RustRelease<Stable>,
+        F: Fn(Self::Channel, PartialRustRelease, PartialRustRelease) -> RustRelease<Self::Channel>,
     {
         StableReleases(self.0.merge_with(other.0, resolver))
     }
@@ -41,6 +44,7 @@ impl StableReleases {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::merge::Merge;
     use crate::resolver::{ConflictResolutionBuilder, ReleaseDateResolver, ToolchainsResolver};
     use rust_release::{
         date::Date,

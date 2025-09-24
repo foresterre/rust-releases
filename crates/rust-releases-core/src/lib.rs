@@ -17,20 +17,11 @@ pub mod merge;
 pub mod releases;
 pub mod resolver;
 
+#[derive(Debug, Default)]
 pub struct RustReleases {
     stable: StableReleases,
     beta: BetaReleases,
     nightly: NightlyReleases,
-}
-
-impl Default for RustReleases {
-    fn default() -> Self {
-        Self {
-            stable: StableReleases::default(),
-            beta: BetaReleases::default(),
-            nightly: NightlyReleases::default(),
-        }
-    }
 }
 
 impl RustReleases {
@@ -52,6 +43,7 @@ impl RustReleases {
 
 #[cfg(test)]
 mod tests {
+    use crate::merge::Merge;
     use crate::resolver::{ConflictResolutionBuilder, ReleaseDateResolver, ToolchainsResolver};
     use crate::StableReleases;
     use rust_release::RustRelease;

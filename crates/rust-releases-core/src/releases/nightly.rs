@@ -1,4 +1,4 @@
-use crate::merge::PartialRustRelease;
+use crate::merge::{Merge, PartialRustRelease};
 use crate::releases::impls;
 use crate::Nightly;
 use rust_release::RustRelease;
@@ -6,9 +6,11 @@ use rust_release::RustRelease;
 #[derive(Debug, Default)]
 pub struct NightlyReleases(impls::ReleasesImpl<Nightly>);
 
-impl NightlyReleases {
+impl Merge for NightlyReleases {
+    type Channel = Nightly;
+
     /// Merge with another set of stable releases
-    pub fn merge_with<F>(self, other: NightlyReleases, resolver: F) -> NightlyReleases
+    fn merge_with<F>(self, other: NightlyReleases, resolver: F) -> NightlyReleases
     where
         F: Fn(Nightly, PartialRustRelease, PartialRustRelease) -> RustRelease<Nightly>,
     {

@@ -1,4 +1,4 @@
-use crate::merge::PartialRustRelease;
+use crate::merge::{Merge, PartialRustRelease};
 use crate::releases::impls;
 use crate::Beta;
 use rust_release::RustRelease;
@@ -6,9 +6,11 @@ use rust_release::RustRelease;
 #[derive(Debug, Default)]
 pub struct BetaReleases(impls::ReleasesImpl<Beta>);
 
-impl BetaReleases {
+impl Merge for BetaReleases {
+    type Channel = Beta;
+
     /// Merge with another set of stable releases
-    pub fn merge_with<F>(self, other: BetaReleases, resolver: F) -> BetaReleases
+    fn merge_with<F>(self, other: BetaReleases, resolver: F) -> BetaReleases
     where
         F: Fn(Beta, PartialRustRelease, PartialRustRelease) -> RustRelease<Beta>,
     {

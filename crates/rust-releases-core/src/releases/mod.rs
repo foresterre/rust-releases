@@ -1,4 +1,4 @@
-use crate::merge::PartialRustRelease;
+use crate::PartialRustRelease;
 use rust_release::RustRelease;
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -31,83 +31,34 @@ pub(in crate::releases) mod impls {
     where
         V: Clone + Ord,
     {
-        /// Merge two sets of releases.
+        /// Merges this releases collection with another using a custom merge function.
         ///
-        // # Generic Context `TODO: removed from current version`
-        //
-        // The generic parameters `C`, `C2` and `C3` can be used to attach arbitrary metadata,
-        // possibly relevant for merging, to a release.
-        //
-        // - `C` is the metadata of `self`
-        // - `C2` is the metadata of `other`
-        // - `C3` is the merged metadata.
-        pub fn merge_with<F>(self, other: ReleasesImpl<V>, resolver: F) -> ReleasesImpl<V>
+        /// When releases with the same version exist in both collections, the merge_fn
+        /// is called to combine them. Releases that exist in only one collection are
+        /// kept as-is.
+        pub fn merge_with<F>(self, rhs: Self, merge_fn: F) -> Self
         where
-            F: Fn(V, PartialRustRelease, PartialRustRelease) -> RustRelease<V>,
+            V: Ord + Clone,
+            F: Fn(RustRelease<V>, RustRelease<V>) -> RustRelease<V>,
         {
-            let mut out = ReleasesImpl::<V>::default();
+            let mut result = BTreeSet::new();
+            let mut others = rhs.releases;
 
-            let mut map: BTreeMap<V, PartialRustRelease> = self
-                .releases
-                .into_iter()
-                .map(|r| {
-                    (
-                        r.version,
-                        PartialRustRelease {
-                            release_date: r.release_date,
-                            toolchains: Some(r.toolchains),
-                        },
-                    )
-                })
-                .collect();
-
-            for other_release in other.releases {
-                let version = other_release.version.clone();
-
-                if let Some(self_result) = map.remove(&version) {
-                    // Exists in both
-                    let lhs = PartialRustRelease::from(self_result);
-                    let rhs = PartialRustRelease::from(other_release);
-
-                    Self::apply_merge(&mut out, version, lhs, rhs, &resolver);
+            for release in self.releases {
+                // Check if a matching release exists in other
+                if let Some(other_release) = others.take(&release) {
+                    // Both have this version - merge them
+                    result.insert(merge_fn(release, other_release));
                 } else {
-                    // Only exists in other
-                    let lhs = PartialRustRelease::default();
-                    let rhs = PartialRustRelease::from(other_release);
-
-                    Self::apply_merge(&mut out, version, lhs, rhs, &resolver);
+                    // Only in self
+                    result.insert(release);
                 }
             }
 
-            // Process remaining versions from self
-            for (version, candidate) in map {
-                let lhs = PartialRustRelease::from(candidate);
-                let rhs = PartialRustRelease::default();
+            // Add remaining releases from other that weren't matched
+            result.extend(others);
 
-                Self::apply_merge(&mut out, version, lhs, rhs, &resolver);
-            }
-
-            out
-        }
-
-        /// Merges two merge candidates with a matching version into a single merged Release.
-        fn apply_merge<F>(
-            out: &mut ReleasesImpl<V>,
-            version: V,
-            lhs: PartialRustRelease,
-            rhs: PartialRustRelease,
-            resolver: &F,
-        ) where
-            F: Fn(V, PartialRustRelease, PartialRustRelease) -> RustRelease<V>,
-        {
-            let merged = resolver(version.clone(), lhs, rhs);
-            let merged_release = RustRelease {
-                version,
-                release_date: merged.release_date,
-                toolchains: merged.toolchains,
-            };
-
-            out.releases.insert(merged_release);
+            ReleasesImpl { releases: result }
         }
     }
 

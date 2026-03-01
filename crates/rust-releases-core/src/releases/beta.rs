@@ -1,6 +1,5 @@
-use crate::merge::PartialRustRelease;
 use crate::releases::impls;
-use crate::Beta;
+use crate::{Beta, PartialRustRelease};
 use rust_release::RustRelease;
 
 #[derive(Debug, Default)]

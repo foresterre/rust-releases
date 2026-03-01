@@ -1,6 +1,5 @@
-use crate::merge::PartialRustRelease;
 use crate::releases::impls;
-use crate::Stable;
+use crate::{PartialRustRelease, Stable};
 use rust_release::RustRelease;
 
 #[derive(Debug, Default)]
@@ -8,11 +7,11 @@ pub struct StableReleases(impls::ReleasesImpl<Stable>);
 
 impl StableReleases {
     /// Merge with another set of stable releases
-    pub fn merge_with<F>(self, other: StableReleases, resolver: F) -> StableReleases
+    pub fn merge_with<F>(self, other: StableReleases, merge_fn: F) -> StableReleases
     where
         F: Fn(Stable, PartialRustRelease, PartialRustRelease) -> RustRelease<Stable>,
     {
-        StableReleases(self.0.merge_with(other.0, resolver))
+        StableReleases(self.0.merge_with(other.0, merge_fn))
     }
 }
 

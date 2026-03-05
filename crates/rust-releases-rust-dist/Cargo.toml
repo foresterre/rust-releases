@@ -3,7 +3,7 @@ name = "rust-releases-rust-dist"
 version = "0.30.0"
 authors = ["Martijn Gribnau <garm@ilumeo.com>"]
 edition = "2018"
-rust-version = "1.85"
+rust-version = "1.91"
 description = "RustDist source implementation for rust-releases"
 license = "MIT OR Apache-2.0"
 documentation = "https://docs.rs/rust-releases-rust-dist"
@@ -19,8 +19,8 @@ rust-releases-io = { version = "^0.30.0", path = "../rust-releases-io" }
 tokio = { version = "1.28.0", features = ["full"] }
 
 # S3 SDK
-aws-config = "1.6.0"
-aws-sdk-s3 = "1.79.0"
+aws-config = "1.8.15"
+aws-sdk-s3 = "1.125.0"
 
 # Regex parser and matcher, and lazy_static to precompile the regex
 lazy_static = "1.4.0"

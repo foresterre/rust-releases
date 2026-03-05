@@ -5,3 +5,5 @@ Cargo.lock
 .idea/
 .vscode/
 *.iml
+
+.DS_Store

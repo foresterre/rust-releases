@@ -20,7 +20,7 @@
 * **rust-releases-rust-dist** Resolved security advisory `GHSA-hfpc-8r3f-gw53`, `GHSA-vw5v-4f2q-w9xf` and `GHSA-65p9-r9h6-22vj` related to `aws-lc`, `aws-lc-fips` and `aws-lc-sys`
 
 
-[0.30.0]: https://github.com/foresterre/rust-releases/releases/tag/v0.31.0
+[0.31.0]: https://github.com/foresterre/rust-releases/releases/tag/v0.31.0
 
 ## [0.30.0] - 2025-03-12
 

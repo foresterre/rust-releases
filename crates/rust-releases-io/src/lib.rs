@@ -15,21 +15,6 @@ pub use crate::{
     io::{base_cache_dir, is_stale, BaseCacheDirError, IsStaleError},
 };
 
-#[cfg(feature = "http_client")]
-pub use crate::client::{
-    cached_client::CachedClient, cached_client::CachedClientError, client::Client,
-    client::ClientError,
-};
-
-/// A macro used to feature gate tests which fetch resources from third party services.
-///
-/// NB: for internal use, not covered by semver.
-#[macro_export]
-macro_rules! __internal_dl_test {
-    ($expr:expr) => {{
-        if cfg!(feature = "internal_dl_test") || option_env!("RUST_RELEASES_RUN_DL_TEST").is_some()
-        {
-            $expr
-        }
-    }};
-}
+pub use crate::client::{cached_client::HttpCachedClient, cached_client::HttpCachedClientError};
+pub use crate::client::{fs_client::FsClient, fs_client::FsClientError};
+pub use crate::client::{remote_client::ClientError, remote_client::HttpClient};

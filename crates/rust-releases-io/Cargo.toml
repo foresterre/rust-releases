@@ -9,12 +9,7 @@ license = "MIT OR Apache-2.0"
 documentation = "https://docs.rs/rust-releases-io"
 repository = "https://github.com/foresterre/rust-releases"
 
-[features]
-http_client = ["ureq"]
-# NB: excluded from SemVer, please do not use this in your crates
-internal_dl_test = []
-
 [dependencies]
 directories-next = "2.0.0"
 thiserror = { workspace = true }
-ureq = { version = "3.0.8", optional = true } # feature: http_client
+ureq = "3.0.8"

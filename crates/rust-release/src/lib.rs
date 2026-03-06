@@ -11,34 +11,85 @@
 //! [`rust-releases`]: https://github.com/foresterre/rust-releases
 //! [`cargo-msrv`]: https://github.com/foresterre/cargo-msrv
 //! [`repository`]: https://github.com/foresterre/rust-releases/issues
-// #![deny(missing_docs)]
 #![warn(clippy::all)]
-#![deny(unsafe_code)]
 #![deny(missing_docs)]
+#![deny(unsafe_code)]
 
-use crate::toolchain::ReleaseToolchain;
+use std::cmp::Ordering;
 
+// exports
+pub use rust_toolchain::channel::{Beta, Nightly, Stable};
+
+/// A module for an unrefined Date type, solely used as a version number.
+///
+/// Do not use as your date type!
+pub mod date {
+    pub use rust_toolchain::Date;
+}
 /// Describes toolchains in so far they're relevant to a release
-pub mod toolchain;
+pub mod toolchain {
+    pub use rust_toolchain::{Channel, Component, RustVersion, Target, Toolchain};
+}
 
 /// Describes the version of a release
 pub mod version;
 
 /// Type to model a Rust release.
-#[derive(Clone, Debug, Eq, PartialEq)]
-pub struct RustRelease {
-    version: ReleaseVersion,
-    release_date: Option<rust_toolchain::Date>,
-    toolchains: Vec<ReleaseToolchain>,
+///
+/// # PartialEq, Eq, Ord, PartialOrd
+///
+/// With respect to the PartialEq, Eq, PartialOrd and Ord traits, a [`RustRelease`]
+/// `a` is equal, less, or greater than a [`RustRelease`] `b` iff respectively the
+/// `a.version` field is equal, less, or greater than `b.version`.
+#[derive(Clone, Debug)]
+pub struct RustRelease<V> {
+    /// The version of a [`RustRelease`].
+    ///
+    /// The versioning scheme depends on the channel, which is why the version
+    /// type is a generic. In this library, the `V` is always substituted by one
+    /// of the following types: [`Stable`], [`Beta`] or [`Nightly`].
+    ///
+    /// [`Stable`] and [`Beta`] carry a semver version number, while [`Nightly`]
+    /// is versioned by a date.
+    pub version: V,
+    /// The release date of the release.
+    ///
+    /// The field is optional, because the value may be absent from a data source.
+    pub release_date: Option<date::Date>,
+    /// The toolchains associated with the release.
+    ///
+    /// The field may be empty if toolchains were absent from a data source.
+    pub toolchains: Vec<toolchain::Toolchain>,
+    // pub context: C, // Eventually, I want to add this again which can be used to tag the release with arbitrary data
 }
 
-impl RustRelease {
+impl<V: PartialEq> PartialEq for RustRelease<V> {
+    fn eq(&self, other: &Self) -> bool {
+        self.version.eq(&other.version)
+    }
+}
+
+impl<V: Eq> Eq for RustRelease<V> {}
+
+impl<V: PartialOrd> PartialOrd for RustRelease<V> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        self.version.partial_cmp(&other.version)
+    }
+}
+
+impl<V: Ord> Ord for RustRelease<V> {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.version.cmp(&other.version)
+    }
+}
+
+impl<V> RustRelease<V> {
     /// Create a new RustRelease instance using a version, optionally
     /// a release date, and an iterator of toolchains.
     pub fn new(
-        version: ReleaseVersion,
+        version: V,
         release_date: Option<rust_toolchain::Date>,
-        toolchains: impl IntoIterator<Item = ReleaseToolchain>,
+        toolchains: impl IntoIterator<Item = toolchain::Toolchain>,
     ) -> Self {
         Self {
             version,
@@ -47,18 +98,20 @@ impl RustRelease {
         }
     }
 
+    /// The version of a release.
+    ///
     /// The 3 component MAJOR.MINOR.PATCH version number of the release
-    pub fn version(&self) -> &ReleaseVersion {
+    pub fn version(&self) -> &V {
         &self.version
     }
 
     /// Release date of the Rust release, if known
-    pub fn release_date(&self) -> Option<&rust_toolchain::Date> {
+    pub fn release_date(&self) -> Option<&date::Date> {
         self.release_date.as_ref()
     }
 
     /// Toolchains associated with the release
-    pub fn toolchains(&self) -> impl Iterator<Item = &ReleaseToolchain> {
+    pub fn toolchains(&self) -> impl Iterator<Item = &toolchain::Toolchain> {
         self.toolchains.iter()
     }
 }
@@ -70,42 +123,39 @@ impl RustRelease {
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum ReleaseVersion {
     /// A stable channel release version
-    Stable(rust_toolchain::channel::Stable),
+    Stable(Stable),
     /// A beta channel release version
-    Beta(rust_toolchain::channel::Beta),
+    Beta(Beta),
     /// A nightly channel release version
-    Nightly(rust_toolchain::channel::Nightly),
+    Nightly(Nightly),
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::toolchain::Toolchain;
+    use rust_toolchain::RustVersion;
     use std::collections::HashSet;
+
+    fn fake(stable: Stable, date: Option<rust_toolchain::Date>) -> Toolchain {
+        Toolchain::new(
+            rust_toolchain::Channel::Stable(stable),
+            date,
+            rust_toolchain::Target::host(),
+            HashSet::new(),
+            HashSet::new(),
+        )
+    }
 
     #[test]
     fn can_instantiate() {
-        let stable_version = rust_toolchain::channel::Stable {
-            version: rust_toolchain::RustVersion::new(1, 82, 0),
+        let stable = Stable {
+            version: RustVersion::new(1, 82, 0),
         };
-        let version = ReleaseVersion::Stable(stable_version.clone());
+        let version = ReleaseVersion::Stable(stable.clone());
+        let release = RustRelease::new(version, None, vec![fake(stable.clone(), None)]);
 
-        let release = RustRelease::new(
-            version,
-            None,
-            vec![ReleaseToolchain::new(
-                rust_toolchain::Toolchain::new(
-                    rust_toolchain::Channel::Stable(stable_version.clone()),
-                    None,
-                    rust_toolchain::Target::host(),
-                    HashSet::new(),
-                    HashSet::new(),
-                ),
-                toolchain::TargetTier::Unknown,
-            )],
-        );
-
-        let release_version = release.version();
-        assert_eq!(release_version, &ReleaseVersion::Stable(stable_version));
+        assert_eq!(release.version(), &ReleaseVersion::Stable(stable));
     }
 
     #[yare::parameterized(
@@ -113,29 +163,14 @@ mod tests {
         none = { None },
     )]
     fn can_instantiate_deux(date: Option<rust_toolchain::Date>) {
-        let stable_version = rust_toolchain::channel::Stable {
-            version: rust_toolchain::RustVersion::new(1, 82, 0),
+        let stable = Stable {
+            version: RustVersion::new(1, 82, 0),
         };
-        let version = ReleaseVersion::Stable(stable_version.clone());
+        let version = ReleaseVersion::Stable(stable.clone());
+        let release = RustRelease::new(version, date.clone(), vec![fake(stable, date)]);
 
-        let release = RustRelease::new(
-            version,
-            date.clone(),
-            vec![ReleaseToolchain::new(
-                rust_toolchain::Toolchain::new(
-                    rust_toolchain::Channel::Stable(stable_version.clone()),
-                    date,
-                    rust_toolchain::Target::host(),
-                    HashSet::new(),
-                    HashSet::new(),
-                ),
-                toolchain::TargetTier::Unknown,
-            )],
-        );
+        let target_date = release.toolchains().next().unwrap().date();
 
-        let release_date = release.release_date();
-        let target_date = release.toolchains().next().unwrap().toolchain().date();
-
-        assert_eq!(release_date, target_date);
+        assert_eq!(release.release_date(), target_date);
     }
 }

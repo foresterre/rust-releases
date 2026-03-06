@@ -10,8 +10,8 @@ documentation = "https://docs.rs/rust-releases-core"
 repository = "https://github.com/foresterre/rust-releases"
 
 [dependencies]
+rust-release = { workspace = true }
 thiserror = { workspace = true }
-semver = "1.0.0"
 
 [dev-dependencies]
 yare = { workspace = true }

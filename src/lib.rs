@@ -99,21 +99,7 @@
 //! # Example
 //!
 //! ```rust,no_run
-//! use rust_releases_core::{Source, Channel, ReleaseIndex};
-//! use rust_releases_rust_changelog::RustChangelog;
-//!
-//! // We choose the RustChangelog source for this example; alternatives are RustDistWithCLI and ChannelManifests
-//! let source = RustChangelog::fetch_channel(Channel::Stable).unwrap();
-//!
-//! // Build a release index using our source of choice
-//! let index = ReleaseIndex::from_source(source).unwrap();
-//!
-//! // Do something with the release information
-//! index.releases()
-//!     .iter()
-//!     .for_each(|release| {
-//!         println!("release {:?}", release)
-//!     });
+//! // TODO
 //!
 //! ```
 //! # Table of implemented features
@@ -188,13 +174,11 @@
 pub mod linear;
 
 // core re-exports
-pub use rust_releases_core::{
-    semver, Channel, CoreError, CoreResult, Release, ReleaseIndex, Source,
-};
+pub use rust_releases_core::Channel;
 
 #[cfg(feature = "rust-releases-io")]
 pub use rust_releases_io::{
-    base_cache_dir, is_stale, BaseCacheDirError, CachedClient, CachedClientError, Document,
+    base_cache_dir, is_stale, BaseCacheDirError, Document, HttpCachedClient, HttpCachedClientError,
     IsStaleError, RetrievedDocument, RustReleasesClient,
 };
 

@@ -11,7 +11,7 @@ documentation = "https://docs.rs/rust-toolchain"
 repository = "https://github.com/foresterre/rust-releases"
 
 [dependencies]
-rust-toolchain = "1.1.0"
+rust-toolchain = { workspace = true }
 
 [dev-dependencies]
 yare = { workspace = true }

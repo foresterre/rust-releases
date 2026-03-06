@@ -4,64 +4,109 @@
 //! Please, see the [`rust-releases`] for additional documentation on how this crate can be used.
 //!
 //! [`rust-releases`]: https://docs.rs/rust-releases
-use rust_releases_core::{semver, Channel, Release, ReleaseIndex, Source};
-use rust_releases_io::Document;
+
+use rust_releases_core::{RustRelease, RustReleases, Stable};
+use rust_releases_io::{FsClient, HttpCachedClient, HttpClient};
+use std::collections::HashSet;
+use std::convert::TryFrom;
+use std::path::{Path, PathBuf};
+use std::str::FromStr;
+use std::time::Duration;
+use time::macros::format_description;
+
 #[cfg(test)]
 #[macro_use]
 extern crate rust_releases_io;
 
-pub(crate) mod errors;
-pub(crate) mod fetch;
-
-use crate::fetch::fetch;
+mod errors;
+mod fetch;
 
 pub use errors::{RustChangelogError, RustChangelogResult};
-use std::str::FromStr;
-use time::macros::format_description;
 
-/// A [`Source`] which obtains release data from the official Rust changelog.
-///
-/// [`Source`]: rust_releases_core::Source
+const URL: &str = "https://raw.githubusercontent.com/rust-lang/rust/master/RELEASES.md";
+
+#[derive(Debug)]
+pub struct RemoteClient {
+    client: ClientImpl,
+}
+
+impl RemoteClient {
+    /// A client where files are fetched from a remote server over http.
+    pub fn http_client() -> Self {
+        Self {
+            client: ClientImpl::Http(HttpClient::default()),
+        }
+    }
+
+    /// A client where files are fetched from a remote server over http,
+    /// or from the client if they're present and not expired.
+    pub fn cached_http_client(folder: PathBuf, expiry: Duration) -> Self {
+        Self {
+            client: ClientImpl::CachedHttp(HttpCachedClient::new(folder, expiry)),
+        }
+    }
+
+    pub fn exec(&mut self) -> Result<RustChangelog, ()> {
+        todo!()
+    }
+}
+
+#[derive(Debug)]
+enum ClientImpl {
+    Http(HttpClient),
+    CachedHttp(HttpCachedClient),
+}
+
+#[derive(Debug, Default)]
+enum RemoteUrl {
+    #[default]
+    GitHub,
+    HttpUrl(String),
+}
+
+impl RemoteUrl {
+    pub fn url(&self) -> &str {
+        match self {
+            Self::GitHub => URL,
+            Self::HttpUrl(url) => &url,
+        }
+    }
+}
+
 pub struct RustChangelog {
-    source: Document,
-
-    /// Used to compare against the date of an unreleased version which does already exist in the
-    /// changelog. If this date is at least as late as the time found in a release registration, we
-    /// will say that such a version is released (i.e. published).
-    today: ReleaseDate,
+    releases: RustReleases,
+    /// Filters can be used to limit the returned results, for example to compare
+    /// against the date of an unreleased version which does already exist in the
+    /// changelog. If this date is at least as late as the time found in a
+    /// release registration, we will say that such a version is released (i.e. published).
+    filters: HashSet<Filter>,
 }
 
 impl RustChangelog {
-    pub(crate) fn from_document(source: Document) -> Self {
+    pub fn new(today: ReleaseDate) -> Self {
+        let mut default_filters = HashSet::new();
+        default_filters.insert(Filter::Date(today));
+
         Self {
-            source,
-            today: ReleaseDate::today(),
+            releases: RustReleases::default(),
+            filters: default_filters,
         }
     }
 
-    #[cfg(test)]
-    pub(crate) fn from_document_with_date(source: Document, date: ReleaseDate) -> Self {
-        Self {
-            source,
-            today: date,
-        }
-    }
-}
-
-impl Source for RustChangelog {
-    type Error = RustChangelogError;
-
-    fn build_index(&self) -> Result<ReleaseIndex, Self::Error> {
-        let buffer = self.source.buffer();
-        let content = std::str::from_utf8(buffer).map_err(RustChangelogError::UnrecognizedText)?;
-
-        let releases = content
-            .lines()
-            .filter(|s| s.starts_with("Version"))
-            .filter_map(|line| create_release(line, &self.today))
-            .collect::<Result<ReleaseIndex, Self::Error>>()?;
-
-        Ok(releases)
+    pub fn stable_releases(&self) -> impl IntoIterator<Item = &RustRelease<Stable>> {
+        self.releases.stable().into_iter().filter(move |release| {
+            release.release_date().is_some_and(|dt| {
+                // Check if the release date passes all date filters
+                self.filters.iter().all(|filter| match filter {
+                    Filter::Date(before_dt) => {
+                        dt.year() <= before_dt.0.year() as u16
+                            && dt.month() <= before_dt.0.month().into()
+                            && dt.day() <= before_dt.0.day()
+                    }
+                    _ => true,
+                })
+            })
+        })
     }
 }
 
@@ -100,11 +145,17 @@ fn create_release(line: &str, today: &ReleaseDate) -> Option<RustChangelogResult
     }
 }
 
+#[derive(Debug, Eq, Hash, PartialOrd, PartialEq)]
+#[non_exhaustive]
+pub enum Filter {
+    Date(ReleaseDate),
+}
+
 impl RustChangelog {
     /// Fetch all known releases from the official rust changelog
     pub fn fetch_channel(channel: Channel) -> Result<Self, RustChangelogError> {
         if let Channel::Stable = channel {
-            let document = fetch()?;
+            let document = fetch(None::<&Path>)?;
             Ok(Self::from_document(document))
         } else {
             Err(RustChangelogError::ChannelNotAvailable(channel))
@@ -123,14 +174,14 @@ fn parse_release<'line>(
         .ok_or(RustChangelogError::NoDateInChangelogItem)?;
 
     let version = semver::Version::parse(version_number)
-        .map_err(|err| RustChangelogError::SemverError(err, version_number.to_string()))?;
+        .map_err(|_| RustChangelogError::VersionParseError(version_number.to_string()))?;
 
     let date = ReleaseDate::parse(&release_date[1..release_date.len() - 1])?;
 
     Ok((version, date))
 }
 
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialOrd, PartialEq, Hash)]
 struct ReleaseDate(time::Date);
 
 impl ReleaseDate {

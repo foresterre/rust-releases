@@ -1,27 +1,30 @@
-use crate::CoreError;
 use std::convert::TryFrom;
 use std::fmt::{Display, Formatter};
 
 /// Enumerates the Rust release channels
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum Channel {
+    /// An identifier for the `stable` release channel
+    Stable,
     /// An identifier for the `beta` release channel
     Beta,
     /// An identifier for the `nightly` release channel
     Nightly,
-    /// An identifier for the `stable` release channel
-    Stable,
 }
 
 impl TryFrom<&str> for Channel {
-    type Error = CoreError;
+    type Error = Error;
 
     fn try_from(item: &str) -> Result<Self, Self::Error> {
         Ok(match item {
             "beta" => Self::Beta,
             "nightly" => Self::Nightly,
             "stable" => Self::Stable,
-            unsupported => return Err(CoreError::NoSuchChannel(unsupported.to_string())),
+            unsupported => {
+                return Err(Error {
+                    channel: unsupported.to_string(),
+                })
+            }
         })
     }
 }
@@ -41,6 +44,12 @@ impl Display for Channel {
         let channel: Channel = *self;
         f.write_str(channel.into())
     }
+}
+
+#[derive(Debug, thiserror::Error)]
+#[error("No such channel: `{}`", .channel)]
+pub struct Error {
+    channel: String,
 }
 
 #[cfg(test)]

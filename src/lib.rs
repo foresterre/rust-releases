@@ -188,9 +188,7 @@
 pub mod linear;
 
 // core re-exports
-pub use rust_releases_core::{
-    semver, Channel, CoreError, CoreResult, Release, ReleaseIndex, Source,
-};
+pub use rust_releases_core::{semver, Channel, CoreError, CoreResult, Release, ReleaseIndex};
 
 #[cfg(feature = "rust-releases-io")]
 pub use rust_releases_io::{

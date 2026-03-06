@@ -18,12 +18,16 @@ exclude = [
 
 [workspace]
 members = [
+    # extra
     "crates/rust-release",
+    "crates/rust-toolchain",
+    # core & shared impl
     "crates/rust-releases-core",
     "crates/rust-releases-io",
+    # sources
+    "crates/rust-releases-github",
     "crates/rust-releases-rust-changelog",
     "crates/rust-releases-rust-dist",
-    "crates/rust-toolchain",
 ]
 
 [features]
@@ -31,6 +35,7 @@ default = [
     "rust-changelog",
 ]
 
+github = ["rust-releases-github"]
 rust-changelog = ["rust-releases-rust-changelog"]
 rust-dist = ["rust-releases-rust-dist"]
 
@@ -38,8 +43,12 @@ io = ["rust-releases-io"]
 io-http = ["rust-releases-io/http_client"]
 
 [dependencies]
-rust-releases-core = { version = "^0.30.0", path = "crates/rust-releases-core" }
-rust-releases-io = { version = "^0.30.0", path = "crates/rust-releases-io", optional = true }
+# types and shared impl's
+rust-releases-core = { workspace = true }
+rust-releases-io = { workspace = true, optional = true }
+
+# sources
+rust-releases-github = { version = "^0.30.0", path = "crates/rust-releases-github", optional = true }
 rust-releases-rust-changelog = { version = "^0.30.0", path = "crates/rust-releases-rust-changelog", optional = true }
 rust-releases-rust-dist = { version = "^0.30.0", path = "crates/rust-releases-rust-dist", optional = true }
 
@@ -52,3 +61,8 @@ thiserror = "2.0.12"
 
 # Parameterized tests
 yare = "3.0.0"
+
+rust-release = { path = "crates/rust-release" }
+rust-toolchain = { path = "crates/rust-toolchain" }
+rust-releases-core = { version = "^0.30.0", path = "crates/rust-releases-core" }
+rust-releases-io = { version = "^0.30.0", path = "crates/rust-releases-io" }

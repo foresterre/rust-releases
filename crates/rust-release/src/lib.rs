@@ -17,6 +17,7 @@
 #![deny(missing_docs)]
 
 use crate::toolchain::ReleaseToolchain;
+pub use rust_toolchain::channel::{Beta, Nightly, Stable};
 
 /// Describes toolchains in so far they're relevant to a release
 pub mod toolchain;
@@ -26,17 +27,17 @@ pub mod version;
 
 /// Type to model a Rust release.
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct RustRelease {
-    version: ReleaseVersion,
+pub struct RustRelease<V> {
+    version: V,
     release_date: Option<rust_toolchain::Date>,
     toolchains: Vec<ReleaseToolchain>,
 }
 
-impl RustRelease {
+impl<V> RustRelease<V> {
     /// Create a new RustRelease instance using a version, optionally
     /// a release date, and an iterator of toolchains.
     pub fn new(
-        version: ReleaseVersion,
+        version: V,
         release_date: Option<rust_toolchain::Date>,
         toolchains: impl IntoIterator<Item = ReleaseToolchain>,
     ) -> Self {
@@ -48,7 +49,7 @@ impl RustRelease {
     }
 
     /// The 3 component MAJOR.MINOR.PATCH version number of the release
-    pub fn version(&self) -> &ReleaseVersion {
+    pub fn version(&self) -> &V {
         &self.version
     }
 

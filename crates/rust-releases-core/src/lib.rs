@@ -20,18 +20,40 @@ pub(crate) mod index;
 /// Defines a `Release`
 pub(crate) mod release;
 
-/// Re-export the semver crate to the root scope
-pub use semver;
-
 pub use crate::{
     channel::Channel, errors::CoreError, errors::CoreResult, index::ReleaseIndex, release::Release,
 };
+/// Re-export the semver crate to the root scope
+pub use semver;
+use std::collections::BTreeSet;
+use std::rc::Rc;
 
-/// A `Source` is a set of inputs from which a release index can be built.
-pub trait Source {
-    /// The error to be returned when an index can not be build for a source.
-    type Error;
+/// TODO
+pub struct RustReleases {
+    stable: BTreeSet<rust_release::RustRelease<rust_release::Stable>>,
+    beta: BTreeSet<rust_release::RustRelease<rust_release::Beta>>,
+    nightly: BTreeSet<rust_release::RustRelease<rust_release::Nightly>>,
+}
 
-    /// Build a release index from a data set.
-    fn build_index(&self) -> Result<ReleaseIndex, Self::Error>;
+impl RustReleases {
+    /// TODO
+    pub fn stable(
+        &self,
+    ) -> impl IntoIterator<Item = &rust_release::RustRelease<rust_release::Stable>> {
+        self.stable.iter()
+    }
+
+    /// TODO
+    pub fn beta(
+        &self,
+    ) -> impl IntoIterator<Item = &rust_release::RustRelease<rust_release::Stable>> {
+        self.stable.iter()
+    }
+
+    /// TODO
+    pub fn nightly(
+        &self,
+    ) -> impl IntoIterator<Item = &rust_release::RustRelease<rust_release::Stable>> {
+        self.stable.iter()
+    }
 }

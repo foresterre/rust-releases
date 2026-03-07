@@ -1,6 +1,6 @@
 [package]
 name = "rust-releases-rust-dist"
-version = "0.30.0"
+version = "0.31.0"
 authors = ["Martijn Gribnau <garm@ilumeo.com>"]
 edition = "2018"
 rust-version = "1.91.1"
@@ -10,8 +10,8 @@ documentation = "https://docs.rs/rust-releases-rust-dist"
 repository = "https://github.com/foresterre/rust-releases"
 
 [dependencies]
-rust-releases-core = { version = "^0.30.0", path = "../rust-releases-core" }
-rust-releases-io = { version = "^0.30.0", path = "../rust-releases-io" }
+rust-releases-core = { version = "^0.31.0", path = "../rust-releases-core" }
+rust-releases-io = { version = "^0.31.0", path = "../rust-releases-io" }
 
 # Async runtime
 # minimum is set because of RUSTSEC-2021-0124 advisory: https://rustsec.org/advisories/RUSTSEC-2021-0124

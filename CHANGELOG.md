@@ -4,6 +4,13 @@
 
 [Unreleased]: https://github.com/foresterre/rust-releases
 
+## 0.32.0 - 2026-03-25
+
+### Fixed
+
+- Updated `aws-sdk-s3` (fixes various security vulnerabilities)
+- Updated `ureq` (fixes various security vulnerabilities)
+
 ## [0.31.0] - 2026-03-06
 
 ### Changed

@@ -42,41 +42,36 @@ impl RustReleases {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    use crate::merge;
 
-    // #[test]
-    // fn empty_merge_is_empty() {
-    //     let left = StableReleases::default();
-    //     let right = StableReleases::default();
-    //
-    //     let merge = left.merge_with(right, |version, _lhs, _rhs| RustRelease {
-    //         version,
-    //         release_date: None,
-    //         toolchains: vec![],
-    //     });
-    //
-    //     assert!(merge.is_empty());
-    //     assert!(merge.is_empty());
-    //     assert!(merge.is_empty());
-    // }
+    #[test]
+    fn empty_merge_is_empty() {
+        let mut out = StableReleases::<()>::default();
 
-    // #[test]
-    // fn base() {
-    //     let mut left = StableReleases::default();
-    //     left.add(RustRelease::new(Stable::new(1, 2, 0), None, []));
-    //     let right = StableReleases::default();
-    //
-    //     let combine = ConflictResolutionBuilder::default()
-    //         .with_release_date_resolver(ReleaseDateResolver::most_recent())
-    //         .with_toolchains_resolver(ToolchainsResolver::chain())
-    //         .build_or_default();
-    //     let out = left.merge_with(right, combine);
-    //
-    //     assert_eq!(out.len(), 1);
-    //
-    //     let first = out.iter().next().unwrap();
-    //
-    //     assert_eq!(first.version(), &Stable::new(1, 2, 0));
-    //     assert_eq!(first.release_date(), None);
-    //     assert_eq!(first.toolchains.len(), 0);
-    // }
+        let left: Vec<RustRelease<Stable>> = vec![];
+        let right: Vec<RustRelease<Stable>> = vec![];
+        for (l, r) in left.into_iter().zip(right) {
+            out.add(merge::merge_default(l, r));
+        }
+
+        assert!(out.is_empty());
+    }
+
+    #[test]
+    fn base() {
+        let left = RustRelease::new(Stable::new(1, 2, 0), None, []);
+        let right = RustRelease::new(Stable::new(1, 2, 0), None, []);
+
+        let mut out = StableReleases::default();
+        out.add(merge::merge_default(left, right));
+
+        assert_eq!(out.len(), 1);
+
+        let first = out.iter().next().unwrap();
+
+        assert_eq!(first.version(), &Stable::new(1, 2, 0));
+        assert_eq!(first.release_date(), None);
+        assert_eq!(first.toolchains().count(), 0);
+    }
 }

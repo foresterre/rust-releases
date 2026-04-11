@@ -174,7 +174,7 @@
 pub mod linear;
 
 // core re-exports
-pub use rust_releases_core::Channel;
+pub use rust_releases_core::channel::Channel;
 
 #[cfg(feature = "rust-releases-io")]
 pub use rust_releases_io::{

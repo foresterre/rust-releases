@@ -6,24 +6,18 @@
 //!
 //! [`rust-releases`]: https://docs.rs/rust-releases
 
-#[cfg(test)]
-#[macro_use]
-extern crate rust_releases_io;
-
 use regex::{Captures, Regex};
-use rust_releases_core::{semver, Channel, Release, ReleaseIndex, Source};
+use rust_releases_core::channel::Channel;
+use rust_releases_core::releases::StableReleases;
+use rust_releases_core::{RustRelease, Stable};
 use rust_releases_io::Document;
-use std::collections::BTreeSet;
-use std::iter::FromIterator;
 
 pub(crate) mod errors;
 pub(crate) mod fetch;
 
 pub use crate::errors::{RustDistError, RustDistResult};
 
-/// A [`Source`] which obtains its input data from the Rust distribution bucket on AWS S3.
-///
-/// [`Source`]: rust_releases_core::Source
+/// A source which obtains its input data from the Rust distribution bucket on AWS S3.
 pub struct RustDist {
     source: Document,
 }
@@ -40,23 +34,22 @@ lazy_static::lazy_static! {
         Regex::new(r"(?m)^dist/rustc-(?P<major>\d+).(?P<minor>\d+).(?P<patch>\d+)(?:\-(alpha|beta|nightly)(\.\d+))?").unwrap();
 }
 
-impl Source for RustDist {
-    type Error = RustDistError;
-
-    fn build_index(&self) -> Result<ReleaseIndex, Self::Error> {
+impl RustDist {
+    /// Build an index of all known stable releases from the Rust distribution bucket.
+    pub fn build_index(&self) -> Result<StableReleases, RustDistError> {
         let buffer = self.source.buffer();
         let content = std::str::from_utf8(buffer).map_err(RustDistError::UnrecognizedText)?;
 
-        let releases = MATCHER
-            .captures_iter(content)
-            .map(parse_release)
-            .collect::<RustDistResult<BTreeSet<Release>>>()?;
+        let mut releases = StableReleases::default();
+        for capture in MATCHER.captures_iter(content) {
+            releases.add(parse_release(capture)?);
+        }
 
-        Ok(ReleaseIndex::from_iter(releases))
+        Ok(releases)
     }
 }
 
-fn parse_release(capture: Captures) -> RustDistResult<Release> {
+fn parse_release(capture: Captures) -> RustDistResult<RustRelease<Stable>> {
     const MAJOR: &str = "major";
     const MINOR: &str = "minor";
     const PATCH: &str = "patch";
@@ -71,9 +64,7 @@ fn parse_release(capture: Captures) -> RustDistResult<Release> {
         RustDistError::UnableToParseVersionNumberComponent(&PATCH, capture[PATCH].to_string())
     })?;
 
-    Ok(Release::new_stable(semver::Version::new(
-        major, minor, patch,
-    )))
+    Ok(RustRelease::new(Stable::new(major, minor, patch), None, []))
 }
 
 impl RustDist {
@@ -91,7 +82,7 @@ impl RustDist {
 #[cfg(test)]
 mod tests {
     use crate::RustDist;
-    use rust_releases_core::{semver, Release, ReleaseIndex};
+    use rust_releases_core::Stable;
     use rust_releases_io::Document;
     use std::fs;
 
@@ -106,20 +97,18 @@ mod tests {
         let buffer = fs::read(path).unwrap();
         let document = Document::new(buffer);
 
-        let strategy = RustDist::from_document(document);
-        let index = ReleaseIndex::from_source(strategy).unwrap();
+        let source = RustDist::from_document(document);
+        let releases = source.build_index().unwrap();
 
         // 74 releases including minor releases from 1.0.0 to 1.53.0
-        let releases = index.releases();
-
         assert_eq!(releases.len(), 74);
         assert_eq!(
-            releases[0],
-            Release::new_stable(semver::Version::new(1, 53, 0))
+            releases.iter().last().unwrap().version,
+            Stable::new(1, 53, 0)
         );
         assert_eq!(
-            releases[releases.len() - 1],
-            Release::new_stable(semver::Version::new(1, 0, 0))
+            releases.iter().next().unwrap().version,
+            Stable::new(1, 0, 0)
         );
     }
 }

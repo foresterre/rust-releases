@@ -1,5 +1,5 @@
-use crate::client::client::Client;
 use crate::client::errors::{HttpError, IoError};
+use crate::client::remote_client::HttpClient;
 use crate::{
     is_stale, ClientError, Document, IsStaleError, ResourceFile, RetrievalLocation,
     RetrievedDocument, RustReleasesClient,
@@ -19,21 +19,22 @@ const DEFAULT_TIMEOUT: Duration = Duration::from_secs(150);
 /// the client will download a new copy of the given resource and store it to the `cache_folder`.
 /// If a cached file is present, and the copy is not outdated, the cached file will be returned
 /// instead.
-pub struct CachedClient {
+#[derive(Debug)]
+pub struct HttpCachedClient {
     cache_folder: PathBuf,
     cache_timeout: Duration,
 }
 
-impl CachedClient {
-    /// Create a new [`CachedClient`].
+impl HttpCachedClient {
+    /// Create a new [`HttpCachedClient`].
     ///
     /// ```
     /// use std::time::Duration;
-    /// use rust_releases_io::{base_cache_dir, CachedClient};
+    /// use rust_releases_io::{base_cache_dir, HttpCachedClient};
     /// let cache_folder = base_cache_dir().unwrap();
     /// let timeout = Duration::from_secs(86_400);
     ///
-    /// let _client = CachedClient::new(cache_folder, timeout);
+    /// let _client = HttpCachedClient::new(cache_folder, timeout);
     /// ```
     pub fn new(cache_folder: PathBuf, cache_timeout: Duration) -> Self {
         Self {
@@ -43,8 +44,8 @@ impl CachedClient {
     }
 }
 
-impl RustReleasesClient for CachedClient {
-    type Error = CachedClientError;
+impl RustReleasesClient for HttpCachedClient {
+    type Error = HttpCachedClientError;
 
     fn fetch(&self, resource: ResourceFile) -> Result<RetrievedDocument, Self::Error> {
         let path = self.cache_folder.join(resource.name());
@@ -57,7 +58,7 @@ impl RustReleasesClient for CachedClient {
 
             return Ok(RetrievedDocument::new(
                 document,
-                RetrievalLocation::Cache(path),
+                RetrievalLocation::Path(path),
             ));
         }
 
@@ -66,8 +67,10 @@ impl RustReleasesClient for CachedClient {
             setup_cache_folder(&path)?;
         }
 
-        let client = Client::new(DEFAULT_TIMEOUT);
-        let mut retrieved = client.fetch(resource).map_err(CachedClientError::from)?;
+        let client = HttpClient::new(DEFAULT_TIMEOUT);
+        let mut retrieved = client
+            .fetch(resource)
+            .map_err(HttpCachedClientError::from)?;
 
         let document = retrieved.mut_document();
 
@@ -78,7 +81,7 @@ impl RustReleasesClient for CachedClient {
     }
 }
 
-fn read_from_path(path: &Path) -> Result<Vec<u8>, CachedClientError> {
+fn read_from_path(path: &Path) -> Result<Vec<u8>, HttpCachedClientError> {
     let mut reader = BufReader::new(
         fs::File::open(path).map_err(|err| IoError::inaccessible(err, path.to_path_buf()))?,
     );
@@ -92,7 +95,7 @@ fn read_from_path(path: &Path) -> Result<Vec<u8>, CachedClientError> {
 }
 
 /// `manifest_path` should include the cache folder and name of the manifest file.
-fn setup_cache_folder(manifest_path: &Path) -> Result<(), CachedClientError> {
+fn setup_cache_folder(manifest_path: &Path) -> Result<(), HttpCachedClientError> {
     fn create_dir_all(path: &Path) -> Result<(), IoError> {
         fs::create_dir_all(path).map_err(|err| IoError::inaccessible(err, path.to_path_buf()))
     }
@@ -120,7 +123,7 @@ fn setup_cache_folder(manifest_path: &Path) -> Result<(), CachedClientError> {
 fn write_document_and_cache(
     document: &mut Document,
     file_path: &Path,
-) -> Result<(), CachedClientError> {
+) -> Result<(), HttpCachedClientError> {
     let mut file = fs::File::create(file_path)
         .map_err(|err| IoError::inaccessible(err, file_path.to_path_buf()))?;
 
@@ -132,10 +135,10 @@ fn write_document_and_cache(
     Ok(())
 }
 
-/// A list of errors which may be produced by [`CachedClient::fetch`].
+/// A list of errors which may be produced by [`HttpCachedClient::fetch`].
 #[derive(Debug, thiserror::Error)]
 #[non_exhaustive]
-pub enum CachedClientError {
+pub enum HttpCachedClientError {
     /// Returned if the fetched file was empty.
     #[error("Received empty file")]
     EmptyFile,
@@ -154,12 +157,12 @@ pub enum CachedClientError {
     IsStale(#[from] IsStaleError),
 }
 
-impl From<ClientError> for CachedClientError {
+impl From<ClientError> for HttpCachedClientError {
     fn from(err: ClientError) -> Self {
         match err {
-            ClientError::Empty => CachedClientError::EmptyFile,
-            ClientError::Http(err) => CachedClientError::Http(err),
-            ClientError::Io(err) => CachedClientError::Io(err),
+            ClientError::Empty => HttpCachedClientError::EmptyFile,
+            ClientError::Http(err) => HttpCachedClientError::Http(err),
+            ClientError::Io(err) => HttpCachedClientError::Io(err),
         }
     }
 }

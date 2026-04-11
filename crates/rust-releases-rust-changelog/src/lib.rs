@@ -4,11 +4,13 @@
 //! Please, see the [`rust-releases`] for additional documentation on how this crate can be used.
 //!
 //! [`rust-releases`]: https://docs.rs/rust-releases
-use rust_releases_core::{semver, Channel, Release, ReleaseIndex, Source};
-use rust_releases_io::Document;
 #[cfg(test)]
-#[macro_use]
 extern crate rust_releases_io;
+use rust_release::toolchain::RustVersion;
+use rust_releases_core::channel::Channel;
+use rust_releases_core::releases::StableReleases;
+use rust_releases_core::{rust_release, RustRelease, Stable};
+use rust_releases_io::Document;
 
 pub(crate) mod errors;
 pub(crate) mod fetch;
@@ -19,9 +21,7 @@ pub use errors::{RustChangelogError, RustChangelogResult};
 use std::str::FromStr;
 use time::macros::format_description;
 
-/// A [`Source`] which obtains release data from the official Rust changelog.
-///
-/// [`Source`]: rust_releases_core::Source
+/// A source which obtains release data from the official Rust changelog.
 pub struct RustChangelog {
     source: Document,
 
@@ -46,22 +46,33 @@ impl RustChangelog {
             today: date,
         }
     }
-}
 
-impl Source for RustChangelog {
-    type Error = RustChangelogError;
-
-    fn build_index(&self) -> Result<ReleaseIndex, Self::Error> {
+    /// Build an index of all known stable releases from the official Rust changelog.
+    pub fn build_index(&self) -> Result<StableReleases, RustChangelogError> {
         let buffer = self.source.buffer();
         let content = std::str::from_utf8(buffer).map_err(RustChangelogError::UnrecognizedText)?;
 
-        let releases = content
-            .lines()
-            .filter(|s| s.starts_with("Version"))
-            .filter_map(|line| create_release(line, &self.today))
-            .collect::<Result<ReleaseIndex, Self::Error>>()?;
+        let mut releases = StableReleases::default();
+        for line in content.lines().filter(|s| s.starts_with("Version")) {
+            match create_release(line, &self.today) {
+                Some(Ok(release)) => releases.add(release),
+                Some(Err(e)) => return Err(e),
+                None => {}
+            }
+        }
 
         Ok(releases)
+    }
+
+    /// Fetch all known releases from the official rust changelog
+    pub fn fetch_channel(channel: Channel) -> Result<Self, RustChangelogError> {
+        if let Channel::Stable = channel {
+            // todo: add support for custom cache locations
+            let document = fetch(None::<&str>)?;
+            Ok(Self::from_document(document))
+        } else {
+            Err(RustChangelogError::ChannelNotAvailable(channel))
+        }
     }
 }
 
@@ -77,44 +88,35 @@ impl Source for RustChangelog {
 /// Versions we currently do not support are also returned as `None`.
 ///
 /// The resulting releases can then be filtered on `Option::is_some`, to only keep relevant results.
-fn create_release(line: &str, today: &ReleaseDate) -> Option<RustChangelogResult<Release>> {
+fn create_release(
+    line: &str,
+    today: &ReleaseDate,
+) -> Option<RustChangelogResult<RustRelease<Stable>>> {
     let parsed = parse_release(line.split_ascii_whitespace());
 
     match parsed {
         // If the version and date can be parsed, and the version has been released
-        Ok((version, date)) if date.is_available(today) && version.pre.is_empty() => {
-            Some(Ok(Release::new_stable(version)))
+        Ok((stable, date)) if date.is_available(today) => {
+            let release_date = rust_release::date::Date::new(
+                date.0.year() as u16,
+                date.0.month() as u8,
+                date.0.day(),
+            );
+            Some(Ok(RustRelease::new(stable, Some(release_date), [])))
         }
         // If the version and date can be parsed, but the version is not yet released
         Ok(_) => None,
-        // We skip versions 0.10, 0.9, etc. which require more lenient semver parsing
-        // Unfortunately we can't access the error kind, so we have to match the string instead
-        Err(RustChangelogError::SemverError(err, _))
-            if err.to_string().as_str()
-                == "unexpected end of input while parsing minor version number" =>
-        {
-            None
-        }
+        // VersionParseError covers pre-release versions (1.0.0-alpha, 1.0.0-beta.1) and
+        // two-component versions (0.10, 0.9, etc.)
+        Err(RustChangelogError::VersionParseError(_)) => None,
         // In any ony other error case, we forward the error
         Err(err) => Some(Err(err)),
     }
 }
 
-impl RustChangelog {
-    /// Fetch all known releases from the official rust changelog
-    pub fn fetch_channel(channel: Channel) -> Result<Self, RustChangelogError> {
-        if let Channel::Stable = channel {
-            let document = fetch()?;
-            Ok(Self::from_document(document))
-        } else {
-            Err(RustChangelogError::ChannelNotAvailable(channel))
-        }
-    }
-}
-
 fn parse_release<'line>(
     mut parts: impl Iterator<Item = &'line str>,
-) -> Result<(semver::Version, ReleaseDate), RustChangelogError> {
+) -> Result<(Stable, ReleaseDate), RustChangelogError> {
     let version_number = parts
         .nth(1)
         .ok_or(RustChangelogError::NoVersionInChangelogItem)?;
@@ -122,12 +124,14 @@ fn parse_release<'line>(
         .next()
         .ok_or(RustChangelogError::NoDateInChangelogItem)?;
 
-    let version = semver::Version::parse(version_number)
-        .map_err(|err| RustChangelogError::SemverError(err, version_number.to_string()))?;
+    let stable = version_number
+        .parse::<RustVersion>()
+        .map(Stable::from)
+        .map_err(|_| RustChangelogError::VersionParseError(version_number.to_string()))?;
 
     let date = ReleaseDate::parse(&release_date[1..release_date.len() - 1])?;
 
-    Ok((version, date))
+    Ok((stable, date))
 }
 
 #[derive(Debug)]
@@ -166,7 +170,8 @@ impl FromStr for ReleaseDate {
 mod tests {
     use super::ReleaseDate;
     use crate::RustChangelog;
-    use rust_releases_core::{semver, Channel, Release, ReleaseIndex};
+    use rust_releases_core::channel::Channel;
+    use rust_releases_core::Stable;
     use rust_releases_io::Document;
     use std::fs;
     use time::macros::date;
@@ -183,13 +188,13 @@ mod tests {
         let buffer = fs::read(path).unwrap();
         let document = Document::new(buffer);
 
-        let strategy = RustChangelog::from_document(document);
-        let index = ReleaseIndex::from_source(strategy).unwrap();
+        let source = RustChangelog::from_document(document);
+        let releases = source.build_index().unwrap();
 
-        assert!(index.releases().len() > 50);
+        assert_eq!(releases.len(), 72);
         assert_eq!(
-            index.releases()[0],
-            Release::new_stable(semver::Version::new(1, 50, 0))
+            releases.iter().last().unwrap().version,
+            Stable::new(1, 50, 0)
         );
     }
 
@@ -212,13 +217,11 @@ mod tests {
 
         let date = ReleaseDate::parse("2021-09-01").unwrap();
         let strategy = RustChangelog::from_document_with_date(document, date);
-        let index = ReleaseIndex::from_source(strategy).unwrap();
-
-        let mut releases = index.releases().iter();
+        let index = strategy.build_index().unwrap();
 
         assert_eq!(
-            releases.next().unwrap().version(),
-            &semver::Version::new(1, 54, 0)
+            index.iter().last().unwrap().version(),
+            &Stable::new(1, 54, 0)
         );
     }
 
@@ -227,17 +230,13 @@ mod tests {
         nightly = { Channel::Nightly },
     )]
     fn fetch_unsupported_channel(channel: Channel) {
-        __internal_dl_test!({
-            let file = RustChangelog::fetch_channel(channel);
-            assert!(file.is_err());
-        })
+        let file = RustChangelog::fetch_channel(channel);
+        assert!(file.is_err());
     }
 
     #[test]
     fn fetch_supported_channel() {
-        __internal_dl_test!({
-            let file = RustChangelog::fetch_channel(Channel::Stable);
-            assert!(file.is_ok());
-        })
+        let file = RustChangelog::fetch_channel(Channel::Stable);
+        assert!(file.is_ok());
     }
 }

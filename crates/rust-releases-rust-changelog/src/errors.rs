@@ -1,17 +1,8 @@
-use rust_releases_core::channel::Channel;
-
-/// A result type which binds the `RustChangelogError` to the error type.
-pub type RustChangelogResult<T> = Result<T, RustChangelogError>;
-
-/// Top level failure cases for rust-releases-rust-changelog source crate
+/// Failure cases w.r.t. parsing a Rust changelog.
 #[derive(Debug, thiserror::Error)]
 #[non_exhaustive]
-pub enum RustChangelogError {
-    /// Returned in case a `Channel` is not available for the `Source`
-    #[error("Channel {0} is not available for the 'RustChangelog' source type")]
-    ChannelNotAvailable(Channel),
-
-    /// Returned in case of of `chrono` parse errors
+pub enum ParseError {
+    /// Returned in case of `time` parse errors
     #[error("Unable to parse release date in a release entry '{0}': {1}")]
     TimeParseError(String, time::error::Parse),
 
@@ -27,19 +18,7 @@ pub enum RustChangelogError {
     #[error("Unable to find a valid version in a release entry")]
     NoVersionInChangelogItem,
 
-    /// Returned in case the base cache dir could not be found
-    #[error(transparent)]
-    BaseCacheDir(#[from] rust_releases_io::BaseCacheDirError),
-
-    /// Returned in case a cached client error is returned
-    #[error(transparent)]
-    CachedClient(#[from] rust_releases_io::HttpCachedClientError),
-
-    /// Returned in case a staleness check error is returned
-    #[error(transparent)]
-    IsStale(#[from] rust_releases_io::IsStaleError),
-
-    /// Returned in case a input resource cannot be parsed as UTF-8
+    /// Returned in case the input resource cannot be parsed as UTF-8
     #[error(transparent)]
     UnrecognizedText(#[from] std::str::Utf8Error),
 }

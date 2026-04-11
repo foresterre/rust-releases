@@ -4,53 +4,64 @@
 //! Please, see the [`rust-releases`] for additional documentation on how this crate can be used.
 //!
 //! [`rust-releases`]: https://docs.rs/rust-releases
-#[cfg(test)]
-extern crate rust_releases_io;
+
+pub use errors::ParseError;
 use rust_release::toolchain::RustVersion;
-use rust_releases_core::channel::Channel;
 use rust_releases_core::releases::StableReleases;
 use rust_releases_core::{rust_release, RustRelease, Stable};
-use rust_releases_io::Document;
-
-pub(crate) mod errors;
-pub(crate) mod fetch;
-
-use crate::fetch::fetch;
-
-pub use errors::{RustChangelogError, RustChangelogResult};
+use rust_releases_io::{Document, ResourceFile, RustReleasesClient};
 use std::str::FromStr;
 use time::macros::format_description;
 
-/// A source which obtains release data from the official Rust changelog.
-pub struct RustChangelog {
-    source: Document,
+// Re-export all clients so callers don't need a separate rust-releases-io dependency.
+pub use rust_releases_io::{FsClient, HttpCachedClient, HttpClient};
+pub use url::Url;
 
-    /// Used to compare against the date of an unreleased version which does already exist in the
-    /// changelog. If this date is at least as late as the time found in a release registration, we
-    /// will say that such a version is released (i.e. published).
+mod errors;
+mod url;
+
+const URL: &str = "https://raw.githubusercontent.com/rust-lang/rust/master/RELEASES.md";
+const RESOURCE_NAME: &str = "RELEASES.md";
+
+/// Fetches the Rust changelog document using a provided client.
+pub struct Client<C> {
+    client: C,
+}
+
+impl<C: RustReleasesClient> Client<C> {
+    /// Create a new client wrapper.
+    pub fn new(client: C) -> Self {
+        Self { client }
+    }
+
+    /// Fetch the changelog document.
+    ///
+    /// The error type is that of the provided client.
+    pub fn fetch(&self) -> Result<RustChangelog, C::Error> {
+        let url = Url::default(); // TODO: make it configurable.
+        let document = self
+            .client
+            .fetch(ResourceFile::new(url.as_ref(), RESOURCE_NAME))?
+            .into_document();
+
+        Ok(RustChangelog {
+            document,
+            today: ReleaseDate::today(),
+        })
+    }
+}
+
+/// The fetched, unparsed Rust changelog document.
+pub struct RustChangelog {
+    document: Document,
     today: ReleaseDate,
 }
 
 impl RustChangelog {
-    pub(crate) fn from_document(source: Document) -> Self {
-        Self {
-            source,
-            today: ReleaseDate::today(),
-        }
-    }
-
-    #[cfg(test)]
-    pub(crate) fn from_document_with_date(source: Document, date: ReleaseDate) -> Self {
-        Self {
-            source,
-            today: date,
-        }
-    }
-
-    /// Build an index of all known stable releases from the official Rust changelog.
-    pub fn build_index(&self) -> Result<StableReleases, RustChangelogError> {
-        let buffer = self.source.buffer();
-        let content = std::str::from_utf8(buffer).map_err(RustChangelogError::UnrecognizedText)?;
+    /// Parse the document into a set of stable releases.
+    pub fn try_parse(self) -> Result<StableReleases, ParseError> {
+        let buffer = self.document.buffer();
+        let content = std::str::from_utf8(buffer).map_err(ParseError::UnrecognizedText)?;
 
         let mut releases = StableReleases::default();
         for line in content.lines().filter(|s| s.starts_with("Version")) {
@@ -64,15 +75,10 @@ impl RustChangelog {
         Ok(releases)
     }
 
-    /// Fetch all known releases from the official rust changelog
-    pub fn fetch_channel(channel: Channel) -> Result<Self, RustChangelogError> {
-        if let Channel::Stable = channel {
-            // todo: add support for custom cache locations
-            let document = fetch(None::<&str>)?;
-            Ok(Self::from_document(document))
-        } else {
-            Err(RustChangelogError::ChannelNotAvailable(channel))
-        }
+    #[cfg(test)]
+    fn with_date(mut self, date: ReleaseDate) -> Self {
+        self.today = date;
+        self
     }
 }
 
@@ -91,7 +97,7 @@ impl RustChangelog {
 fn create_release(
     line: &str,
     today: &ReleaseDate,
-) -> Option<RustChangelogResult<RustRelease<Stable>>> {
+) -> Option<Result<RustRelease<Stable>, ParseError>> {
     let parsed = parse_release(line.split_ascii_whitespace());
 
     match parsed {
@@ -108,7 +114,7 @@ fn create_release(
         Ok(_) => None,
         // VersionParseError covers pre-release versions (1.0.0-alpha, 1.0.0-beta.1) and
         // two-component versions (0.10, 0.9, etc.)
-        Err(RustChangelogError::VersionParseError(_)) => None,
+        Err(ParseError::VersionParseError(_)) => None,
         // In any ony other error case, we forward the error
         Err(err) => Some(Err(err)),
     }
@@ -116,20 +122,16 @@ fn create_release(
 
 fn parse_release<'line>(
     mut parts: impl Iterator<Item = &'line str>,
-) -> Result<(Stable, ReleaseDate), RustChangelogError> {
-    let version_number = parts
-        .nth(1)
-        .ok_or(RustChangelogError::NoVersionInChangelogItem)?;
-    let release_date = parts
-        .next()
-        .ok_or(RustChangelogError::NoDateInChangelogItem)?;
+) -> Result<(Stable, ReleaseDate), ParseError> {
+    let version_number = parts.nth(1).ok_or(ParseError::NoVersionInChangelogItem)?;
+    let release_date = parts.next().ok_or(ParseError::NoDateInChangelogItem)?;
 
     let stable = version_number
         .parse::<RustVersion>()
         .map(Stable::from)
-        .map_err(|_| RustChangelogError::VersionParseError(version_number.to_string()))?;
+        .map_err(|_| ParseError::VersionParseError(version_number.to_string()))?;
 
-    let date = ReleaseDate::parse(&release_date[1..release_date.len() - 1])?;
+    let date = ReleaseDate::try_parse(&release_date[1..release_date.len() - 1])?;
 
     Ok((stable, date))
 }
@@ -144,7 +146,7 @@ impl ReleaseDate {
         Self(date)
     }
 
-    fn parse(from: &str) -> Result<Self, RustChangelogError> {
+    fn try_parse(from: &str) -> Result<Self, ParseError> {
         from.parse::<ReleaseDate>()
     }
 
@@ -154,13 +156,13 @@ impl ReleaseDate {
 }
 
 impl FromStr for ReleaseDate {
-    type Err = crate::RustChangelogError;
+    type Err = ParseError;
 
     fn from_str(item: &str) -> Result<Self, Self::Err> {
         let format = format_description!("[year]-[month]-[day]");
 
         let result = time::Date::parse(item.trim(), &format)
-            .map_err(|err| RustChangelogError::TimeParseError(item.to_string(), err))?;
+            .map_err(|err| ParseError::TimeParseError(item.to_string(), err))?;
 
         Ok(Self(result))
     }
@@ -170,26 +172,25 @@ impl FromStr for ReleaseDate {
 mod tests {
     use super::ReleaseDate;
     use crate::RustChangelog;
-    use rust_releases_core::channel::Channel;
     use rust_releases_core::Stable;
     use rust_releases_io::Document;
     use std::fs;
     use time::macros::date;
-    use yare::parameterized;
+
+    fn changelog_from_file(rel_path: &str) -> RustChangelog {
+        let path = [env!("CARGO_MANIFEST_DIR"), rel_path].join("");
+        let buffer = fs::read(path).unwrap();
+        RustChangelog {
+            document: Document::new(buffer),
+            today: ReleaseDate::today(),
+        }
+    }
 
     #[test]
     fn source_dist_index() {
-        let path = [
-            env!("CARGO_MANIFEST_DIR"),
-            "/../../resources/rust_changelog/RELEASES.md",
-        ]
-        .join("");
-
-        let buffer = fs::read(path).unwrap();
-        let document = Document::new(buffer);
-
-        let source = RustChangelog::from_document(document);
-        let releases = source.build_index().unwrap();
+        let releases = changelog_from_file("/../../resources/rust_changelog/RELEASES.md")
+            .try_parse()
+            .unwrap();
 
         assert_eq!(releases.len(), 72);
         assert_eq!(
@@ -200,43 +201,23 @@ mod tests {
 
     #[test]
     fn parse_date() {
-        let date = ReleaseDate::parse("2021-09-01").unwrap();
+        let date = ReleaseDate::try_parse("2021-09-01").unwrap();
         let expected = date!(2021 - 09 - 01);
         assert_eq!(date.0, expected);
     }
 
     #[test]
     fn with_unreleased_version() {
-        let path = [
-            env!("CARGO_MANIFEST_DIR"),
-            "/../../resources/rust_changelog/RELEASES_with_unreleased.md",
-        ]
-        .join("");
-        let buffer = fs::read(path).unwrap();
-        let document = Document::new(buffer);
-
-        let date = ReleaseDate::parse("2021-09-01").unwrap();
-        let strategy = RustChangelog::from_document_with_date(document, date);
-        let index = strategy.build_index().unwrap();
+        let date = ReleaseDate::try_parse("2021-09-01").unwrap();
+        let releases =
+            changelog_from_file("/../../resources/rust_changelog/RELEASES_with_unreleased.md")
+                .with_date(date)
+                .try_parse()
+                .unwrap();
 
         assert_eq!(
-            index.iter().last().unwrap().version(),
+            releases.iter().last().unwrap().version(),
             &Stable::new(1, 54, 0)
         );
-    }
-
-    #[parameterized(
-        beta = { Channel::Beta },
-        nightly = { Channel::Nightly },
-    )]
-    fn fetch_unsupported_channel(channel: Channel) {
-        let file = RustChangelog::fetch_channel(channel);
-        assert!(file.is_err());
-    }
-
-    #[test]
-    fn fetch_supported_channel() {
-        let file = RustChangelog::fetch_channel(Channel::Stable);
-        assert!(file.is_ok());
     }
 }

@@ -180,7 +180,7 @@ pub use rust_releases_io::{
 };
 
 #[cfg(feature = "rust-releases-rust-changelog")]
-pub use rust_releases_rust_changelog::{RustChangelog, RustChangelogError, RustChangelogResult};
+pub use rust_releases_rust_changelog::{ParseError, RustChangelog};
 
 #[cfg(feature = "rust-releases-rust-dist")]
 pub use rust_releases_rust_dist::{RustDist, RustDistError, RustDistResult};

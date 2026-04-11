@@ -50,5 +50,48 @@ pub(in crate::releases) mod impls {
         pub fn iter(&self) -> impl Iterator<Item = &RustRelease<V, C>> {
             self.releases.iter()
         }
+
+        /// Merge two sets of releases.
+        ///
+        /// If a release exists in both, apply the `merge_fn` to resolve the conflict. Releases that
+        /// exist in only one set are included unchanged.
+        pub fn merge_with<F>(self, right: Self, merge_fn: F) -> Self
+        where
+            V: Ord,
+            F: Fn(RustRelease<V, C>, RustRelease<V, C>) -> RustRelease<V, C>,
+        {
+            let mut result = BTreeSet::new();
+            let mut others = right.releases;
+
+            for release in self.releases {
+                if let Some(other_release) = others.take(&release) {
+                    result.insert(merge_fn(release, other_release));
+                } else {
+                    result.insert(release);
+                }
+            }
+
+            result.extend(others);
+            Self { releases: result }
+        }
+    }
+
+    #[cfg(test)]
+    mod tests {
+        use super::*;
+        use crate::Stable;
+
+        #[test]
+        fn merge_with_is_additive() {
+            let mut left = ReleasesImpl::default();
+            left.add(RustRelease::new(Stable::new(1, 0, 0), None, []));
+
+            let mut right = ReleasesImpl::default();
+            right.add(RustRelease::new(Stable::new(2, 0, 0), None, []));
+
+            let merged = left.merge_with(right, |_l, _r| panic!("must not be called"));
+
+            assert_eq!(merged.len(), 2);
+        }
     }
 }

@@ -1,4 +1,4 @@
-use rust_releases_core::Channel;
+use rust_releases_core::channel::Channel;
 
 /// A result type which binds the `RustChangelogError` to the error type.
 pub type RustChangelogResult<T> = Result<T, RustChangelogError>;
@@ -15,6 +15,7 @@ pub enum RustChangelogError {
     #[error("Unable to parse release date in a release entry '{0}': {1}")]
     TimeParseError(String, time::error::Parse),
 
+    /// Returned when a version string cannot be parsed as a three-component `major.minor.patch` version
     #[error("Unable to parse version '{0}")]
     VersionParseError(String),
 

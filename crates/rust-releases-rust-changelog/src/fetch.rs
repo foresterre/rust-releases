@@ -1,6 +1,7 @@
 use crate::RustChangelogResult;
-use rust_releases_io::base_cache_dir;
-use rust_releases_io::{Document, HttpCachedClient, ResourceFile, RustReleasesClient};
+use rust_releases_io::{
+    base_cache_dir, Document, HttpCachedClient, ResourceFile, RustReleasesClient,
+};
 use std::path::Path;
 use std::time::Duration;
 
@@ -28,9 +29,7 @@ mod tests {
 
     #[test]
     fn test_fetch_meta_manifest() {
-        __internal_dl_test!({
-            let meta = fetch(None);
-            assert!(meta.is_ok());
-        })
+        let meta = fetch(None::<&str>);
+        assert!(meta.is_ok());
     }
 }

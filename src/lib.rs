@@ -170,9 +170,6 @@
 //! [`RustDist`]: rust_releases_rust_dist::RustDist
 //! [`features`]: https://doc.rust-lang.org/cargo/reference/features.html#features
 
-/// Provides an iterator over the latest patch versions for stable releases.
-pub mod linear;
-
 // core re-exports
 pub use rust_releases_core::channel::Channel;
 

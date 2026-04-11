@@ -52,7 +52,13 @@ mod tests {
     use rust_release::date::Date;
 
     fn make_release(year: u16, month: u8, day: u8) -> RustRelease<Nightly> {
-        RustRelease::new(Nightly { date: Date::new(year, month, day) }, None, [])
+        RustRelease::new(
+            Nightly {
+                date: Date::new(year, month, day),
+            },
+            None,
+            [],
+        )
     }
 
     #[test]
@@ -70,8 +76,14 @@ mod tests {
         assert_eq!(merged.len(), 3);
 
         let versions: Vec<_> = merged.iter().map(|r| &r.version).collect();
-        assert!(versions.contains(&&Nightly { date: Date::new(2024, 1, 1) }));
-        assert!(versions.contains(&&Nightly { date: Date::new(2024, 1, 2) }));
-        assert!(versions.contains(&&Nightly { date: Date::new(2024, 1, 3) }));
+        assert!(versions.contains(&&Nightly {
+            date: Date::new(2024, 1, 1)
+        }));
+        assert!(versions.contains(&&Nightly {
+            date: Date::new(2024, 1, 2)
+        }));
+        assert!(versions.contains(&&Nightly {
+            date: Date::new(2024, 1, 3)
+        }));
     }
 }

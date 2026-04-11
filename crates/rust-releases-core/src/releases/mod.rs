@@ -75,4 +75,23 @@ pub(in crate::releases) mod impls {
             Self { releases: result }
         }
     }
+
+    #[cfg(test)]
+    mod tests {
+        use super::*;
+        use crate::Stable;
+
+        #[test]
+        fn merge_with_is_additive() {
+            let mut left = ReleasesImpl::default();
+            left.add(RustRelease::new(Stable::new(1, 0, 0), None, []));
+
+            let mut right = ReleasesImpl::default();
+            right.add(RustRelease::new(Stable::new(2, 0, 0), None, []));
+
+            let merged = left.merge_with(right, |_l, _r| panic!("must not be called"));
+
+            assert_eq!(merged.len(), 2);
+        }
+    }
 }

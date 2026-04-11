@@ -1,23 +1,13 @@
 use crate::releases::impls;
-use crate::{Beta, PartialRustRelease};
+use crate::Beta;
 use rust_release::RustRelease;
 
 #[derive(Debug, Default)]
-pub struct BetaReleases(impls::ReleasesImpl<Beta>);
+pub struct BetaReleases<C = ()>(impls::ReleasesImpl<Beta, C>);
 
-impl BetaReleases {
-    /// Merge with another set of stable releases
-    pub fn merge_with<F>(self, other: BetaReleases, resolver: F) -> BetaReleases
-    where
-        F: Fn(Beta, PartialRustRelease, PartialRustRelease) -> RustRelease<Beta>,
-    {
-        BetaReleases(self.0.merge_with(other.0, resolver))
-    }
-}
-
-impl BetaReleases {
+impl<C> BetaReleases<C> {
     /// Add a stable release
-    pub fn add(&mut self, release: RustRelease<Beta>) {
+    pub fn add(&mut self, release: RustRelease<Beta, C>) {
         self.0.add(release);
     }
 
@@ -32,7 +22,7 @@ impl BetaReleases {
     }
 
     /// Iterate over the releases
-    pub fn iter(&self) -> impl Iterator<Item = &RustRelease<Beta>> {
+    pub fn iter(&self) -> impl Iterator<Item = &RustRelease<Beta, C>> {
         self.0.iter()
     }
 }

@@ -1,23 +1,13 @@
 use crate::releases::impls;
-use crate::{PartialRustRelease, Stable};
+use crate::Stable;
 use rust_release::RustRelease;
 
 #[derive(Debug, Default)]
-pub struct StableReleases(impls::ReleasesImpl<Stable>);
+pub struct StableReleases<C = ()>(impls::ReleasesImpl<Stable, C>);
 
-impl StableReleases {
-    /// Merge with another set of stable releases
-    pub fn merge_with<F>(self, other: StableReleases, merge_fn: F) -> StableReleases
-    where
-        F: Fn(Stable, PartialRustRelease, PartialRustRelease) -> RustRelease<Stable>,
-    {
-        StableReleases(self.0.merge_with(other.0, merge_fn))
-    }
-}
-
-impl StableReleases {
+impl<C> StableReleases<C> {
     /// Add a stable release
-    pub fn add(&mut self, release: RustRelease<Stable>) {
+    pub fn add(&mut self, release: RustRelease<Stable, C>) {
         self.0.add(release);
     }
 
@@ -32,7 +22,7 @@ impl StableReleases {
     }
 
     /// Iterate over the releases
-    pub fn iter(&self) -> impl Iterator<Item = &RustRelease<Stable>> {
+    pub fn iter(&self) -> impl Iterator<Item = &RustRelease<Stable, C>> {
         self.0.iter()
     }
 }
@@ -40,7 +30,7 @@ impl StableReleases {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::resolver::{ConflictResolutionBuilder, ReleaseDateResolver, ToolchainsResolver};
+    use crate::merge::builder::MergeBuilder;
     use rust_release::{
         date::Date,
         toolchain::{Channel, RustVersion, Target, Toolchain},
@@ -53,15 +43,16 @@ mod tests {
         RustRelease {
             version: Stable::new(v.major(), v.minor(), v.patch()),
             release_date: d.clone(),
-            toolchains: vec![make_toolchain(v, d)],
+            toolchains: vec![make_toolchain(v, d, Target::host())],
+            context: (),
         }
     }
 
-    fn make_toolchain(v: impl Into<RustVersion>, d: Option<Date>) -> Toolchain {
+    fn make_toolchain(v: impl Into<RustVersion>, d: Option<Date>, target: Target) -> Toolchain {
         Toolchain::new(
             Channel::stable(v.into()),
             d,
-            Target::host(),
+            target,
             HashSet::new(),
             HashSet::new(),
         )
@@ -69,69 +60,65 @@ mod tests {
 
     #[test]
     fn two_unique_versions() {
-        let mut releases1 = StableReleases::default();
-        let mut releases2 = StableReleases::default();
+        let mut releases = StableReleases::default();
 
-        releases1.add(make_release((1, 2, 3), None));
-        releases2.add(make_release((4, 5, 6), None));
+        releases.add(make_release((1, 2, 3), None));
+        releases.add(make_release((4, 5, 6), None));
 
-        let combine = ConflictResolutionBuilder::default()
-            .with_release_date_resolver(ReleaseDateResolver::most_recent())
-            .with_toolchains_resolver(ToolchainsResolver::deduped())
-            .build_or_default();
-        let merged = releases1.merge_with(releases2, combine);
-        assert_eq!(merged.len(), 2);
+        assert_eq!(releases.len(), 2);
 
-        let versions: Vec<_> = merged.iter().map(|r| &r.version).collect();
+        let versions: Vec<_> = releases.iter().map(|r| &r.version).collect();
         assert!(versions.contains(&&Stable::new(1, 2, 3)));
         assert!(versions.contains(&&Stable::new(4, 5, 6)));
 
-        let toolchains: Vec<_> = merged.iter().map(|r| r.toolchains.len()).collect();
+        let toolchains: Vec<_> = releases.iter().map(|r| r.toolchains.len()).collect();
         assert_eq!(toolchains, vec![1, 1]);
     }
 
     #[test]
     fn two_matching_versions() {
-        let mut releases1 = StableReleases::default();
-        let mut releases2 = StableReleases::default();
+        let r1 = make_release((1, 2, 3), None);
+        let r2 = RustRelease {
+            version: Stable::new(1, 2, 3),
+            release_date: None,
+            toolchains: vec![make_toolchain(
+                (1u64, 2u64, 3u64),
+                None,
+                Target::from_target_triple_or_unknown("wasm32-unknown-unknown"),
+            )],
+            context: (),
+        };
 
-        releases1.add(make_release((1, 2, 3), None));
-        releases2.add(make_release((1, 2, 3), None));
+        let merged = MergeBuilder::new(r1, r2).finish();
 
-        let chain = ConflictResolutionBuilder::default()
-            .with_release_date_resolver(ReleaseDateResolver::most_recent())
-            .with_toolchains_resolver(ToolchainsResolver::chain())
-            .build_or_default();
-        let merged = releases1.merge_with(releases2, chain);
-        assert_eq!(merged.len(), 1);
+        let mut releases = StableReleases::default();
+        releases.add(merged);
 
-        let versions: Vec<_> = merged.iter().map(|r| &r.version).collect();
-        assert_eq!(&versions[0], &&Stable::new(1, 2, 3));
+        assert_eq!(releases.len(), 1);
 
-        // The combine resolver doesn't filter toolchains based on uniqueness properties
-        assert_eq!(merged.iter().next().unwrap().toolchains.len(), 2);
+        let versions: Vec<_> = releases.iter().map(|r| &r.version).collect();
+        assert_eq!(versions[0], &Stable::new(1, 2, 3));
+
+        // UnionToolchains keeps both since the toolchains have different targets
+        assert_eq!(releases.iter().next().unwrap().toolchains.len(), 2);
     }
 
     #[test]
     fn two_matching_versions_with_dedup_toolchains() {
-        let mut releases1 = StableReleases::default();
-        let mut releases2 = StableReleases::default();
+        let r1 = make_release((1, 2, 3), None);
+        let r2 = make_release((1, 2, 3), None);
 
-        releases1.add(make_release((1, 2, 3), None));
-        releases2.add(make_release((1, 2, 3), None));
+        let merged = MergeBuilder::new(r1, r2).finish();
 
-        let dedup_toolchains = ConflictResolutionBuilder::default()
-            .with_release_date_resolver(ReleaseDateResolver::most_recent())
-            .with_toolchains_resolver(ToolchainsResolver::deduped())
-            .build_or_default();
-        let merged = releases1.merge_with(releases2, dedup_toolchains);
-        assert_eq!(merged.len(), 1);
+        let mut releases = StableReleases::default();
+        releases.add(merged);
 
-        let versions: Vec<_> = merged.iter().map(|r| &r.version).collect();
-        assert_eq!(&versions[0], &&Stable::new(1, 2, 3));
+        assert_eq!(releases.len(), 1);
 
-        // The dedup_toolchains resolver does some filtering of toolchains based on
-        // uniqueness properties (via hashing)
-        assert_eq!(merged.iter().next().unwrap().toolchains.len(), 1);
+        let versions: Vec<_> = releases.iter().map(|r| &r.version).collect();
+        assert_eq!(versions[0], &Stable::new(1, 2, 3));
+
+        // UnionToolchains deduplicates identical toolchains
+        assert_eq!(releases.iter().next().unwrap().toolchains.len(), 1);
     }
 }

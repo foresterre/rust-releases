@@ -15,10 +15,10 @@
 #![deny(missing_docs)]
 #![deny(unsafe_code)]
 
-use std::cmp::Ordering;
-
 // exports
 pub use rust_toolchain::channel::{Beta, Nightly, Stable};
+use std::cmp;
+use std::fmt::Debug;
 
 /// A module for an unrefined Date type, solely used as a version number.
 ///
@@ -42,7 +42,7 @@ pub mod version;
 /// `a` is equal, less, or greater than a [`RustRelease`] `b` iff respectively the
 /// `a.version` field is equal, less, or greater than `b.version`.
 #[derive(Clone, Debug)]
-pub struct RustRelease<V> {
+pub struct RustRelease<V: Debug, C = ()> {
     /// The version of a [`RustRelease`].
     ///
     /// The versioning scheme depends on the channel, which is why the version
@@ -60,30 +60,31 @@ pub struct RustRelease<V> {
     ///
     /// The field may be empty if toolchains were absent from a data source.
     pub toolchains: Vec<toolchain::Toolchain>,
-    // pub context: C, // Eventually, I want to add this again which can be used to tag the release with arbitrary data
+    /// Arbitrary extra data
+    pub context: C, // Eventually, I want to add this again which can be used to tag the release with arbitrary data
 }
 
-impl<V: PartialEq> PartialEq for RustRelease<V> {
+impl<V: PartialEq + Debug, C> PartialEq for RustRelease<V, C> {
     fn eq(&self, other: &Self) -> bool {
         self.version.eq(&other.version)
     }
 }
 
-impl<V: Eq> Eq for RustRelease<V> {}
+impl<V: Eq + Debug, C> Eq for RustRelease<V, C> {}
 
-impl<V: PartialOrd> PartialOrd for RustRelease<V> {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+impl<V: PartialOrd + Debug, C> PartialOrd for RustRelease<V, C> {
+    fn partial_cmp(&self, other: &Self) -> Option<cmp::Ordering> {
         self.version.partial_cmp(&other.version)
     }
 }
 
-impl<V: Ord> Ord for RustRelease<V> {
-    fn cmp(&self, other: &Self) -> Ordering {
+impl<V: Ord + Debug, C> Ord for RustRelease<V, C> {
+    fn cmp(&self, other: &Self) -> cmp::Ordering {
         self.version.cmp(&other.version)
     }
 }
 
-impl<V> RustRelease<V> {
+impl<V: Debug> RustRelease<V, ()> {
     /// Create a new RustRelease instance using a version, optionally
     /// a release date, and an iterator of toolchains.
     pub fn new(
@@ -95,9 +96,12 @@ impl<V> RustRelease<V> {
             version,
             release_date,
             toolchains: toolchains.into_iter().collect(),
+            context: (),
         }
     }
+}
 
+impl<V: Debug, C> RustRelease<V, C> {
     /// The version of a release.
     ///
     /// The 3 component MAJOR.MINOR.PATCH version number of the release

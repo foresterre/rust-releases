@@ -1,24 +1,13 @@
 use crate::releases::impls;
 use crate::Nightly;
-use crate::PartialRustRelease;
 use rust_release::RustRelease;
 
 #[derive(Debug, Default)]
-pub struct NightlyReleases(impls::ReleasesImpl<Nightly>);
+pub struct NightlyReleases<C = ()>(impls::ReleasesImpl<Nightly, C>);
 
-impl NightlyReleases {
-    /// Merge with another set of stable releases
-    pub fn merge_with<F>(self, other: NightlyReleases, resolver: F) -> NightlyReleases
-    where
-        F: Fn(Nightly, PartialRustRelease, PartialRustRelease) -> RustRelease<Nightly>,
-    {
-        NightlyReleases(self.0.merge_with(other.0, resolver))
-    }
-}
-
-impl NightlyReleases {
+impl<C> NightlyReleases<C> {
     /// Add a stable release
-    pub fn add(&mut self, release: RustRelease<Nightly>) {
+    pub fn add(&mut self, release: RustRelease<Nightly, C>) {
         self.0.add(release);
     }
 
@@ -33,7 +22,7 @@ impl NightlyReleases {
     }
 
     /// Iterate over the releases
-    pub fn iter(&self) -> impl Iterator<Item = &RustRelease<Nightly>> {
+    pub fn iter(&self) -> impl Iterator<Item = &RustRelease<Nightly, C>> {
         self.0.iter()
     }
 }

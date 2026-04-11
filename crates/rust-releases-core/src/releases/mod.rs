@@ -1,6 +1,5 @@
-use crate::PartialRustRelease;
 use rust_release::RustRelease;
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::BTreeSet;
 
 mod beta;
 mod nightly;
@@ -13,13 +12,14 @@ pub use stable::StableReleases;
 // shared implementation for StableReleases, BetaReleases and NightlyReleases (implementation detail)
 pub(in crate::releases) mod impls {
     use super::*;
+    use std::fmt::Debug;
 
     #[derive(Debug)]
-    pub struct ReleasesImpl<V> {
-        releases: BTreeSet<RustRelease<V>>,
+    pub struct ReleasesImpl<V: Debug, C> {
+        releases: BTreeSet<RustRelease<V, C>>,
     }
 
-    impl<V> Default for ReleasesImpl<V> {
+    impl<V: Debug, C> Default for ReleasesImpl<V, C> {
         fn default() -> Self {
             Self {
                 releases: BTreeSet::default(),
@@ -27,47 +27,12 @@ pub(in crate::releases) mod impls {
         }
     }
 
-    impl<V> ReleasesImpl<V>
-    where
-        V: Clone + Ord,
-    {
-        /// Merges this releases collection with another using a custom merge function.
-        ///
-        /// When releases with the same version exist in both collections, the merge_fn
-        /// is called to combine them. Releases that exist in only one collection are
-        /// kept as-is.
-        pub fn merge_with<F>(self, rhs: Self, merge_fn: F) -> Self
-        where
-            V: Ord + Clone,
-            F: Fn(RustRelease<V>, RustRelease<V>) -> RustRelease<V>,
-        {
-            let mut result = BTreeSet::new();
-            let mut others = rhs.releases;
-
-            for release in self.releases {
-                // Check if a matching release exists in other
-                if let Some(other_release) = others.take(&release) {
-                    // Both have this version - merge them
-                    result.insert(merge_fn(release, other_release));
-                } else {
-                    // Only in self
-                    result.insert(release);
-                }
-            }
-
-            // Add remaining releases from other that weren't matched
-            result.extend(others);
-
-            ReleasesImpl { releases: result }
-        }
-    }
-
-    impl<V> ReleasesImpl<V>
+    impl<V: Debug, C> ReleasesImpl<V, C>
     where
         V: Ord,
     {
         /// Add a release to the collection
-        pub fn add(&mut self, release: RustRelease<V>) {
+        pub fn add(&mut self, release: RustRelease<V, C>) {
             self.releases.insert(release);
         }
 
@@ -82,7 +47,7 @@ pub(in crate::releases) mod impls {
         }
 
         /// Iterate over the releases.
-        pub fn iter(&self) -> impl Iterator<Item = &RustRelease<V>> {
+        pub fn iter(&self) -> impl Iterator<Item = &RustRelease<V, C>> {
             self.releases.iter()
         }
     }

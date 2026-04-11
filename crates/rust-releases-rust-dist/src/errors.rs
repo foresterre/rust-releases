@@ -1,6 +1,6 @@
 use aws_config::InvalidAppName;
 use aws_sdk_s3::operation::list_objects_v2::ListObjectsV2Error;
-use rust_releases_core::Channel;
+use rust_releases_core::channel::Channel;
 
 /// A result type which binds the `RustDistError` to the error type.
 pub type RustDistResult<T> = Result<T, RustDistError>;

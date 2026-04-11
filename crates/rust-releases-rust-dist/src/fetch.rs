@@ -269,10 +269,9 @@ mod tests {
 
     // @runWith cargo test --all-features --package rust-releases --lib source::rust_dist::fetch::tests::test_fetch_meta_manifest -- --exact
     #[test]
-    fn test_fetch_meta_manifest() {
-        __internal_dl_test!({
-            let meta = fetch();
-            assert!(meta.is_ok());
-        })
+    #[ignore = "fetches latest live manifest, and thus requires network access to AWS S3"]
+    fn live_manifest() {
+        let meta = fetch();
+        assert!(meta.is_ok());
     }
 }

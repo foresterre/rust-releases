@@ -25,6 +25,25 @@ impl<C> StableReleases<C> {
     pub fn iter(&self) -> impl Iterator<Item = &RustRelease<Stable, C>> {
         self.0.iter()
     }
+
+    /// Merge two collections, applying `merge_fn` to releases that exist in both.
+    ///
+    /// Releases that exist in only one collection are included unchanged.
+    pub fn merge_with<F>(self, right: StableReleases<C>, merge_fn: F) -> StableReleases<C>
+    where
+        F: Fn(RustRelease<Stable, C>, RustRelease<Stable, C>) -> RustRelease<Stable, C>,
+    {
+        StableReleases(self.0.merge_with(right.0, merge_fn))
+    }
+}
+
+impl StableReleases<()> {
+    /// Merge two collections using default strategies (prefer left date, union toolchains).
+    ///
+    /// Releases that exist in only one collection are included unchanged.
+    pub fn merge(self, right: StableReleases<()>) -> StableReleases<()> {
+        self.merge_with(right, crate::merge::merge_default)
+    }
 }
 
 #[cfg(test)]
@@ -120,5 +139,25 @@ mod tests {
 
         // UnionToolchains deduplicates identical toolchains
         assert_eq!(releases.iter().next().unwrap().toolchains.len(), 1);
+    }
+
+    #[test]
+    fn merge_overlapping_sets() {
+        let mut left = StableReleases::default();
+        left.add(make_release((1, 0, 0), None));
+        left.add(make_release((2, 0, 0), None));
+
+        let mut right = StableReleases::default();
+        right.add(make_release((2, 0, 0), None));
+        right.add(make_release((3, 0, 0), None));
+
+        let merged = left.merge(right);
+
+        assert_eq!(merged.len(), 3);
+
+        let versions: Vec<_> = merged.iter().map(|r| &r.version).collect();
+        assert!(versions.contains(&&Stable::new(1, 0, 0)));
+        assert!(versions.contains(&&Stable::new(2, 0, 0)));
+        assert!(versions.contains(&&Stable::new(3, 0, 0)));
     }
 }

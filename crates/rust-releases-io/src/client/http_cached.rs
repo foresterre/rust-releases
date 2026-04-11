@@ -1,5 +1,5 @@
 use crate::client::errors::{HttpError, IoError};
-use crate::client::remote_client::HttpClient;
+use crate::client::http::HttpClient;
 use crate::{
     is_stale, ClientError, Document, IsStaleError, ResourceFile, RetrievalLocation,
     RetrievedDocument, RustReleasesClient,

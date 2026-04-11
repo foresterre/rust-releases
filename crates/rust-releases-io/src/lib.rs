@@ -15,6 +15,6 @@ pub use crate::{
     io::{base_cache_dir, is_stale, BaseCacheDirError, IsStaleError},
 };
 
-pub use crate::client::{cached_client::HttpCachedClient, cached_client::HttpCachedClientError};
-pub use crate::client::{fs_client::FsClient, fs_client::FsClientError};
-pub use crate::client::{remote_client::ClientError, remote_client::HttpClient};
+pub use crate::client::{fs::FsClient, fs::FsClientError};
+pub use crate::client::{http::ClientError, http::HttpClient};
+pub use crate::client::{http_cached::HttpCachedClient, http_cached::HttpCachedClientError};

@@ -1,9 +1,9 @@
 use crate::document::RetrievedDocument;
 
-pub mod cached_client;
 pub mod errors;
-pub mod fs_client;
-pub mod remote_client;
+pub mod fs;
+pub mod http;
+pub mod http_cached;
 
 /// Fetch a document, given a `resource` description.
 pub trait RustReleasesClient {

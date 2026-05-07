@@ -267,7 +267,7 @@ fn write_objects(buffer: &mut impl Write, objects: &[Object]) -> Option<String> 
 mod tests {
     use super::*;
 
-    // @runWith cargo test --all-features --package rust-releases --lib source::rust_dist::fetch::tests::test_fetch_meta_manifest -- --exact
+    // @runWith cargo test --all-features --package rust-releases --lib source::rust_dist::fetch::tests::live_manifest -- --exact
     #[test]
     #[ignore = "fetches latest live manifest, and thus requires network access to AWS S3"]
     fn live_manifest() {

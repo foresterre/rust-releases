@@ -15,7 +15,7 @@ const DEFAULT_TIMEOUT: Duration = Duration::from_secs(150);
 /// instead.
 #[derive(Debug)]
 pub struct HttpClient {
-    timeout: Duration,
+    agent: ureq::Agent,
 }
 
 impl HttpClient {
@@ -29,7 +29,26 @@ impl HttpClient {
     /// let _client = HttpClient::new(timeout);
     /// ```
     pub fn new(timeout: Duration) -> Self {
-        Self { timeout }
+        let config = ureq::Agent::config_builder()
+            .user_agent("rust-releases (github.com/foresterre/rust-releases/issues)")
+            .proxy(ureq::Proxy::try_from_env())
+            .timeout_global(Some(timeout))
+            .build();
+
+        let agent = config.new_agent();
+
+        Self { agent }
+    }
+
+    /// Fetch a response from the given `url`.
+    fn fetch_url(&self, url: &str) -> Result<Box<dyn Read + Send + Sync>, ClientError> {
+        let response = self.agent.get(url).call().map_err(|err| HttpError {
+            error: Box::new(err),
+        })?;
+
+        let reader = Box::new(response.into_body().into_reader());
+
+        Ok(reader)
     }
 }
 
@@ -42,9 +61,7 @@ impl Default for HttpClient {
     /// let _client = HttpClient::default();
     /// ```
     fn default() -> Self {
-        Self {
-            timeout: DEFAULT_TIMEOUT,
-        }
+        Self::new(DEFAULT_TIMEOUT)
     }
 }
 
@@ -52,7 +69,7 @@ impl RustReleasesClient for HttpClient {
     type Error = ClientError;
 
     fn fetch(&self, resource: ResourceFile) -> Result<RetrievedDocument, Self::Error> {
-        let mut reader = fetch_file(resource.url(), self.timeout)?;
+        let mut reader = self.fetch_url(resource.url())?;
 
         // write to memory
         let document = write_document(&mut reader)?;
@@ -62,24 +79,6 @@ impl RustReleasesClient for HttpClient {
             RetrievalLocation::Url(resource.url.to_string()),
         ))
     }
-}
-
-fn fetch_file(url: &str, timeout: Duration) -> Result<Box<dyn Read + Send + Sync>, ClientError> {
-    let config = ureq::Agent::config_builder()
-        .user_agent("rust-releases (github.com/foresterre/rust-releases/issues)")
-        .proxy(ureq::Proxy::try_from_env())
-        .timeout_global(Some(timeout))
-        .build();
-
-    let agent = config.new_agent();
-
-    let response = agent.get(url).call().map_err(|err| HttpError {
-        error: Box::new(err),
-    })?;
-
-    let reader = Box::new(response.into_body().into_reader());
-
-    Ok(reader)
 }
 
 fn write_document(reader: &mut Box<dyn Read + Send + Sync>) -> Result<Document, ClientError> {

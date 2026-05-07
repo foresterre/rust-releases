@@ -4,28 +4,46 @@
 
 [Unreleased]: https://github.com/foresterre/rust-releases
 
-## 0.32.0 - 2026-03-25
+## [0.33.0] - 2026-03-25
+
+### Changed
+
+- Reworked `rust-releases-core` & friends to allow merging from different sources (breaking)
 
 ### Fixed
 
 - Updated `aws-sdk-s3` (fixes various security vulnerabilities)
 - Updated `ureq` (fixes various security vulnerabilities)
 
+[0.33.0]: https://github.com/foresterre/rust-releases/releases/tag/v0.33.0
+
+## [0.32.0] - 2026-03-25
+
+### Fixed
+
+- Updated `aws-sdk-s3` (fixes various security vulnerabilities)
+- Updated `ureq` (fixes various security vulnerabilities)
+
+[0.32.0]: https://github.com/foresterre/rust-releases/releases/tag/v0.32.0
+
 ## [0.31.0] - 2026-03-06
 
 ### Changed
 
 * **rust-releases-core** Remove `FetchResources` trait (breaking)
-* **rust-releases-rust-changelog** Implement fetching of release information directly instead of via `FetchResources` trait (breaking)
-* **rust-releases-rust-dist** Implement fetching of release information directly instead of via `FetchResources` trait (breaking)
+* **rust-releases-rust-changelog** Implement fetching of release information directly instead of via `FetchResources`
+  trait (breaking)
+* **rust-releases-rust-dist** Implement fetching of release information directly instead of via `FetchResources` trait (
+  breaking)
 * **rust-releases** MSRV is now 1.91.1
 * **rust-releases-rust-dist** MSRV is now 1.91.1
 
 ### Fixed
 
-* **rust-releases** Resolved security advisory `GHSA-hfpc-8r3f-gw53`, `GHSA-vw5v-4f2q-w9xf` and `GHSA-65p9-r9h6-22vj` related to `aws-lc`, `aws-lc-fips` and `aws-lc-sys`
-* **rust-releases-rust-dist** Resolved security advisory `GHSA-hfpc-8r3f-gw53`, `GHSA-vw5v-4f2q-w9xf` and `GHSA-65p9-r9h6-22vj` related to `aws-lc`, `aws-lc-fips` and `aws-lc-sys`
-
+* **rust-releases** Resolved security advisory `GHSA-hfpc-8r3f-gw53`, `GHSA-vw5v-4f2q-w9xf` and `GHSA-65p9-r9h6-22vj`
+  related to `aws-lc`, `aws-lc-fips` and `aws-lc-sys`
+* **rust-releases-rust-dist** Resolved security advisory `GHSA-hfpc-8r3f-gw53`, `GHSA-vw5v-4f2q-w9xf` and
+  `GHSA-65p9-r9h6-22vj` related to `aws-lc`, `aws-lc-fips` and `aws-lc-sys`
 
 [0.31.0]: https://github.com/foresterre/rust-releases/releases/tag/v0.31.0
 

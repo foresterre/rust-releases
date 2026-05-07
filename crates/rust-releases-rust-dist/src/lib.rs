@@ -64,7 +64,9 @@ fn parse_release(capture: Captures) -> RustDistResult<RustRelease<Stable>> {
         RustDistError::UnableToParseVersionNumberComponent(&PATCH, capture[PATCH].to_string())
     })?;
 
-    Ok(RustRelease::new(Stable::new(major, minor, patch), None, []))
+    let stable = Stable::new(major, minor, patch);
+
+    Ok(RustRelease::new(stable, None, []))
 }
 
 impl RustDist {

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Changed
+
+- Renamed `ContextMerge` to `MergeContext` for consistency with `MergeReleaseDate` amd `MergeToolchains`
+
 ## 0.33.0 - 2026-05-08
 
 ### Maintenance

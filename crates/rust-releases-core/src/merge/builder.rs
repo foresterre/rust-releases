@@ -1,7 +1,7 @@
 use crate::merge::strategy::context::UnitContext;
 use crate::merge::strategy::release_date::PreferLeftDate;
 use crate::merge::strategy::toolchains::UnionToolchains;
-use crate::merge::{merge, ContextMerge, MergeReleaseDate, MergeToolchains};
+use crate::merge::{merge, MergeContext, MergeReleaseDate, MergeToolchains};
 use rust_release::RustRelease;
 use std::fmt::Debug;
 
@@ -16,9 +16,9 @@ where
 {
     left: RustRelease<V, CL>,
     right: RustRelease<V, CR>,
-    date_merge: D,
-    toolchains_merge: T,
-    context_merge: C,
+    date: D,
+    toolchains: T,
+    context: C,
 }
 
 impl<V: Debug> MergeBuilder<V, (), (), PreferLeftDate, UnionToolchains, UnitContext> {
@@ -26,9 +26,9 @@ impl<V: Debug> MergeBuilder<V, (), (), PreferLeftDate, UnionToolchains, UnitCont
         Self {
             left,
             right,
-            date_merge: PreferLeftDate,
-            toolchains_merge: UnionToolchains,
-            context_merge: UnitContext,
+            date: PreferLeftDate,
+            toolchains: UnionToolchains,
+            context: UnitContext,
         }
     }
 }
@@ -38,7 +38,7 @@ where
     V: Eq + Debug,
     D: MergeReleaseDate,
     T: MergeToolchains,
-    C: ContextMerge<CL, CR>,
+    C: MergeContext<CL, CR>,
 {
     pub fn date_merge<D2: MergeReleaseDate>(
         self,
@@ -47,35 +47,35 @@ where
         MergeBuilder {
             left: self.left,
             right: self.right,
-            date_merge,
-            toolchains_merge: self.toolchains_merge,
-            context_merge: self.context_merge,
+            date: date_merge,
+            toolchains: self.toolchains,
+            context: self.context,
         }
     }
 
     pub fn toolchains_merge<T2: MergeToolchains>(
         self,
-        toolchains_merge: T2,
+        toolchains: T2,
     ) -> MergeBuilder<V, CL, CR, D, T2, C> {
         MergeBuilder {
             left: self.left,
             right: self.right,
-            date_merge: self.date_merge,
-            toolchains_merge,
-            context_merge: self.context_merge,
+            date: self.date,
+            toolchains,
+            context: self.context,
         }
     }
 
-    pub fn context_merge<C2: ContextMerge<CL, CR>>(
+    pub fn context_merge<C2: MergeContext<CL, CR>>(
         self,
         context_merge: C2,
     ) -> MergeBuilder<V, CL, CR, D, T, C2> {
         MergeBuilder {
             left: self.left,
             right: self.right,
-            date_merge: self.date_merge,
-            toolchains_merge: self.toolchains_merge,
-            context_merge,
+            date: self.date,
+            toolchains: self.toolchains,
+            context: context_merge,
         }
     }
 
@@ -83,9 +83,9 @@ where
         merge(
             self.left,
             self.right,
-            &self.date_merge,
-            &self.toolchains_merge,
-            &self.context_merge,
+            &self.date,
+            &self.toolchains,
+            &self.context,
         )
     }
 }

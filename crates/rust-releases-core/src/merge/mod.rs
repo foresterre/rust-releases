@@ -30,7 +30,7 @@ pub trait MergeToolchains {
 ///
 /// Separate from the field traits because it carries type parameters
 /// that vary per call site.
-pub trait ContextMerge<CL, CR> {
+pub trait MergeContext<CL, CR> {
     type Output;
 
     fn merge_context(&self, left: CL, right: CR) -> Self::Output;
@@ -55,7 +55,7 @@ where
     V: Eq + Debug,
     D: MergeReleaseDate,
     T: MergeToolchains,
-    C: ContextMerge<CL, CR>,
+    C: MergeContext<CL, CR>,
 {
     debug_assert_eq!(
         left.version, right.version,

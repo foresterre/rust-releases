@@ -1,4 +1,4 @@
-use crate::merge::{ContextMerge, MergeReleaseDate, MergeToolchains};
+use crate::merge::{MergeContext, MergeReleaseDate, MergeToolchains};
 use rust_release::{date, toolchain};
 
 /// Wraps a closure into a merge trait implementation.
@@ -58,7 +58,7 @@ where
     }
 }
 
-impl<CL, CR, CO, F> ContextMerge<CL, CR> for FromFn<F>
+impl<CL, CR, CO, F> MergeContext<CL, CR> for FromFn<F>
 where
     F: Fn(CL, CR) -> CO,
 {
@@ -115,8 +115,8 @@ where
     FromFn(f)
 }
 
-/// Creates a [`ContextMerge`] strategy from a closure.
-pub fn context_fn<CL, CR, CO, F>(f: F) -> impl ContextMerge<CL, CR, Output = CO>
+/// Creates a [`MergeContext`] strategy from a closure.
+pub fn context_fn<CL, CR, CO, F>(f: F) -> impl MergeContext<CL, CR, Output = CO>
 where
     F: Fn(CL, CR) -> CO,
 {

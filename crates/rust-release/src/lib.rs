@@ -61,7 +61,7 @@ pub struct RustRelease<V: Debug, C = ()> {
     /// The field may be empty if toolchains were absent from a data source.
     pub toolchains: Vec<toolchain::Toolchain>,
     /// Arbitrary extra data
-    pub context: C, // Eventually, I want to add this again which can be used to tag the release with arbitrary data
+    pub context: C,
 }
 
 impl<V: PartialEq + Debug, C> PartialEq for RustRelease<V, C> {

@@ -38,6 +38,29 @@ impl<C> StableReleases<C> {
 }
 
 impl StableReleases<()> {
+    /// Create a new, but empty, instance.
+    ///
+    /// NB: This function is only available for `C = ()`. Instances which use a different type `C`
+    ///     can be created using `StableReleases::<C>::default()`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use rust_releases_core::StableReleases;
+    ///
+    /// let releases = StableReleases::empty();
+    ///
+    /// assert!(releases.is_empty());
+    /// ```
+    ///
+    /// # See also
+    ///
+    /// [`StableReleases::default`]: create an empty collection, with any context type `C`.
+    /// [`StableReleases::add`]: add releases to the collection.
+    pub fn empty() -> Self {
+        Self(impls::ReleasesImpl::default())
+    }
+
     /// Merge two collections using default strategies (prefer left date, union toolchains).
     ///
     /// Releases that exist in only one collection are included unchanged.
@@ -159,5 +182,11 @@ mod tests {
         assert!(versions.contains(&&Stable::new(1, 0, 0)));
         assert!(versions.contains(&&Stable::new(2, 0, 0)));
         assert!(versions.contains(&&Stable::new(3, 0, 0)));
+    }
+
+    #[test]
+    fn empty() {
+        let releases = StableReleases::empty();
+        assert!(releases.is_empty());
     }
 }

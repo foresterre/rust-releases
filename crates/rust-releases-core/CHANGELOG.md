@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Added
+
+- Added convenience function `empty` to instantiate an empty `StableReleases`, `BetaReleases`, `NightlyReleases` instance with a context `C = ()`
+
 ### Changed
 
 - Renamed `ContextMerge` to `MergeContext` for consistency with `MergeReleaseDate` amd `MergeToolchains`

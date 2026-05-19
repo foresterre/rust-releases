@@ -38,6 +38,29 @@ impl<C> NightlyReleases<C> {
 }
 
 impl NightlyReleases<()> {
+    /// Create a new, but empty, instance.
+    ///
+    /// NB: This function is only available for `C = ()`. Instances which use a different type `C`
+    ///     can be created using `NightlyReleases::<C>::default()`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use rust_releases_core::NightlyReleases;
+    ///
+    /// let releases = NightlyReleases::empty();
+    ///
+    /// assert!(releases.is_empty());
+    /// ```
+    ///
+    /// # See also
+    ///
+    /// [`NightlyReleases::default`]: create an empty collection, with any context type `C`.
+    /// [`NightlyReleases::add`]: add releases to the collection.
+    pub fn empty() -> Self {
+        Self(impls::ReleasesImpl::default())
+    }
+
     /// Merge two collections using default strategies (prefer left date, union toolchains).
     ///
     /// Releases that exist in only one collection are included unchanged.

@@ -1,8 +1,10 @@
 use crate::releases::impls;
 use crate::Stable;
 use rust_release::RustRelease;
+use std::fmt::Debug;
+use std::iter::FromIterator;
 
-#[derive(Debug, Default)]
+#[derive(Clone, Debug, Default, PartialEq)]
 pub struct StableReleases<C = ()>(impls::ReleasesImpl<Stable, C>);
 
 impl<C> StableReleases<C> {
@@ -43,6 +45,12 @@ impl<C> IntoIterator for StableReleases<C> {
 
     fn into_iter(self) -> Self::IntoIter {
         self.0.into_iter()
+    }
+}
+
+impl<C> FromIterator<RustRelease<Stable, C>> for StableReleases<C> {
+    fn from_iter<T: IntoIterator<Item = RustRelease<Stable, C>>>(iter: T) -> Self {
+        Self(iter.into_iter().collect())
     }
 }
 
@@ -213,5 +221,20 @@ mod tests {
 
         assert_eq!(out[0], item0);
         assert_eq!(out[1], item1);
+    }
+
+    #[test]
+    fn collect() {
+        let item0 = RustRelease::new(Stable::new(1, 2, 3), None, []);
+        let item1 = RustRelease::new(Stable::new(2, 3, 4), None, []);
+
+        let mut original = StableReleases::empty();
+        original.add(item0.clone());
+        original.add(item1.clone());
+
+        // only test that what goes in, also goes out again, without changes
+        let out = original.clone().into_iter().collect::<StableReleases<()>>();
+
+        assert_eq!(original, out);
     }
 }

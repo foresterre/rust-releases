@@ -37,6 +37,15 @@ impl<C> StableReleases<C> {
     }
 }
 
+impl<C> IntoIterator for StableReleases<C> {
+    type Item = RustRelease<Stable, C>;
+    type IntoIter = std::collections::btree_set::IntoIter<RustRelease<Stable, C>>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.into_iter()
+    }
+}
+
 impl StableReleases<()> {
     /// Create a new, but empty, instance.
     ///
@@ -188,5 +197,21 @@ mod tests {
     fn empty() {
         let releases = StableReleases::empty();
         assert!(releases.is_empty());
+    }
+
+    #[test]
+    fn into_iter() {
+        let item0 = RustRelease::new(Stable::new(1, 2, 3), None, []);
+        let item1 = RustRelease::new(Stable::new(2, 3, 4), None, []);
+
+        let mut releases = StableReleases::empty();
+        releases.add(item0.clone());
+        releases.add(item1.clone());
+
+        // only test that what goes in, also goes out again, without changes
+        let out = releases.into_iter().collect::<Vec<_>>();
+
+        assert_eq!(out[0], item0);
+        assert_eq!(out[1], item1);
     }
 }

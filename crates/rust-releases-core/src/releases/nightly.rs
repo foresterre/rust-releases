@@ -37,6 +37,15 @@ impl<C> NightlyReleases<C> {
     }
 }
 
+impl<C> IntoIterator for NightlyReleases<C> {
+    type Item = RustRelease<Nightly, C>;
+    type IntoIter = std::collections::btree_set::IntoIter<RustRelease<Nightly, C>>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.into_iter()
+    }
+}
+
 impl NightlyReleases<()> {
     /// Create a new, but empty, instance.
     ///

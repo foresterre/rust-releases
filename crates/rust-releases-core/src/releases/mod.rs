@@ -76,6 +76,18 @@ pub(in crate::releases) mod impls {
         }
     }
 
+    impl<V: Debug, C> IntoIterator for ReleasesImpl<V, C>
+    where
+        V: Ord,
+    {
+        type Item = RustRelease<V, C>;
+        type IntoIter = std::collections::btree_set::IntoIter<RustRelease<V, C>>;
+
+        fn into_iter(self) -> Self::IntoIter {
+            self.releases.into_iter()
+        }
+    }
+
     #[cfg(test)]
     mod tests {
         use super::*;

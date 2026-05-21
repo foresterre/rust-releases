@@ -5,6 +5,7 @@
 ### Added
 
 - Added convenience function `empty` to instantiate an empty `StableReleases`, `BetaReleases`, `NightlyReleases` instance with a context `C = ()`
+- Implement `IntoIterator` for `StableReleases`, `BetaReleases` and `NightlyReleases`
 
 ### Changed
 

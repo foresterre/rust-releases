@@ -37,6 +37,15 @@ impl<C> BetaReleases<C> {
     }
 }
 
+impl<C> IntoIterator for BetaReleases<C> {
+    type Item = RustRelease<Beta, C>;
+    type IntoIter = std::collections::btree_set::IntoIter<RustRelease<Beta, C>>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.into_iter()
+    }
+}
+
 impl BetaReleases<()> {
     /// Create a new, but empty, instance.
     ///

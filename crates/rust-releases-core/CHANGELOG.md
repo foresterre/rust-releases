@@ -5,7 +5,10 @@
 ### Added
 
 - Added convenience function `empty` to instantiate an empty `StableReleases`, `BetaReleases`, `NightlyReleases` instance with a context `C = ()`
+- Implement `Clone` for `StableReleases`, `BetaReleases` and `NightlyReleases`
+- Implement `FromIterator` for `StableReleases`, `BetaReleases` and `NightlyReleases`
 - Implement `IntoIterator` for `StableReleases`, `BetaReleases` and `NightlyReleases`
+- Implement `PartialEq` for `StableReleases`, `BetaReleases` and `NightlyReleases`
 
 ### Changed
 

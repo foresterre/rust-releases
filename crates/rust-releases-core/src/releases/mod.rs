@@ -13,8 +13,9 @@ pub use stable::StableReleases;
 pub(in crate::releases) mod impls {
     use super::*;
     use std::fmt::Debug;
+    use std::iter::FromIterator;
 
-    #[derive(Debug)]
+    #[derive(Clone, Debug, PartialEq)]
     pub struct ReleasesImpl<V: Debug, C> {
         releases: BTreeSet<RustRelease<V, C>>,
     }
@@ -85,6 +86,17 @@ pub(in crate::releases) mod impls {
 
         fn into_iter(self) -> Self::IntoIter {
             self.releases.into_iter()
+        }
+    }
+
+    impl<V: Debug, C> FromIterator<RustRelease<V, C>> for ReleasesImpl<V, C>
+    where
+        V: Ord,
+    {
+        fn from_iter<T: IntoIterator<Item = RustRelease<V, C>>>(iter: T) -> Self {
+            Self {
+                releases: iter.into_iter().collect(),
+            }
         }
     }
 

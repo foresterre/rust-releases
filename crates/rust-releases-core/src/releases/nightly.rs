@@ -1,8 +1,9 @@
 use crate::releases::impls;
 use crate::Nightly;
 use rust_release::RustRelease;
+use std::iter::FromIterator;
 
-#[derive(Debug, Default)]
+#[derive(Clone, Debug, Default, PartialEq)]
 pub struct NightlyReleases<C = ()>(impls::ReleasesImpl<Nightly, C>);
 
 impl<C> NightlyReleases<C> {
@@ -43,6 +44,12 @@ impl<C> IntoIterator for NightlyReleases<C> {
 
     fn into_iter(self) -> Self::IntoIter {
         self.0.into_iter()
+    }
+}
+
+impl<C> FromIterator<RustRelease<Nightly, C>> for NightlyReleases<C> {
+    fn from_iter<T: IntoIterator<Item = RustRelease<Nightly, C>>>(iter: T) -> Self {
+        Self(iter.into_iter().collect())
     }
 }
 

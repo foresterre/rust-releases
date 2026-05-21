@@ -1,8 +1,9 @@
 use crate::releases::impls;
 use crate::Beta;
 use rust_release::RustRelease;
+use std::iter::FromIterator;
 
-#[derive(Debug, Default)]
+#[derive(Clone, Debug, Default, PartialEq)]
 pub struct BetaReleases<C = ()>(impls::ReleasesImpl<Beta, C>);
 
 impl<C> BetaReleases<C> {
@@ -43,6 +44,12 @@ impl<C> IntoIterator for BetaReleases<C> {
 
     fn into_iter(self) -> Self::IntoIter {
         self.0.into_iter()
+    }
+}
+
+impl<C> FromIterator<RustRelease<Beta, C>> for BetaReleases<C> {
+    fn from_iter<T: IntoIterator<Item = RustRelease<Beta, C>>>(iter: T) -> Self {
+        Self(iter.into_iter().collect())
     }
 }
 

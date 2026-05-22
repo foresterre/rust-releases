@@ -41,6 +41,7 @@ pub mod version;
 /// With respect to the PartialEq, Eq, PartialOrd and Ord traits, a [`RustRelease`]
 /// `a` is equal, less, or greater than a [`RustRelease`] `b` iff respectively the
 /// `a.version` field is equal, less, or greater than `b.version`.
+// The fields are have a `pub` privacy so they can be pattern patched on
 #[derive(Clone, Debug)]
 pub struct RustRelease<V: Debug, C = ()> {
     /// The version of a [`RustRelease`].
@@ -378,5 +379,22 @@ mod tests {
         *release.context_mut() = replacement;
 
         assert_eq!(release.context.checksum, Checksum::Crc32(0xFFFFFFFF));
+    }
+
+    #[test]
+    fn pattern_match() {
+        let stable = Stable::new(1, 82, 0);
+        let release = RustRelease::new(stable.clone(), None, vec![fake_tc(stable.clone(), None)]);
+
+        let RustRelease {
+            version,
+            toolchains,
+            context,
+            ..
+        } = release;
+
+        assert_eq!(version, stable);
+        assert_eq!(toolchains.len(), 1);
+        assert_eq!(context, ());
     }
 }

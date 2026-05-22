@@ -102,20 +102,54 @@ impl<V: Debug> RustRelease<V, ()> {
 }
 
 impl<V: Debug, C> RustRelease<V, C> {
-    /// The version of a release.
+    /// A shared reference to version of a release.
     ///
-    /// The 3 component MAJOR.MINOR.PATCH version number of the release
+    /// # See also
+    ///
+    /// Commonly `V` is parameterized by one of these:
+    ///
+    /// * [`Stable`]
+    /// * [`Beta`]
+    /// * [`Nightly`]
     pub fn version(&self) -> &V {
         &self.version
     }
 
-    /// Release date of the Rust release, if known
+    /// An exclusive reference to version of a release.
+    ///
+    /// # See also
+    ///
+    /// Commonly `V` is parameterized by one of these:
+    ///
+    /// * [`Stable`]
+    /// * [`Beta`]
+    /// * [`Nightly`]
+    pub fn version_mut(&mut self) -> &mut V {
+        &mut self.version
+    }
+
+    /// A shared reference to the release date of a release, if set.
     pub fn release_date(&self) -> Option<&date::Date> {
         self.release_date.as_ref()
     }
 
-    /// Toolchains associated with the release
-    pub fn toolchains(&self) -> impl Iterator<Item = &toolchain::Toolchain> {
+    /// An exclusive reference to the release date of a release, if set.
+    pub fn release_date_mut(&mut self) -> Option<&mut date::Date> {
+        self.release_date.as_mut()
+    }
+
+    /// A shared reference to the toolchains associated with the release.
+    pub fn toolchains(&self) -> &Vec<toolchain::Toolchain> {
+        &self.toolchains
+    }
+
+    /// An exclusive reference to the toolchains associated with the release.
+    pub fn toolchains_mut(&mut self) -> &mut Vec<toolchain::Toolchain> {
+        &mut self.toolchains
+    }
+
+    /// Iterator over the toolchains associated with the release.
+    pub fn toolchains_iter(&self) -> impl Iterator<Item = &toolchain::Toolchain> {
         self.toolchains.iter()
     }
 }
@@ -151,17 +185,6 @@ mod tests {
         )
     }
 
-    #[test]
-    fn can_instantiate() {
-        let stable = Stable {
-            version: RustVersion::new(1, 82, 0),
-        };
-        let version = ReleaseVersion::Stable(stable.clone());
-        let release = RustRelease::new(version, None, vec![fake(stable.clone(), None)]);
-
-        assert_eq!(release.version(), &ReleaseVersion::Stable(stable));
-    }
-
     #[yare::parameterized(
         some = { Some(rust_toolchain::Date::new(2024, 1, 1)) },
         none = { None },
@@ -173,8 +196,98 @@ mod tests {
         let version = ReleaseVersion::Stable(stable.clone());
         let release = RustRelease::new(version, date.clone(), vec![fake(stable, date)]);
 
-        let target_date = release.toolchains().next().unwrap().date();
+        let target_date = release.toolchains_iter().next().unwrap().date();
 
         assert_eq!(release.release_date(), target_date);
+    }
+
+    #[test]
+    fn version() {
+        let stable = Stable::new(1, 82, 0);
+        let release = RustRelease::new(stable.clone(), None, vec![fake(stable.clone(), None)]);
+
+        assert_eq!(release.version(), &stable);
+    }
+
+    #[test]
+    fn version_mut() {
+        let stable = Stable::new(1, 82, 0);
+        let mut release = RustRelease::new(stable.clone(), None, vec![fake(stable.clone(), None)]);
+
+        assert_eq!(release.version(), &stable);
+        let replacement = Stable::new(9, 9, 9);
+        *release.version_mut() = replacement.clone();
+
+        assert_eq!(release.version(), &replacement);
+    }
+
+    #[test]
+    fn release_date() {
+        let stable = Stable::new(1, 82, 0);
+        let date = rust_toolchain::Date::new(2026, 12, 12);
+        let release = RustRelease::new(
+            stable.clone(),
+            Some(date.clone()),
+            vec![fake(stable.clone(), Some(date.clone()))],
+        );
+
+        assert_eq!(release.release_date().unwrap(), &date);
+    }
+
+    #[test]
+    fn release_date_mut() {
+        let stable = Stable::new(1, 82, 0);
+        let date = rust_toolchain::Date::new(2026, 12, 12);
+        let mut release = RustRelease::new(
+            stable.clone(),
+            Some(date.clone()),
+            vec![fake(stable.clone(), Some(date.clone()))],
+        );
+
+        assert_eq!(release.release_date().unwrap(), &date);
+        let replacement = rust_toolchain::Date::new(2026, 05, 22);
+        release.release_date_mut().replace(&mut replacement.clone());
+
+        assert_eq!(release.release_date().unwrap(), &date);
+    }
+
+    #[test]
+    fn toolchains() {
+        let stable1 = Stable::new(1, 82, 0);
+        let stable2 = Stable::new(1, 83, 0);
+        let date = rust_toolchain::Date::new(2026, 12, 12);
+        // doesn't really make sense to put different versions in the toolchains vec, but for this test
+        // it is enough, and theoretically it would be possible.
+        let toolchains = vec![
+            fake(stable1.clone(), Some(date.clone())),
+            fake(stable2.clone(), None),
+        ];
+
+        let release = RustRelease::new(stable1.clone(), None, toolchains.clone());
+
+        assert_eq!(release.toolchains(), &toolchains);
+    }
+
+    #[test]
+    fn toolchains_mut() {
+        let stable1 = Stable::new(1, 82, 0);
+        let stable2 = Stable::new(1, 83, 0);
+        let date = rust_toolchain::Date::new(2026, 12, 12);
+        // doesn't really make sense to put different versions in the toolchains vec, but for this test
+        // it is enough, and theoretically it would be possible.
+        let toolchains = vec![
+            fake(stable1.clone(), Some(date.clone())),
+            fake(stable2.clone(), None),
+        ];
+        let mut release = RustRelease::new(stable1.clone(), None, toolchains.clone());
+
+        assert_eq!(release.toolchains(), &toolchains);
+
+        let stable3 = Stable::new(9, 9, 9);
+        let extension = fake(stable3, None);
+        release.toolchains_mut().push(extension.clone());
+
+        let expected = [toolchains, vec![extension]].concat();
+        assert_eq!(release.toolchains(), &expected);
     }
 }

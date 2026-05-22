@@ -72,6 +72,6 @@ mod tests {
 
         assert_eq!(first.version(), &Stable::new(1, 2, 0));
         assert_eq!(first.release_date(), None);
-        assert_eq!(first.toolchains().count(), 0);
+        assert_eq!(first.toolchains_iter().count(), 0);
     }
 }

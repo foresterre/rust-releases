@@ -8,6 +8,8 @@
 - Added `RustRelease::release_date_mut` which returns an option of an exclusive reference to the release date of a release, if set
 - Added new `RustRelease::toolchains` which returns a shared reference to the toolchains associated with the release
 - Added `RustRelease::toolchains_mut` which returns an exclusive reference to the toolchains associated with the release
+- Added `RustRelease::context` which returns an shared reference to the (arbitrary) context
+- Added `RustRelease::context_mut` which returns an exclusive reference to the (arbitrary) context
 
 ### Changed
 

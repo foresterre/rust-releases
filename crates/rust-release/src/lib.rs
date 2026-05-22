@@ -102,6 +102,26 @@ impl<V: Debug> RustRelease<V, ()> {
 }
 
 impl<V: Debug, C> RustRelease<V, C> {
+    /// Create a new RustRelease instance using a version, optionally
+    /// a release date, an iterator of toolchains and an "arbitrary" context.
+    ///
+    /// The context is can contain any additional data you want to store with the previously mentioned
+    /// data fields, i.e. the version, release date and toolchains. For example, you could add a struct
+    /// which contains metadata about when and where the data was fetched from, or which contains
+    /// checksums or signatures.
+    pub fn new_with_context(
+        version: V,
+        release_date: Option<rust_toolchain::Date>,
+        toolchains: impl IntoIterator<Item = toolchain::Toolchain>,
+        context: C,
+    ) -> Self {
+        Self {
+            version,
+            release_date,
+            toolchains: toolchains.into_iter().collect(),
+            context,
+        }
+    }
     /// A shared reference to version of a release.
     ///
     /// # See also
@@ -152,6 +172,16 @@ impl<V: Debug, C> RustRelease<V, C> {
     pub fn toolchains_iter(&self) -> impl Iterator<Item = &toolchain::Toolchain> {
         self.toolchains.iter()
     }
+
+    /// A shared reference to the (added) context of this release.
+    pub fn context(&self) -> &C {
+        &self.context
+    }
+
+    /// An exclusive reference to the (added) context of this release.
+    pub fn context_mut(&mut self) -> &mut C {
+        &mut self.context
+    }
 }
 
 /// A combination of a channel and the version number.
@@ -175,7 +205,8 @@ mod tests {
     use rust_toolchain::RustVersion;
     use std::collections::HashSet;
 
-    fn fake(stable: Stable, date: Option<rust_toolchain::Date>) -> Toolchain {
+    // Create a fake toolchain model
+    fn fake_tc(stable: Stable, date: Option<rust_toolchain::Date>) -> Toolchain {
         Toolchain::new(
             rust_toolchain::Channel::Stable(stable),
             date,
@@ -194,7 +225,7 @@ mod tests {
             version: RustVersion::new(1, 82, 0),
         };
         let version = ReleaseVersion::Stable(stable.clone());
-        let release = RustRelease::new(version, date.clone(), vec![fake(stable, date)]);
+        let release = RustRelease::new(version, date.clone(), vec![fake_tc(stable, date)]);
 
         let target_date = release.toolchains_iter().next().unwrap().date();
 
@@ -204,7 +235,7 @@ mod tests {
     #[test]
     fn version() {
         let stable = Stable::new(1, 82, 0);
-        let release = RustRelease::new(stable.clone(), None, vec![fake(stable.clone(), None)]);
+        let release = RustRelease::new(stable.clone(), None, vec![fake_tc(stable.clone(), None)]);
 
         assert_eq!(release.version(), &stable);
     }
@@ -212,7 +243,8 @@ mod tests {
     #[test]
     fn version_mut() {
         let stable = Stable::new(1, 82, 0);
-        let mut release = RustRelease::new(stable.clone(), None, vec![fake(stable.clone(), None)]);
+        let mut release =
+            RustRelease::new(stable.clone(), None, vec![fake_tc(stable.clone(), None)]);
 
         assert_eq!(release.version(), &stable);
         let replacement = Stable::new(9, 9, 9);
@@ -228,7 +260,7 @@ mod tests {
         let release = RustRelease::new(
             stable.clone(),
             Some(date.clone()),
-            vec![fake(stable.clone(), Some(date.clone()))],
+            vec![fake_tc(stable.clone(), Some(date.clone()))],
         );
 
         assert_eq!(release.release_date().unwrap(), &date);
@@ -241,7 +273,7 @@ mod tests {
         let mut release = RustRelease::new(
             stable.clone(),
             Some(date.clone()),
-            vec![fake(stable.clone(), Some(date.clone()))],
+            vec![fake_tc(stable.clone(), Some(date.clone()))],
         );
 
         assert_eq!(release.release_date().unwrap(), &date);
@@ -259,8 +291,8 @@ mod tests {
         // doesn't really make sense to put different versions in the toolchains vec, but for this test
         // it is enough, and theoretically it would be possible.
         let toolchains = vec![
-            fake(stable1.clone(), Some(date.clone())),
-            fake(stable2.clone(), None),
+            fake_tc(stable1.clone(), Some(date.clone())),
+            fake_tc(stable2.clone(), None),
         ];
 
         let release = RustRelease::new(stable1.clone(), None, toolchains.clone());
@@ -276,18 +308,75 @@ mod tests {
         // doesn't really make sense to put different versions in the toolchains vec, but for this test
         // it is enough, and theoretically it would be possible.
         let toolchains = vec![
-            fake(stable1.clone(), Some(date.clone())),
-            fake(stable2.clone(), None),
+            fake_tc(stable1.clone(), Some(date.clone())),
+            fake_tc(stable2.clone(), None),
         ];
         let mut release = RustRelease::new(stable1.clone(), None, toolchains.clone());
 
         assert_eq!(release.toolchains(), &toolchains);
 
         let stable3 = Stable::new(9, 9, 9);
-        let extension = fake(stable3, None);
+        let extension = fake_tc(stable3, None);
         release.toolchains_mut().push(extension.clone());
 
         let expected = [toolchains, vec![extension]].concat();
         assert_eq!(release.toolchains(), &expected);
+    }
+
+    #[test]
+    fn context() {
+        #[derive(Copy, Clone, Debug, Eq, PartialEq)]
+        enum Checksum {
+            Crc32(u32),
+        }
+
+        struct MyContext {
+            checksum: Checksum,
+        }
+
+        let stable = Stable::new(1, 82, 0);
+        let date = rust_toolchain::Date::new(2026, 12, 12);
+        let release = RustRelease::new_with_context(
+            stable.clone(),
+            None,
+            vec![fake_tc(stable.clone(), Some(date.clone()))],
+            MyContext {
+                checksum: Checksum::Crc32(0x00000000),
+            },
+        );
+
+        assert_eq!(release.context().checksum, Checksum::Crc32(0x00000000));
+    }
+
+    #[test]
+    fn context_mut() {
+        #[derive(Copy, Clone, Debug, Eq, PartialEq)]
+        enum Checksum {
+            Crc32(u32),
+        }
+
+        struct MyContext {
+            checksum: Checksum,
+        }
+
+        let stable = Stable::new(1, 82, 0);
+        let date = rust_toolchain::Date::new(2026, 12, 12);
+        let mut release = RustRelease::new_with_context(
+            stable.clone(),
+            None,
+            vec![fake_tc(stable.clone(), Some(date.clone()))],
+            MyContext {
+                checksum: Checksum::Crc32(0x00000000),
+            },
+        );
+
+        assert_eq!(release.context().checksum, Checksum::Crc32(0x00000000));
+
+        let replacement = MyContext {
+            checksum: Checksum::Crc32(0xFFFFFFFF),
+        };
+        *release.context_mut() = replacement;
+
+        assert_eq!(release.context.checksum, Checksum::Crc32(0xFFFFFFFF));
     }
 }

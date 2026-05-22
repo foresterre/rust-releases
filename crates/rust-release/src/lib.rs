@@ -278,7 +278,7 @@ mod tests {
         );
 
         assert_eq!(release.release_date().unwrap(), &date);
-        let replacement = rust_toolchain::Date::new(2026, 05, 22);
+        let replacement = rust_toolchain::Date::new(2026, 5, 22);
         release.release_date_mut().replace(&mut replacement.clone());
 
         assert_eq!(release.release_date().unwrap(), &date);

@@ -6,7 +6,7 @@ authors = { workspace = true }
 license = { workspace = true }
 edition = { workspace = true }
 repository = { workspace = true }
-rust-version = "1.92"
+rust-version = "1.94"
 
 [dependencies]
 rust-releases-core = { workspace = true }
@@ -18,8 +18,8 @@ rust-releases-io = { workspace = true }
 tokio = { version = "1.28.0", features = ["full"] }
 
 # S3 SDK
-aws-config = "1.8.16"
-aws-sdk-s3 = "1.132.0"
+aws-config = "1.10.1"
+aws-sdk-s3 = "1.140.0"
 
 # Regex parser and matcher, and lazy_static to precompile the regex
 lazy_static = "1.5.0"

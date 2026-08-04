@@ -1,8 +1,8 @@
 use crate::client::errors::{HttpError, IoError};
 use crate::client::remote_client::HttpClient;
-use crate::{
-    is_stale, ClientError, Document, IsStaleError, ResourceFile, RetrievalLocation,
-    RetrievedDocument, RustReleasesClient,
+use crate::{ClientError, Document, IsStaleError, ResourceFile, RetrievalLocation,
+            RetrievedDocument, RustReleasesClient,
+            is_stale,
 };
 use std::fs;
 use std::io::{self, BufReader, BufWriter, Read, Write};
@@ -21,6 +21,7 @@ const DEFAULT_TIMEOUT: Duration = Duration::from_secs(150);
 /// instead.
 #[derive(Debug)]
 pub struct HttpCachedClient {
+    client: HttpClient,
     cache_folder: PathBuf,
     cache_timeout: Duration,
 }
@@ -30,14 +31,37 @@ impl HttpCachedClient {
     ///
     /// ```
     /// use std::time::Duration;
-    /// use rust_releases_io::{base_cache_dir, HttpCachedClient};
-    /// let cache_folder = base_cache_dir().unwrap();
-    /// let timeout = Duration::from_secs(86_400);
+    /// use rust_releases_io::{base_cache_dir, HttpClient, HttpCachedClient};
     ///
-    /// let _client = HttpCachedClient::new(cache_folder, timeout);
+    /// let req_timeout = Duration::from_secs(5);
+    /// let cache_folder = base_cache_dir().unwrap();
+    /// let cache_timeout = Duration::from_secs(86_400);
+    ///
+    /// let http = HttpClient::new(req_timeout);
+    /// let _client = HttpCachedClient::new(http, cache_folder, cache_timeout);
     /// ```
-    pub fn new(cache_folder: PathBuf, cache_timeout: Duration) -> Self {
+    pub fn new(client: HttpClient, cache_folder: PathBuf, cache_timeout: Duration) -> Self {
         Self {
+            client,
+            cache_folder,
+            cache_timeout,
+        }
+    }
+
+    /// Create a new [`HttpCachedClient`].
+    ///
+    /// ```
+    /// use std::time::Duration;
+    /// use rust_releases_io::{base_cache_dir, HttpClient, HttpCachedClient};
+    ///
+    /// let cache_folder = base_cache_dir().unwrap();
+    /// let cache_timeout = Duration::from_secs(86_400);
+    ///
+    /// let _client = HttpCachedClient::new_with_default_client(cache_folder, cache_timeout);
+    /// ```
+    pub fn new_with_default_client(cache_folder: PathBuf, cache_timeout: Duration) -> Self {
+        Self {
+            client: HttpClient::new(DEFAULT_TIMEOUT),
             cache_folder,
             cache_timeout,
         }
@@ -67,8 +91,7 @@ impl RustReleasesClient for HttpCachedClient {
             setup_cache_folder(&path)?;
         }
 
-        let client = HttpClient::new(DEFAULT_TIMEOUT);
-        let mut retrieved = client
+        let mut retrieved = self.client
             .fetch(resource)
             .map_err(HttpCachedClientError::from)?;
 

@@ -11,6 +11,16 @@ pub struct Beta {
     pub prerelease: Option<u32>,
 }
 
+impl Beta {
+    /// Instantiate a new `Beta` struct, representing the version of a release channel.
+    pub fn new(major: u64, minor: u64, patch: u64, prerelease: Option<u32>) -> Self {
+        Self {
+            version: RustVersion::new(major, minor, patch),
+            prerelease,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::{channel::Beta, RustVersion};

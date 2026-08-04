@@ -1,14 +1,12 @@
 [package]
 name = "rust-release"
-version = "2.0.0"
-authors = ["Martijn Gribnau <garm@ilumeo.com>"]
-edition = "2021"
-rust-version = "1.84"
 description = "Types to model a Rust release"
-license = "MIT OR Apache-2.0"
-
-documentation = "https://docs.rs/rust-toolchain"
-repository = "https://github.com/foresterre/rust-releases"
+version = "2.0.0"
+authors = { workspace = true }
+license = { workspace = true }
+edition = { workspace = true }
+repository = { workspace = true }
+rust-version = "1.85"
 
 [dependencies]
 rust-toolchain = { workspace = true }

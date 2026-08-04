@@ -12,12 +12,12 @@ install-publish-tools:
 
 # determine the Minimum Supported Rust Version
 msrv-find:
-    cargo msrv find --output-format json -- cargo check -p rust-release --all-features
-    cargo msrv find --output-format json -- cargo check -p rust-releases-core --all-features
-    cargo msrv find --output-format json -- cargo check -p rust-releases-io --all-features
-    cargo msrv find --output-format json -- cargo check -p rust-releases-rust-changelog --all-features
-    cargo msrv find --output-format json -- cargo check -p rust-releases-rust-dist --all-features
-    cargo msrv find --output-format json -- cargo check -p rust-toolchain --all-features
+    cargo msrv find --min 1.85 --output-format json -- cargo check -p rust-release --all-features
+    cargo msrv find --min 1.85 --output-format json -- cargo check -p rust-releases-core --all-features
+    cargo msrv find --min 1.85 --output-format json -- cargo check -p rust-releases-io --all-features
+    cargo msrv find --min 1.85 --output-format json -- cargo check -p rust-releases-rust-changelog --all-features
+    cargo msrv find --min 1.85 --output-format json -- cargo check -p rust-releases-rust-dist --all-features
+    cargo msrv find --min 1.85 --output-format json -- cargo check -p rust-toolchain --all-features
 
 # verify the Minimum Supported Rust Version
 msrv-verify:

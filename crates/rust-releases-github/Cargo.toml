@@ -1,13 +1,12 @@
 [package]
 name = "rust-releases-github"
-version = "0.30.0"
-authors = ["Martijn Gribnau <garm@ilumeo.com>"]
-edition = "2018"
-rust-version = "1.85"
 description = "GithubReleases source implementation for rust-releasess"
-license = "MIT OR Apache-2.0"
-documentation = "https://docs.rs/rust-releases-rust-changelog"
-repository = "https://github.com/foresterre/rust-releases"
+version = { workspace = true }
+authors = { workspace = true }
+license = { workspace = true }
+edition = { workspace = true }
+repository = { workspace = true }
+rust-version = "1.85"
 
 [dependencies]
 rust-releases-core = { workspace = true }

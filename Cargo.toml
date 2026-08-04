@@ -1,19 +1,18 @@
 [package]
 name = "rust-releases"
-version = "0.33.0"
-authors = ["Martijn Gribnau <garm@ilumeo.com>"]
 description = "Find, index and obtain all officially available Rust releases"
-license = "MIT OR Apache-2.0"
-edition = "2018"
-rust-version = "1.91.1"
-documentation = "https://docs.rs/rust-releases"
-repository = "https://github.com/foresterre/rust-releases"
+version = { workspace = true }
+authors = { workspace = true }
+license = { workspace = true }
+edition = { workspace = true }
+repository = { workspace = true }
 exclude = [
     "/resources", # used by test cases; not relevant for library consumers; approx. 1MB
     "/.github", # version control and CI configs
     "/bors.toml", # CI staging bot config
     "/deny.toml" # dependency license checking config
 ]
+rust-version = "1.94"
 
 
 [workspace]
@@ -35,7 +34,7 @@ default = [
     "rust-changelog",
 ]
 
-#github = ["rust-releases-github"]
+#githubx = ["rust-releases-github"]
 rust-changelog = ["rust-releases-rust-changelog"]
 rust-dist = ["rust-releases-rust-dist"]
 
@@ -46,11 +45,18 @@ rust-releases-io = { workspace = true, optional = true }
 
 # sources
 #rust-releases-github = { version = "^0.30.0", path = "crates/rust-releases-github", optional = true }
-rust-releases-rust-changelog = { version = "^0.31.0", path = "crates/rust-releases-rust-changelog", optional = true }
+rust-releases-rust-changelog = { version = "^0.33.0", path = "crates/rust-releases-rust-changelog", optional = true }
 rust-releases-rust-dist = { version = "^0.33.0", path = "crates/rust-releases-rust-dist", optional = true }
 
 [dev-dependencies]
 yare = { workspace = true }
+
+[workspace.package]
+version = "0.33.0"
+authors = ["Martijn Gribnau <garm@ilumeo.com>"]
+license = "MIT OR Apache-2.0"
+edition = "2024"
+repository = "https://github.com/foresterre/rust-releases"
 
 [workspace.dependencies]
 # Declarative error handling

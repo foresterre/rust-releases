@@ -179,7 +179,7 @@ pub use rust_releases_io::{
     IsStaleError, RetrievedDocument, RustReleasesClient,
 };
 
-#[cfg(feature = "rust-releases-rust-changelog")]
+#[cfg(feature = "rust-changelog")]
 pub use rust_releases_rust_changelog::{RustChangelog, RustChangelogError, RustChangelogResult};
 
 #[cfg(feature = "rust-releases-rust-dist")]

@@ -9,6 +9,7 @@
 - Implement `FromIterator` for `StableReleases`, `BetaReleases` and `NightlyReleases`
 - Implement `IntoIterator` for `StableReleases`, `BetaReleases` and `NightlyReleases`
 - Implement `PartialEq` for `StableReleases`, `BetaReleases` and `NightlyReleases`
+- Added `map`, `map_version`, `map_release_date`, `map_toolchains`, and `map_context` to `StableReleases`
 
 ### Changed
 

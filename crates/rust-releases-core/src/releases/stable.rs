@@ -1,6 +1,6 @@
 use crate::releases::impls;
 use crate::Stable;
-use rust_release::RustRelease;
+use rust_release::{date, toolchain, RustRelease};
 use std::fmt::Debug;
 use std::iter::FromIterator;
 
@@ -26,6 +26,131 @@ impl<C> StableReleases<C> {
     /// Iterate over the releases
     pub fn iter(&self) -> impl Iterator<Item = &RustRelease<Stable, C>> {
         self.0.iter()
+    }
+
+    /// Map the `release` and re-collect the result.
+    ///
+    /// # Warning: may result in unintended consequences
+    ///
+    /// Internally, versions are stored by `version` in a `BTreeSet`, so if you
+    /// map the version specifically, you might lose releases unexpectedly.
+    pub fn map<F>(self, f: F) -> StableReleases<C>
+    where
+        F: FnMut(RustRelease<Stable, C>) -> RustRelease<Stable, C>,
+    {
+        let releases = self.into_iter().map(f).collect();
+
+        StableReleases(impls::ReleasesImpl::new(releases))
+    }
+
+    /// Map the `version` property of all releases in the set.
+    ///
+    /// # Warning: may result in unintended consequences
+    ///
+    /// Since the `version` field of a [`RustRelease`] is the only relevant property for
+    /// equivalence wrt `PartialEq`, `Eq`, `PartialOrd` and `Ord`, in set of `RustRelease` elements,
+    /// changing the `version` of multiple elements to the same version may have unintended
+    /// consequences.
+    ///
+    /// For example:
+    ///
+    /// ```
+    ///  # use rust_release::RustRelease;
+    ///  # use rust_releases_core::{Stable, StableReleases};
+    ///
+    ///  let item0 = RustRelease::new(Stable::new(1, 2, 3), None, []);
+    ///  let item1 = RustRelease::new(Stable::new(2, 3, 4), None, []);
+    ///
+    ///  let mut original = StableReleases::empty();
+    ///  original.add(item0.clone());
+    ///  original.add(item1.clone());
+    ///  assert_eq!(original.len(), 2);
+    ///
+    ///  // Eq. is determined by version
+    ///  let modified = original.map_version(|_| Stable::new(9, 9, 9));
+    ///  assert_eq!(modified.len(), 1);
+    /// ```
+    pub fn map_version<F>(self, mut f: F) -> StableReleases<C>
+    where
+        F: FnMut(&RustRelease<Stable, C>) -> Stable,
+    {
+        let releases = self
+            .into_iter()
+            .map(|r| {
+                let version = f(&r);
+                RustRelease {
+                    version,
+                    release_date: r.release_date,
+                    toolchains: r.toolchains,
+                    context: r.context,
+                }
+            })
+            .collect();
+
+        StableReleases(impls::ReleasesImpl::new(releases))
+    }
+
+    /// Map the `release_date` property of all releases in the set.
+    pub fn map_release_date<F>(self, mut f: F) -> StableReleases<C>
+    where
+        F: FnMut(&RustRelease<Stable, C>) -> Option<date::Date>,
+    {
+        let releases = self
+            .into_iter()
+            .map(|r| {
+                let release_date = f(&r);
+                RustRelease {
+                    version: r.version,
+                    release_date,
+                    toolchains: r.toolchains,
+                    context: r.context,
+                }
+            })
+            .collect();
+
+        StableReleases(impls::ReleasesImpl::new(releases))
+    }
+
+    /// Map the `toolchains` property of all releases in the set.
+    pub fn map_toolchains<F>(self, mut f: F) -> StableReleases<C>
+    where
+        F: FnMut(&RustRelease<Stable, C>) -> Vec<toolchain::Toolchain>,
+    {
+        let releases = self
+            .into_iter()
+            .map(|r| {
+                let toolchains = f(&r);
+                RustRelease {
+                    version: r.version,
+                    release_date: r.release_date,
+                    toolchains,
+                    context: r.context,
+                }
+            })
+            .collect();
+
+        StableReleases(impls::ReleasesImpl::new(releases))
+    }
+
+    /// Map the `context` property of all releases in the set, changing the context type from `C` to `C2`.
+    pub fn map_context<C2, F>(self, mut f: F) -> StableReleases<C2>
+    where
+        F: FnMut(&RustRelease<Stable, C>) -> C2,
+    {
+        let releases = self
+            .into_iter()
+            .map(|r| {
+                let context = f(&r);
+                RustRelease {
+                    version: r.version,
+                    release_date: r.release_date,
+                    toolchains: r.toolchains,
+                    context,
+                }
+            })
+            .collect();
+
+        StableReleases(impls::ReleasesImpl::new(releases))
     }
 
     /// Merge two collections, applying `merge_fn` to releases that exist in both.
@@ -236,5 +361,23 @@ mod tests {
         let out = original.clone().into_iter().collect::<StableReleases<()>>();
 
         assert_eq!(original, out);
+    }
+
+    #[test]
+    fn map_version() {
+        let item0 = RustRelease::new(Stable::new(1, 2, 3), None, []);
+        let item1 = RustRelease::new(Stable::new(2, 3, 4), None, []);
+
+        let mut original = StableReleases::empty();
+        original.add(item0.clone());
+        original.add(item1.clone());
+        assert_eq!(original.len(), 2);
+
+        // Eq. is determined by version
+        let modified = original.map_version(|_s| Stable::new(9, 9, 9));
+        assert_eq!(modified.len(), 1);
+
+        let out = modified.iter().next().unwrap();
+        assert_eq!(out.version().version, RustVersion::new(9, 9, 9));
     }
 }

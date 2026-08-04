@@ -32,6 +32,11 @@ pub(in crate::releases) mod impls {
     where
         V: Ord,
     {
+        /// Create a new instance
+        pub fn new(releases: BTreeSet<RustRelease<V, C>>) -> Self {
+            Self { releases }
+        }
+
         /// Add a release to the collection
         pub fn add(&mut self, release: RustRelease<V, C>) {
             self.releases.insert(release);

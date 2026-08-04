@@ -9,6 +9,15 @@ pub struct Nightly {
     pub date: Date,
 }
 
+impl Nightly {
+    /// Instantiate a new `Nightly` struct, representing the version of a release channel.
+    pub fn new(year: u16, month: u8, day: u8) -> Self {
+        Self {
+            date: Date::new(year, month, day),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::{channel::Nightly, Date};

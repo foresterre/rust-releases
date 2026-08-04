@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Added
+
+- Added `new` constructors for `Beta` and `Nightly`
+
 ## 2.0.0 - 2026-05-08
 
 ### Notice

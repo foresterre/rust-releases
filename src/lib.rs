@@ -175,8 +175,8 @@ pub use rust_releases_core::channel::Channel;
 
 #[cfg(feature = "rust-releases-io")]
 pub use rust_releases_io::{
-    base_cache_dir, is_stale, BaseCacheDirError, Document, HttpCachedClient, HttpCachedClientError,
-    IsStaleError, RetrievedDocument, RustReleasesClient,
+    BaseCacheDirError, Document, HttpCachedClient, HttpCachedClientError, IsStaleError,
+    RetrievedDocument, RustReleasesClient, base_cache_dir, is_stale,
 };
 
 #[cfg(feature = "rust-changelog")]

@@ -1,6 +1,6 @@
-use crate::releases::impls;
 use crate::Nightly;
-use rust_release::{date, toolchain, RustRelease};
+use crate::releases::impls;
+use rust_release::{RustRelease, date, toolchain};
 use std::iter::FromIterator;
 
 #[derive(Clone, Debug, Default, PartialEq)]

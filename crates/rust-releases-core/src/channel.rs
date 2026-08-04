@@ -23,7 +23,7 @@ impl TryFrom<&str> for Channel {
             unsupported => {
                 return Err(Error {
                     channel: unsupported.to_string(),
-                })
+                });
             }
         })
     }

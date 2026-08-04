@@ -32,7 +32,9 @@ pub enum IsStaleError {
     /// Returned when the staleness check could not be completed because the
     /// modification date of the cache file is more recent than the current system time.
     /// The modification date should not be in the future.
-    #[error("Failed to check if file is stale: modification date is more recent than the current system time ({0})")]
+    #[error(
+        "Failed to check if file is stale: modification date is more recent than the current system time ({0})"
+    )]
     ElapsedSinceModified(time::SystemTimeError),
 }
 

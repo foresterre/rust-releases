@@ -6,7 +6,7 @@ authors = { workspace = true }
 license = { workspace = true }
 edition = { workspace = true }
 repository = { workspace = true }
-rust-version = "1.94"
+rust-version = "1.94.1"
 
 [dependencies]
 # A dependency to describe two- and three component version numbers. Unlike `semver`

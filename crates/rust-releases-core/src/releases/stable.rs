@@ -1,6 +1,6 @@
-use crate::releases::impls;
 use crate::Stable;
-use rust_release::{date, toolchain, RustRelease};
+use crate::releases::impls;
+use rust_release::{RustRelease, date, toolchain};
 use std::fmt::Debug;
 use std::iter::FromIterator;
 

@@ -9,7 +9,7 @@ extern crate rust_releases_io;
 use rust_release::toolchain::RustVersion;
 use rust_releases_core::channel::Channel;
 use rust_releases_core::releases::StableReleases;
-use rust_releases_core::{rust_release, RustRelease, Stable};
+use rust_releases_core::{RustRelease, Stable, rust_release};
 use rust_releases_io::Document;
 
 pub(crate) mod errors;
@@ -170,8 +170,8 @@ impl FromStr for ReleaseDate {
 mod tests {
     use super::ReleaseDate;
     use crate::RustChangelog;
-    use rust_releases_core::channel::Channel;
     use rust_releases_core::Stable;
+    use rust_releases_core::channel::Channel;
     use rust_releases_io::Document;
     use std::fs;
     use time::macros::date;

@@ -3,7 +3,7 @@ use aws_config::{AppName, BehaviorVersion};
 use aws_sdk_s3::config::Region;
 use aws_sdk_s3::operation::list_objects_v2::ListObjectsV2Output;
 use aws_sdk_s3::types::Object;
-use rust_releases_io::{base_cache_dir, is_stale, Document};
+use rust_releases_io::{Document, base_cache_dir, is_stale};
 use std::convert::{TryFrom, TryInto};
 use std::fs;
 use std::fs::{File, OpenOptions};

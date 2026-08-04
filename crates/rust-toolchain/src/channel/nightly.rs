@@ -20,7 +20,7 @@ impl Nightly {
 
 #[cfg(test)]
 mod tests {
-    use crate::{channel::Nightly, Date};
+    use crate::{Date, channel::Nightly};
 
     #[yare::parameterized(
         patch1 = { Date::new(0, 0, 0), Date::new(0, 0, 1) },

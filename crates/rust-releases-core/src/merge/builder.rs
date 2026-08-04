@@ -1,7 +1,7 @@
 use crate::merge::strategy::context::UnitContext;
 use crate::merge::strategy::release_date::PreferLeftDate;
 use crate::merge::strategy::toolchains::UnionToolchains;
-use crate::merge::{merge, MergeContext, MergeReleaseDate, MergeToolchains};
+use crate::merge::{MergeContext, MergeReleaseDate, MergeToolchains, merge};
 use rust_release::RustRelease;
 use std::fmt::Debug;
 

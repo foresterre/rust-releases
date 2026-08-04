@@ -4,9 +4,9 @@ pub mod strategy;
 
 use std::fmt::Debug;
 
+use rust_release::RustRelease;
 use rust_release::date;
 use rust_release::toolchain;
-use rust_release::RustRelease;
 
 /// Resolves how to combine the `release_date` field during a merge.
 pub trait MergeReleaseDate {

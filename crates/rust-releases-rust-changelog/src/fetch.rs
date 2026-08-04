@@ -1,6 +1,6 @@
 use crate::RustChangelogResult;
-use rust_releases_io::{Document, HttpCachedClient, ResourceFile, RustReleasesClient,
-                       base_cache_dir,
+use rust_releases_io::{
+    Document, HttpCachedClient, ResourceFile, RustReleasesClient, base_cache_dir,
 };
 use std::path::Path;
 use std::time::Duration;

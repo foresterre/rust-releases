@@ -12,7 +12,7 @@ mod io;
 pub use crate::{
     client::{ResourceFile, RustReleasesClient},
     document::{Document, RetrievalLocation, RetrievedDocument},
-    io::{base_cache_dir, is_stale, BaseCacheDirError, IsStaleError},
+    io::{BaseCacheDirError, IsStaleError, base_cache_dir, is_stale},
 };
 
 pub use crate::client::{cached_client::HttpCachedClient, cached_client::HttpCachedClientError};

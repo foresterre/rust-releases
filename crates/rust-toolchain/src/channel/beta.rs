@@ -23,7 +23,7 @@ impl Beta {
 
 #[cfg(test)]
 mod tests {
-    use crate::{channel::Beta, RustVersion};
+    use crate::{RustVersion, channel::Beta};
 
     #[yare::parameterized(
         day1 = { RustVersion::new(0, 0, 0), RustVersion::new(0, 0, 1) },

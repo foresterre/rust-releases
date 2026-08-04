@@ -32,7 +32,7 @@ impl From<(u64, u64, u64)> for Stable {
 
 #[cfg(test)]
 mod tests {
-    use crate::{channel::Stable, RustVersion};
+    use crate::{RustVersion, channel::Stable};
 
     #[yare::parameterized(
         patch1 = { RustVersion::new(0, 0, 0), RustVersion::new(0, 0, 1) },

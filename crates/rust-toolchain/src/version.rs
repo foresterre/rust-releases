@@ -56,9 +56,9 @@ impl FromStr for RustVersion {
     type Err = ParseError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
+        use version_number::ParserError;
         use version_number::parsers::error::ExpectedError;
         use version_number::parsers::error::NumericError;
-        use version_number::ParserError;
 
         version_number::FullVersion::parse(s)
             .map(|version| Self { version })
@@ -175,7 +175,10 @@ mod tests {
                 "PartialEq should be transitive: 'b == c' must hold, by symmetric property"
             );
 
-            assert_eq!(a, c, "PartialEq should be transitive: 'a == c' must hold, given a == b (prior) and b == c (prior)");
+            assert_eq!(
+                a, c,
+                "PartialEq should be transitive: 'a == c' must hold, given a == b (prior) and b == c (prior)"
+            );
         }
     }
 
@@ -191,7 +194,11 @@ mod tests {
                 a, b,
                 "PartialOrd should hold for equality: 'a == b' must hold"
             );
-            assert_eq!(a.partial_cmp(&b), Some(Ordering::Equal), "PartialOrd should hold for equality: 'a.partial_cmp(&b) == Ordering::Equal' must hold");
+            assert_eq!(
+                a.partial_cmp(&b),
+                Some(Ordering::Equal),
+                "PartialOrd should hold for equality: 'a.partial_cmp(&b) == Ordering::Equal' must hold"
+            );
         }
 
         #[test]
@@ -202,7 +209,10 @@ mod tests {
 
             assert!(a < b, "PartialOrd should be transitive: 'a < b' must hold");
             assert!(b < c, "PartialOrd should be transitive: 'b < c' must hold");
-            assert!(a < c, "PartialOrd should be transitive: 'a < c' must hold, given a < b (prior) and b < c (prior)");
+            assert!(
+                a < c,
+                "PartialOrd should be transitive: 'a < c' must hold, given a < b (prior) and b < c (prior)"
+            );
         }
 
         #[test]
@@ -213,7 +223,10 @@ mod tests {
 
             assert!(a > b, "PartialOrd should be transitive: 'a > b' must hold");
             assert!(b > c, "PartialOrd should be transitive: 'b > c' must hold");
-            assert!(a > c, "PartialOrd should be transitive: 'a > c' must hold, given a > b (prior) and b > c (prior)");
+            assert!(
+                a > c,
+                "PartialOrd should be transitive: 'a > c' must hold, given a > b (prior) and b > c (prior)"
+            );
         }
     }
 }

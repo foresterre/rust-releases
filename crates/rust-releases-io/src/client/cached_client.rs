@@ -1,8 +1,8 @@
 use crate::client::errors::{HttpError, IoError};
 use crate::client::remote_client::HttpClient;
-use crate::{ClientError, Document, IsStaleError, ResourceFile, RetrievalLocation,
-            RetrievedDocument, RustReleasesClient,
-            is_stale,
+use crate::{
+    ClientError, Document, IsStaleError, ResourceFile, RetrievalLocation, RetrievedDocument,
+    RustReleasesClient, is_stale,
 };
 use std::fs;
 use std::io::{self, BufReader, BufWriter, Read, Write};
@@ -91,7 +91,8 @@ impl RustReleasesClient for HttpCachedClient {
             setup_cache_folder(&path)?;
         }
 
-        let mut retrieved = self.client
+        let mut retrieved = self
+            .client
             .fetch(resource)
             .map_err(HttpCachedClientError::from)?;
 

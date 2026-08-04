@@ -6,10 +6,10 @@ authors = { workspace = true }
 license = { workspace = true }
 edition = { workspace = true }
 repository = { workspace = true }
-rust-version = "1.92"
+rust-version = "1.94.1"
 
 [dependencies]
-time = { version = "0.3.7", features = ["macros", "parsing"] }
+time = { version = "0.3.47", features = ["macros", "parsing"] }
 rust-releases-core = { workspace = true }
 rust-releases-io = { workspace = true }
 thiserror = { workspace = true }

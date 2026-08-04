@@ -6,7 +6,7 @@ authors = { workspace = true }
 license = { workspace = true }
 edition = { workspace = true }
 repository = { workspace = true }
-rust-version = "1.92"
+rust-version = "1.94.1"
 
 [dependencies]
 rust-release = { workspace = true }

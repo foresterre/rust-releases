@@ -12,7 +12,7 @@ exclude = [
     "/bors.toml", # CI staging bot config
     "/deny.toml" # dependency license checking config
 ]
-rust-version = "1.94"
+rust-version = "1.94.1"
 
 
 [workspace]

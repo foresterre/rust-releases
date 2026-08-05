@@ -1,6 +1,8 @@
 use crate::client::errors::IoError;
+use crate::transport::BoxFuture;
 use crate::{
-    Document, IsStaleError, ResourceFile, RetrievalLocation, RetrievedDocument, RustReleasesClient,
+    AsyncRustReleasesClient, Document, IsStaleError, ResourceFile, RetrievalLocation,
+    RetrievedDocument, RustReleasesClient,
 };
 use std::path::Path;
 use std::{fs, io};
@@ -32,6 +34,17 @@ impl RustReleasesClient for FsClient {
             document,
             RetrievalLocation::Path(path.to_path_buf()),
         ))
+    }
+}
+
+impl AsyncRustReleasesClient for FsClient {
+    type Error = FsClientError;
+
+    fn fetch<'a>(
+        &'a self,
+        resource: ResourceFile<'a, 'a>,
+    ) -> BoxFuture<'a, Result<RetrievedDocument, Self::Error>> {
+        Box::pin(async move { RustReleasesClient::fetch(self, resource) })
     }
 }
 

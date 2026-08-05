@@ -1,8 +1,9 @@
-use crate::client::errors::{HttpError, IoError};
+use crate::client::errors::IoError;
 use crate::client::remote_client::HttpClient;
+use crate::transport::{AsyncHttpTransport, BoxFuture, HttpTransport};
 use crate::{
-    ClientError, Document, IsStaleError, ResourceFile, RetrievalLocation, RetrievedDocument,
-    RustReleasesClient, is_stale,
+    AsyncRustReleasesClient, ClientError, Document, IsStaleError, ResourceFile, RetrievalLocation,
+    RetrievedDocument, RustReleasesClient, is_stale,
 };
 use std::fs;
 use std::io::{self, BufReader, BufWriter, Read, Write};
@@ -11,36 +12,37 @@ use std::time::Duration;
 
 const DEFAULT_MEMORY_SIZE: usize = 4096;
 
-const DEFAULT_TIMEOUT: Duration = Duration::from_secs(150);
-
 /// The client to download and cache rust releases.
 ///
 /// If a cached file is not present, or if a cached file is present, but the copy is outdated,
 /// the client will download a new copy of the given resource and store it to the `cache_folder`.
 /// If a cached file is present, and the copy is not outdated, the cached file will be returned
 /// instead.
-#[derive(Debug)]
-pub struct HttpCachedClient {
-    client: HttpClient,
+///
+/// Like the [`HttpClient`] it wraps, this client is agnostic of the HTTP client
+/// used to download resources.
+#[derive(Clone, Debug)]
+pub struct HttpCachedClient<T> {
+    client: HttpClient<T>,
     cache_folder: PathBuf,
     cache_timeout: Duration,
 }
 
-impl HttpCachedClient {
+impl<T> HttpCachedClient<T> {
     /// Create a new [`HttpCachedClient`].
     ///
     /// ```
     /// use std::time::Duration;
-    /// use rust_releases_io::{base_cache_dir, HttpClient, HttpCachedClient};
+    /// use rust_releases_io::{base_cache_dir, HttpClient, HttpCachedClient, UreqTransport};
     ///
     /// let req_timeout = Duration::from_secs(5);
     /// let cache_folder = base_cache_dir().unwrap();
     /// let cache_timeout = Duration::from_secs(86_400);
     ///
-    /// let http = HttpClient::new(req_timeout);
+    /// let http = HttpClient::new(UreqTransport::new()).with_timeout(req_timeout);
     /// let _client = HttpCachedClient::new(http, cache_folder, cache_timeout);
     /// ```
-    pub fn new(client: HttpClient, cache_folder: PathBuf, cache_timeout: Duration) -> Self {
+    pub fn new(client: HttpClient<T>, cache_folder: PathBuf, cache_timeout: Duration) -> Self {
         Self {
             client,
             cache_folder,
@@ -48,60 +50,96 @@ impl HttpCachedClient {
         }
     }
 
-    /// Create a new [`HttpCachedClient`].
+    /// The client used to download resources which are absent from the cache.
+    pub fn client(&self) -> &HttpClient<T> {
+        &self.client
+    }
+
+    /// Returns the cached document, if it exists and is not stale yet.
+    fn cached(&self, path: &Path) -> Result<Option<RetrievedDocument>, HttpCachedClientError> {
+        if !path.exists() || is_stale(path, self.cache_timeout)? {
+            return Ok(None);
+        }
+
+        let document = Document::new(read_from_path(path)?);
+
+        Ok(Some(RetrievedDocument::new(
+            document,
+            RetrievalLocation::Path(path.to_path_buf()),
+        )))
+    }
+
+    /// Store the retrieved document at the given cache `path`.
+    fn store(
+        &self,
+        retrieved: &mut RetrievedDocument,
+        path: &Path,
+    ) -> Result<(), HttpCachedClientError> {
+        setup_cache_folder(path)?;
+
+        write_document_and_cache(retrieved.mut_document(), path)
+    }
+}
+
+#[cfg(feature = "ureq")]
+impl HttpCachedClient<crate::UreqTransport> {
+    /// Create a new [`HttpCachedClient`], which downloads resources over the
+    /// [`UreqTransport`].
     ///
     /// ```
     /// use std::time::Duration;
-    /// use rust_releases_io::{base_cache_dir, HttpClient, HttpCachedClient};
+    /// use rust_releases_io::{base_cache_dir, HttpCachedClient};
     ///
     /// let cache_folder = base_cache_dir().unwrap();
     /// let cache_timeout = Duration::from_secs(86_400);
     ///
     /// let _client = HttpCachedClient::new_with_default_client(cache_folder, cache_timeout);
     /// ```
+    ///
+    /// [`UreqTransport`]: crate::UreqTransport
     pub fn new_with_default_client(cache_folder: PathBuf, cache_timeout: Duration) -> Self {
-        Self {
-            client: HttpClient::new(DEFAULT_TIMEOUT),
-            cache_folder,
-            cache_timeout,
-        }
+        Self::new(HttpClient::default(), cache_folder, cache_timeout)
     }
 }
 
-impl RustReleasesClient for HttpCachedClient {
+impl<T: HttpTransport> RustReleasesClient for HttpCachedClient<T> {
     type Error = HttpCachedClientError;
 
     fn fetch(&self, resource: ResourceFile) -> Result<RetrievedDocument, Self::Error> {
         let path = self.cache_folder.join(resource.name());
-        let exists = path.exists();
 
-        // Returned the cached document if it exists and is not stale
-        if exists && !is_stale(&path, self.cache_timeout)? {
-            let buffer = read_from_path(&path)?;
-            let document = Document::new(buffer);
-
-            return Ok(RetrievedDocument::new(
-                document,
-                RetrievalLocation::Path(path),
-            ));
+        if let Some(cached) = self.cached(&path)? {
+            return Ok(cached);
         }
 
-        // Ensure we have a place to put the cached document.
-        if !exists {
-            setup_cache_folder(&path)?;
-        }
+        let mut retrieved = self.client.fetch(resource)?;
 
-        let mut retrieved = self
-            .client
-            .fetch(resource)
-            .map_err(HttpCachedClientError::from)?;
-
-        let document = retrieved.mut_document();
-
-        // write to memory
-        write_document_and_cache(document, &path)?;
+        self.store(&mut retrieved, &path)?;
 
         Ok(retrieved)
+    }
+}
+
+impl<T: AsyncHttpTransport> AsyncRustReleasesClient for HttpCachedClient<T> {
+    type Error = HttpCachedClientError;
+
+    fn fetch<'a>(
+        &'a self,
+        resource: ResourceFile<'a, 'a>,
+    ) -> BoxFuture<'a, Result<RetrievedDocument, Self::Error>> {
+        Box::pin(async move {
+            let path = self.cache_folder.join(resource.name());
+
+            if let Some(cached) = self.cached(&path)? {
+                return Ok(cached);
+            }
+
+            let mut retrieved = self.client.fetch(resource).await?;
+
+            self.store(&mut retrieved, &path)?;
+
+            Ok(retrieved)
+        })
     }
 }
 
@@ -160,16 +198,14 @@ fn write_document_and_cache(
 }
 
 /// A list of errors which may be produced by [`HttpCachedClient::fetch`].
+///
+/// [`HttpCachedClient::fetch`]: RustReleasesClient::fetch
 #[derive(Debug, thiserror::Error)]
 #[non_exhaustive]
 pub enum HttpCachedClientError {
-    /// Returned if the fetched file was empty.
-    #[error("Received empty file")]
-    EmptyFile,
-
-    /// Returned if the HTTP client could not fetch an item
+    /// Returned if the client could not fetch an item.
     #[error(transparent)]
-    Http(#[from] HttpError),
+    Client(#[from] ClientError),
 
     /// Returned in case of an `std::io::Error`.
     #[error(transparent)]
@@ -179,14 +215,4 @@ pub enum HttpCachedClientError {
     /// stale or not.
     #[error(transparent)]
     IsStale(#[from] IsStaleError),
-}
-
-impl From<ClientError> for HttpCachedClientError {
-    fn from(err: ClientError) -> Self {
-        match err {
-            ClientError::Empty => HttpCachedClientError::EmptyFile,
-            ClientError::Http(err) => HttpCachedClientError::Http(err),
-            ClientError::Io(err) => HttpCachedClientError::Io(err),
-        }
-    }
 }

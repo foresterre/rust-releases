@@ -8,7 +8,25 @@ edition = { workspace = true }
 repository = { workspace = true }
 rust-version = "1.85"
 
+[features]
+default = ["ureq"]
+# A blocking transport, backed by ureq
+ureq = ["dep:ureq"]
+# An asynchronous transport, backed by reqwest
+reqwest = ["dep:reqwest"]
+
 [dependencies]
 directories-next = "2.0.0"
+http = "1.5.0"
 thiserror = { workspace = true }
-ureq = "3.3.0"
+
+# Transports
+reqwest = { version = "0.13.4", optional = true, default-features = false, features = [
+    "http2",
+    "rustls",
+    "system-proxy",
+] }
+ureq = { version = "3.3.0", optional = true }
+
+[dev-dependencies]
+tokio = { version = "1.48.0", features = ["macros", "rt"] }

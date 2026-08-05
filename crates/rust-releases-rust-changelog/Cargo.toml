@@ -11,7 +11,7 @@ rust-version = "1.94.1"
 [dependencies]
 time = { version = "0.3.47", features = ["macros", "parsing"] }
 rust-releases-core = { workspace = true }
-rust-releases-io = { workspace = true }
+rust-releases-io = { workspace = true, features = ["ureq"] }
 thiserror = { workspace = true }
 
 [dev-dependencies]

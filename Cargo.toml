@@ -38,6 +38,10 @@ default = [
 rust-changelog = ["rust-releases-rust-changelog"]
 rust-dist = ["rust-releases-rust-dist"]
 
+# Transports for the rust-releases-io clients
+reqwest = ["rust-releases-io/reqwest"]
+ureq = ["rust-releases-io/ureq"]
+
 [dependencies]
 # types and shared impl's
 rust-releases-core = { workspace = true }

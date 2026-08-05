@@ -1,4 +1,5 @@
 use crate::document::RetrievedDocument;
+use crate::transport::BoxFuture;
 
 pub mod cached_client;
 pub mod errors;
@@ -12,6 +13,24 @@ pub trait RustReleasesClient {
 
     /// Fetch the document described by the `resource` file.
     fn fetch(&self, resource: ResourceFile) -> Result<RetrievedDocument, Self::Error>;
+}
+
+/// Fetch a document asynchronously, given a `resource` description.
+///
+/// The asynchronous counterpart of [`RustReleasesClient`]. Clients which are
+/// generic over their transport implement this trait if, and only if, their
+/// transport is an [`AsyncHttpTransport`].
+///
+/// [`AsyncHttpTransport`]: crate::AsyncHttpTransport
+pub trait AsyncRustReleasesClient {
+    /// The type of error returned by the client implementation.
+    type Error;
+
+    /// Fetch the document described by the `resource` file.
+    fn fetch<'a>(
+        &'a self,
+        resource: ResourceFile<'a, 'a>,
+    ) -> BoxFuture<'a, Result<RetrievedDocument, Self::Error>>;
 }
 
 /// A resource which can be fetched, named and stored.

@@ -170,14 +170,22 @@
 //! [`RustDist`]: rust_releases_rust_dist::RustDist
 //! [`features`]: https://doc.rust-lang.org/cargo/reference/features.html#features
 
-// core re-exports
-pub use rust_releases_core::channel::Channel;
+// core re-export
+pub use rust_releases_core as core;
 
 #[cfg(feature = "rust-releases-io")]
 pub use rust_releases_io::{
-    BaseCacheDirError, Document, HttpCachedClient, HttpCachedClientError, IsStaleError,
-    RetrievedDocument, RustReleasesClient, base_cache_dir, is_stale,
+    AsyncHttpTransport, AsyncRustReleasesClient, BaseCacheDirError, BoxFuture, Document,
+    HttpCachedClient, HttpCachedClientError, HttpClient, HttpTransport, IsStaleError,
+    RetrievedDocument, RustReleasesClient, Timeout, TransportError, TransportResult,
+    base_cache_dir, is_stale,
 };
+
+#[cfg(all(feature = "rust-releases-io", feature = "reqwest"))]
+pub use rust_releases_io::ReqwestTransport;
+
+#[cfg(all(feature = "rust-releases-io", feature = "ureq"))]
+pub use rust_releases_io::UreqTransport;
 
 #[cfg(feature = "rust-changelog")]
 pub use rust_releases_rust_changelog::{RustChangelog, RustChangelogError, RustChangelogResult};

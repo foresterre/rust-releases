@@ -1,0 +1,26 @@
+[
+  {
+    "url": "https://api.github.com/repos/rust-lang/rust/releases/355073850",
+    "html_url": "https://github.com/rust-lang/rust/releases/tag/1.97.1",
+    "id": 355073850,
+    "node_id": "RE_kwDOAAsO6M4VKf86",
+    "tag_name": "1.97.1",
+    "target_commitish": "main",
+    "name": "Rust 1.97.1",
+    "draft": false,
+    "immutable": false,
+    "prerelease": false,
+    "author": {
+      "login": "rustbot",
+      "id": 47979223,
+      "type": "User"
+    },
+    "created_at": "2026-07-16T12:29:08Z",
+    "updated_at": "2026-07-16T12:29:15Z",
+    "published_at": "the day before yesterday",
+    "assets": [],
+    "tarball_url": "https://api.github.com/repos/rust-lang/rust/tarball/1.97.1",
+    "zipball_url": "https://api.github.com/repos/rust-lang/rust/zipball/1.97.1",
+    "body": "Release notes omitted from this fixture."
+  }
+]

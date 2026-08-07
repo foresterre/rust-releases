@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Added
+
+- Add transport independent GitHub releases client
+
 ## 0.32.0 - 2026-05-08
 
 ### Notice

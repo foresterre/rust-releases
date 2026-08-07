@@ -1,0 +1,122 @@
+[
+  {
+    "url": "https://api.github.com/repos/rust-lang/rust/releases/31032096",
+    "html_url": "https://github.com/rust-lang/rust/releases/tag/1.0.0",
+    "id": 31032096,
+    "node_id": "MDc6UmVsZWFzZTMxMDMyMDk2",
+    "tag_name": "1.0.0",
+    "target_commitish": "main",
+    "name": "Rust 1.0.0",
+    "draft": false,
+    "immutable": false,
+    "prerelease": false,
+    "author": {
+      "login": "rustbot",
+      "id": 47979223,
+      "type": "User"
+    },
+    "created_at": "2015-05-16T00:17:20Z",
+    "updated_at": "2022-01-15T07:27:47Z",
+    "published_at": "2020-09-10T08:07:48Z",
+    "assets": [],
+    "tarball_url": "https://api.github.com/repos/rust-lang/rust/tarball/1.0.0",
+    "zipball_url": "https://api.github.com/repos/rust-lang/rust/zipball/1.0.0",
+    "body": "Release notes omitted from this fixture."
+  },
+  {
+    "url": "https://api.github.com/repos/rust-lang/rust/releases/31032118",
+    "html_url": "https://github.com/rust-lang/rust/releases/tag/1.0.0-alpha.2",
+    "id": 31032118,
+    "node_id": "MDc6UmVsZWFzZTMxMDMyMTE4",
+    "tag_name": "1.0.0-alpha.2",
+    "target_commitish": "main",
+    "name": "Rust 1.0.0-alpha.2",
+    "draft": false,
+    "immutable": false,
+    "prerelease": false,
+    "author": {
+      "login": "rustbot",
+      "id": 47979223,
+      "type": "User"
+    },
+    "created_at": "2015-02-20T20:00:38Z",
+    "updated_at": "2022-01-15T07:27:41Z",
+    "published_at": "2020-09-10T08:08:04Z",
+    "assets": [],
+    "tarball_url": "https://api.github.com/repos/rust-lang/rust/tarball/1.0.0-alpha.2",
+    "zipball_url": "https://api.github.com/repos/rust-lang/rust/zipball/1.0.0-alpha.2",
+    "body": "Release notes omitted from this fixture."
+  },
+  {
+    "url": "https://api.github.com/repos/rust-lang/rust/releases/31026041",
+    "html_url": "https://github.com/rust-lang/rust/releases/tag/1.0.0-alpha",
+    "id": 31026041,
+    "node_id": "MDc6UmVsZWFzZTMxMDI2MDQx",
+    "tag_name": "1.0.0-alpha",
+    "target_commitish": "main",
+    "name": "Rust 1.0.0-alpha",
+    "draft": false,
+    "immutable": false,
+    "prerelease": false,
+    "author": {
+      "login": "rustbot",
+      "id": 47979223,
+      "type": "User"
+    },
+    "created_at": "2015-01-09T18:36:58Z",
+    "updated_at": "2022-01-15T07:27:50Z",
+    "published_at": "2020-09-10T05:53:24Z",
+    "assets": [],
+    "tarball_url": "https://api.github.com/repos/rust-lang/rust/tarball/1.0.0-alpha",
+    "zipball_url": "https://api.github.com/repos/rust-lang/rust/zipball/1.0.0-alpha",
+    "body": "Release notes omitted from this fixture."
+  },
+  {
+    "url": "https://api.github.com/repos/rust-lang/rust/releases/31026018",
+    "html_url": "https://github.com/rust-lang/rust/releases/tag/0.12.0",
+    "id": 31026018,
+    "node_id": "MDc6UmVsZWFzZTMxMDI2MDE4",
+    "tag_name": "0.12.0",
+    "target_commitish": "main",
+    "name": "Rust 0.12.0",
+    "draft": false,
+    "immutable": false,
+    "prerelease": false,
+    "author": {
+      "login": "rustbot",
+      "id": 47979223,
+      "type": "User"
+    },
+    "created_at": "2014-10-09T16:33:59Z",
+    "updated_at": "2020-09-10T05:53:03Z",
+    "published_at": "2020-09-10T05:53:03Z",
+    "assets": [],
+    "tarball_url": "https://api.github.com/repos/rust-lang/rust/tarball/0.12.0",
+    "zipball_url": "https://api.github.com/repos/rust-lang/rust/zipball/0.12.0",
+    "body": "Release notes omitted from this fixture."
+  },
+  {
+    "url": "https://api.github.com/repos/rust-lang/rust/releases/31026050",
+    "html_url": "https://github.com/rust-lang/rust/releases/tag/0.10",
+    "id": 31026050,
+    "node_id": "MDc6UmVsZWFzZTMxMDI2MDUw",
+    "tag_name": "0.10",
+    "target_commitish": "main",
+    "name": "Rust 0.10",
+    "draft": false,
+    "immutable": false,
+    "prerelease": false,
+    "author": {
+      "login": "rustbot",
+      "id": 47979223,
+      "type": "User"
+    },
+    "created_at": "2014-04-03T18:18:20Z",
+    "updated_at": "2020-09-10T05:53:32Z",
+    "published_at": "2020-09-10T05:53:32Z",
+    "assets": [],
+    "tarball_url": "https://api.github.com/repos/rust-lang/rust/tarball/0.10",
+    "zipball_url": "https://api.github.com/repos/rust-lang/rust/zipball/0.10",
+    "body": "Release notes omitted from this fixture."
+  }
+]

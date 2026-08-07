@@ -121,6 +121,12 @@ pub use rust_releases_io::ReqwestTransport;
 #[cfg(all(feature = "rust-releases-io", feature = "ureq"))]
 pub use rust_releases_io::UreqTransport;
 
+#[cfg(feature = "github")]
+pub use rust_releases_github as github;
+
+#[cfg(feature = "github")]
+pub use rust_releases_github::{GithubReleases, GithubReleasesError};
+
 #[cfg(feature = "rust-changelog")]
 pub use rust_releases_rust_changelog::{RustChangelog, RustChangelogError, RustChangelogResult};
 

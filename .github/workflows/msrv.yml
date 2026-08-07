@@ -42,6 +42,7 @@ jobs:
           "rust-release",
           "rust-releases-core",
           "rust-releases-io",
+          "rust-releases-github",
           "rust-releases-rust-changelog",
           "rust-releases-rust-dist",
           "rust-toolchain"

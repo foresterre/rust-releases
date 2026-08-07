@@ -8,6 +8,13 @@ use std::iter::FromIterator;
 pub struct StableReleases<C = ()>(impls::ReleasesImpl<Stable, C>);
 
 impl<C> StableReleases<C> {
+    pub fn new<I>(releases: I) -> Self
+    where
+        I: IntoIterator<Item = RustRelease<Stable, C>>,
+    {
+        Self(releases.into_iter().collect())
+    }
+
     /// Add a stable release
     pub fn add(&mut self, release: RustRelease<Stable, C>) {
         self.0.add(release);
@@ -329,6 +336,33 @@ mod tests {
     #[test]
     fn empty() {
         let releases = StableReleases::empty();
+        assert!(releases.is_empty());
+    }
+
+    #[test]
+    fn new_from_iterator() {
+        let item0 = RustRelease::new(Stable::new(1, 2, 3), None, []);
+        let item1 = RustRelease::new(Stable::new(2, 3, 4), None, []);
+
+        let releases = StableReleases::new([item0.clone(), item1.clone()]);
+
+        assert_eq!(releases.iter().collect::<Vec<_>>(), vec![&item0, &item1]);
+    }
+
+    #[test]
+    fn new_from_iterator_deduplicates_by_version() {
+        let item0 = RustRelease::new(Stable::new(1, 2, 3), None, []);
+        let item1 = RustRelease::new(Stable::new(1, 2, 3), None, []);
+
+        let releases = StableReleases::new([item0, item1]);
+
+        assert_eq!(releases.len(), 1);
+    }
+
+    #[test]
+    fn new_from_empty_iterator() {
+        let releases = StableReleases::new::<[RustRelease<Stable>; 0]>([]);
+
         assert!(releases.is_empty());
     }
 

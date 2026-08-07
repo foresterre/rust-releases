@@ -9,7 +9,8 @@
 - Implement `FromIterator` for `StableReleases`, `BetaReleases` and `NightlyReleases`
 - Implement `IntoIterator` for `StableReleases`, `BetaReleases` and `NightlyReleases`
 - Implement `PartialEq` for `StableReleases`, `BetaReleases` and `NightlyReleases`
-- Added `map`, `map_ver sion`, `map_release_date`, `map_toolchains`, and `map_context` to `StableReleases`, , `BetaReleases` and `NightlyReleases`
+- Added `map`, `map_ver sion`, `map_release_date`, `map_toolchains`, and `map_context` to `StableReleases`, `BetaReleases` and `NightlyReleases`
+- Added constructor `new` to instantiate a `StableReleases`, `BetaReleases` or `NightlyReleases` instance from an iterator of releases
 
 ### Changed
 

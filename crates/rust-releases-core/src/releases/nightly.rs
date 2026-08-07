@@ -7,6 +7,13 @@ use std::iter::FromIterator;
 pub struct NightlyReleases<C = ()>(impls::ReleasesImpl<Nightly, C>);
 
 impl<C> NightlyReleases<C> {
+    pub fn new<I>(releases: I) -> Self
+    where
+        I: IntoIterator<Item = RustRelease<Nightly, C>>,
+    {
+        Self(releases.into_iter().collect())
+    }
+
     /// Add a stable release
     pub fn add(&mut self, release: RustRelease<Nightly, C>) {
         self.0.add(release);
@@ -237,6 +244,16 @@ mod tests {
         assert!(versions.contains(&&Nightly::new(2024, 1, 1)));
         assert!(versions.contains(&&Nightly::new(2024, 1, 2)));
         assert!(versions.contains(&&Nightly::new(2024, 1, 3)));
+    }
+
+    #[test]
+    fn new_from_iterator() {
+        let item0 = make_release(2024, 1, 2);
+        let item1 = make_release(2024, 2, 3);
+
+        let releases = NightlyReleases::new([item0.clone(), item1.clone()]);
+
+        assert_eq!(releases.iter().collect::<Vec<_>>(), vec![&item0, &item1]);
     }
 
     #[test]

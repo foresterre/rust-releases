@@ -7,6 +7,13 @@ use std::iter::FromIterator;
 pub struct BetaReleases<C = ()>(impls::ReleasesImpl<Beta, C>);
 
 impl<C> BetaReleases<C> {
+    pub fn new<I>(releases: I) -> Self
+    where
+        I: IntoIterator<Item = RustRelease<Beta, C>>,
+    {
+        Self(releases.into_iter().collect())
+    }
+
     /// Add a stable release
     pub fn add(&mut self, release: RustRelease<Beta, C>) {
         self.0.add(release);
@@ -237,6 +244,16 @@ mod tests {
         assert!(versions.contains(&&Beta::new(1, 0, 0, None)));
         assert!(versions.contains(&&Beta::new(2, 0, 0, None)));
         assert!(versions.contains(&&Beta::new(3, 0, 0, None)));
+    }
+
+    #[test]
+    fn new_from_iterator() {
+        let item0 = make_release(1, 2, 3);
+        let item1 = make_release(2, 3, 4);
+
+        let releases = BetaReleases::new([item0.clone(), item1.clone()]);
+
+        assert_eq!(releases.iter().collect::<Vec<_>>(), vec![&item0, &item1]);
     }
 
     #[test]

@@ -8,11 +8,28 @@ edition = { workspace = true }
 repository = { workspace = true }
 rust-version = "1.94.1"
 
+[features]
+default = ["ureq"]
+# A blocking client, backed by ureq
+ureq = ["rust-releases-io/ureq"]
+# An asynchronous client, backed by reqwest
+reqwest = ["rust-releases-io/reqwest"]
+
 [dependencies]
 time = { version = "0.3.47", features = ["macros", "parsing"] }
 rust-releases-core = { workspace = true }
-rust-releases-io = { workspace = true, features = ["ureq"] }
+rust-releases-io = { workspace = true }
 thiserror = { workspace = true }
 
 [dev-dependencies]
-yare = "3.0.0"
+http = "1.5.0"
+tokio = { version = "1.48.0", features = ["macros", "rt"] }
+yare = { workspace = true }
+
+[[example]]
+name = "list-stable-releases"
+required-features = ["ureq"]
+
+[[example]]
+name = "list-stable-releases-async"
+required-features = ["reqwest"]

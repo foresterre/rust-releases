@@ -39,8 +39,16 @@ rust-changelog = ["rust-releases-rust-changelog"]
 rust-dist = ["rust-releases-rust-dist"]
 
 # Transports for the rust-releases-io clients
-reqwest = ["rust-releases-io/reqwest", "rust-releases-github?/reqwest"]
-ureq = ["rust-releases-io/ureq", "rust-releases-github?/ureq"]
+reqwest = [
+    "rust-releases-io/reqwest",
+    "rust-releases-github?/reqwest",
+    "rust-releases-rust-changelog?/reqwest",
+]
+ureq = [
+    "rust-releases-io/ureq",
+    "rust-releases-github?/ureq",
+    "rust-releases-rust-changelog?/ureq",
+]
 
 [dependencies]
 # types and shared impl's
@@ -48,7 +56,7 @@ rust-releases-core = { workspace = true }
 rust-releases-io = { workspace = true, optional = true }
 
 # sources
-rust-releases-github = { version = "^0.33.0", path = "crates/rust-releases-github", optional = true, default-features = false }
+rust-releases-github = { version = "^0.33.0", path = "crates/rust-releases-github", optional = true }
 rust-releases-rust-changelog = { version = "^0.33.0", path = "crates/rust-releases-rust-changelog", optional = true }
 rust-releases-rust-dist = { version = "^0.33.0", path = "crates/rust-releases-rust-dist", optional = true }
 

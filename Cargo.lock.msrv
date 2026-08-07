@@ -1984,10 +1984,12 @@ dependencies = [
 name = "rust-releases-rust-changelog"
 version = "0.33.0"
 dependencies = [
+ "http 1.5.0",
  "rust-releases-core",
  "rust-releases-io",
  "thiserror 2.0.19",
  "time",
+ "tokio",
  "yare",
 ]
 

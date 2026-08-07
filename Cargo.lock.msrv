@@ -1938,6 +1938,7 @@ name = "rust-releases"
 version = "0.33.0"
 dependencies = [
  "rust-releases-core",
+ "rust-releases-github",
  "rust-releases-io",
  "rust-releases-rust-changelog",
  "rust-releases-rust-dist",
@@ -1957,11 +1958,13 @@ dependencies = [
 name = "rust-releases-github"
 version = "0.33.0"
 dependencies = [
+ "http 1.5.0",
  "rust-releases-core",
  "rust-releases-io",
  "serde",
  "serde_json",
  "thiserror 2.0.19",
+ "tokio",
  "yare",
 ]
 
@@ -1981,10 +1984,12 @@ dependencies = [
 name = "rust-releases-rust-changelog"
 version = "0.33.0"
 dependencies = [
+ "http 1.5.0",
  "rust-releases-core",
  "rust-releases-io",
  "thiserror 2.0.19",
  "time",
+ "tokio",
  "yare",
 ]
 

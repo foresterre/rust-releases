@@ -1,0 +1,122 @@
+[
+  {
+    "url": "https://api.github.com/repos/rust-lang/rust/releases/355073850",
+    "html_url": "https://github.com/rust-lang/rust/releases/tag/1.97.1",
+    "id": 355073850,
+    "node_id": "RE_kwDOAAsO6M4VKf86",
+    "tag_name": "1.97.1",
+    "target_commitish": "main",
+    "name": "Rust 1.97.1",
+    "draft": false,
+    "immutable": false,
+    "prerelease": false,
+    "author": {
+      "login": "rustbot",
+      "id": 47979223,
+      "type": "User"
+    },
+    "created_at": "2026-07-16T12:29:08Z",
+    "updated_at": "2026-07-16T12:29:15Z",
+    "published_at": "2026-07-16T12:29:15Z",
+    "assets": [],
+    "tarball_url": "https://api.github.com/repos/rust-lang/rust/tarball/1.97.1",
+    "zipball_url": "https://api.github.com/repos/rust-lang/rust/zipball/1.97.1",
+    "body": "Release notes omitted from this fixture."
+  },
+  {
+    "url": "https://api.github.com/repos/rust-lang/rust/releases/351516957",
+    "html_url": "https://github.com/rust-lang/rust/releases/tag/1.97.0",
+    "id": 351516957,
+    "node_id": "RE_kwDOAAsO6M4U87kd",
+    "tag_name": "1.97.0",
+    "target_commitish": "main",
+    "name": "Rust 1.97.0",
+    "draft": false,
+    "immutable": false,
+    "prerelease": false,
+    "author": {
+      "login": "rustbot",
+      "id": 47979223,
+      "type": "User"
+    },
+    "created_at": "2026-07-09T12:25:09Z",
+    "updated_at": "2026-07-09T12:25:16Z",
+    "published_at": "2026-07-09T12:25:16Z",
+    "assets": [],
+    "tarball_url": "https://api.github.com/repos/rust-lang/rust/tarball/1.97.0",
+    "zipball_url": "https://api.github.com/repos/rust-lang/rust/zipball/1.97.0",
+    "body": "Release notes omitted from this fixture."
+  },
+  {
+    "url": "https://api.github.com/repos/rust-lang/rust/releases/349271259",
+    "html_url": "https://github.com/rust-lang/rust/releases/tag/1.96.1",
+    "id": 349271259,
+    "node_id": "RE_kwDOAAsO6M4U0XTb",
+    "tag_name": "1.96.1",
+    "target_commitish": "main",
+    "name": "Rust 1.96.1",
+    "draft": false,
+    "immutable": false,
+    "prerelease": false,
+    "author": {
+      "login": "rustbot",
+      "id": 47979223,
+      "type": "User"
+    },
+    "created_at": "2026-06-30T12:18:53Z",
+    "updated_at": "2026-07-05T23:50:27Z",
+    "published_at": "2026-07-05T23:50:27Z",
+    "assets": [],
+    "tarball_url": "https://api.github.com/repos/rust-lang/rust/tarball/1.96.1",
+    "zipball_url": "https://api.github.com/repos/rust-lang/rust/zipball/1.96.1",
+    "body": "Release notes omitted from this fixture."
+  },
+  {
+    "url": "https://api.github.com/repos/rust-lang/rust/releases/331023263",
+    "html_url": "https://github.com/rust-lang/rust/releases/tag/1.96.0",
+    "id": 331023263,
+    "node_id": "RE_kwDOAAsO6M4TuwOf",
+    "tag_name": "1.96.0",
+    "target_commitish": "main",
+    "name": "Rust 1.96.0",
+    "draft": false,
+    "immutable": false,
+    "prerelease": false,
+    "author": {
+      "login": "rustbot",
+      "id": 47979223,
+      "type": "User"
+    },
+    "created_at": "2026-05-28T17:50:34Z",
+    "updated_at": "2026-06-07T09:14:01Z",
+    "published_at": "2026-05-28T17:50:42Z",
+    "assets": [],
+    "tarball_url": "https://api.github.com/repos/rust-lang/rust/tarball/1.96.0",
+    "zipball_url": "https://api.github.com/repos/rust-lang/rust/zipball/1.96.0",
+    "body": "Release notes omitted from this fixture."
+  },
+  {
+    "url": "https://api.github.com/repos/rust-lang/rust/releases/309991266",
+    "html_url": "https://github.com/rust-lang/rust/releases/tag/1.95.0",
+    "id": 309991266,
+    "node_id": "RE_kwDOAAsO6M4Sehdi",
+    "tag_name": "1.95.0",
+    "target_commitish": "main",
+    "name": "Rust 1.95.0",
+    "draft": false,
+    "immutable": false,
+    "prerelease": false,
+    "author": {
+      "login": "rustbot",
+      "id": 47979223,
+      "type": "User"
+    },
+    "created_at": "2026-04-16T12:47:36Z",
+    "updated_at": "2026-04-16T21:37:55Z",
+    "published_at": "2026-04-16T18:19:31Z",
+    "assets": [],
+    "tarball_url": "https://api.github.com/repos/rust-lang/rust/tarball/1.95.0",
+    "zipball_url": "https://api.github.com/repos/rust-lang/rust/zipball/1.95.0",
+    "body": "Release notes omitted from this fixture."
+  }
+]

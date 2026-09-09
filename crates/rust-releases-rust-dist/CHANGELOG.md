@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Changed
+
+- Rewrite the rust-releases-rust-dist crate to sync + async client with optional caching
+
 ## 0.33.0 - 2026-05-08
 
 ### Maintenance

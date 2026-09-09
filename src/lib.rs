@@ -127,5 +127,5 @@ pub use rust_releases_github::{self as github, GithubReleases, GithubReleasesErr
 #[cfg(feature = "rust-changelog")]
 pub use rust_releases_rust_changelog::{self as rust_changelog, RustChangelog, RustChangelogError};
 
-#[cfg(feature = "rust-releases-rust-dist")]
-pub use rust_releases_rust_dist::{RustDist, RustDistError, RustDistResult};
+#[cfg(feature = "rust-dist")]
+pub use rust_releases_rust_dist::{self as rust_dist, RustDist, RustDistError};

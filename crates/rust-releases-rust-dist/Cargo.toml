@@ -8,6 +8,11 @@ edition = { workspace = true }
 repository = { workspace = true }
 rust-version = "1.94.1"
 
+[features]
+default = ["aws"]
+# The index client which lists the Rust distribution bucket, backed by the AWS S3 SDK
+aws = ["dep:aws-config", "dep:aws-sdk-s3", "dep:tokio"]
+
 [dependencies]
 rust-releases-core = { workspace = true }
 rust-releases-io = { workspace = true }
@@ -15,11 +20,11 @@ rust-releases-io = { workspace = true }
 # Async runtime
 # minimum is set because of RUSTSEC-2021-0124 advisory: https://rustsec.org/advisories/RUSTSEC-2021-0124
 # full required by aws-sdk-s3
-tokio = { version = "1.28.0", features = ["full"] }
+tokio = { version = "1.28.0", features = ["full"], optional = true }
 
 # S3 SDK
-aws-config = "1.10.1"
-aws-sdk-s3 = { version = "1.140.0", default-features = false, features = [ "sigv4a", "http-1x", "default-https-client", "rt-tokio" ] }
+aws-config = { version = "1.10.1", optional = true }
+aws-sdk-s3 = { version = "1.140.0", default-features = false, features = ["sigv4a", "http-1x", "default-https-client", "rt-tokio"], optional = true }
 
 # Regex parser and matcher, and lazy_static to precompile the regex
 lazy_static = "1.5.0"
@@ -29,4 +34,13 @@ regex = "1.12.3"
 thiserror = { workspace = true }
 
 [dev-dependencies]
+tokio = { version = "1.28.0", features = ["macros", "rt"] }
 yare = { workspace = true }
+
+[[example]]
+name = "list-stable-releases"
+required-features = ["aws"]
+
+[[example]]
+name = "list-stable-releases-async"
+required-features = ["aws"]

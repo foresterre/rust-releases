@@ -9,14 +9,14 @@
 //! The Rust programming language uses deterministic versioning for toolchain releases. Stable versions use SemVer,
 //! while nightly, beta and historical builds can be accessed by using dated builds (YY-MM-DD).
 //!
-//! Unfortunately, a complete index of releases is not available any more. There are however
+//! Unfortunately, a complete index of releases is not available anymore. There are however
 //! a few places where we can find partial release indices, from which we can build our own
 //! index.
 //!
-//! This process consists of two parts: 1) obtaining the data sources, and 2) building the index
-//! from these data sources. For the first part `rust-releases` provides the [`FetchResources`] trait, and
-//! for the second part `rust-releases` provides the [`Source`] trait.
-//! Both traits find their origin in the `rust-releases-core` crate, and re-exported here.
+//! The data to build an index of releases is fetched from one of four currently supported data sources.
+//! Not every data source supports all release channels (stable, beta, nightly). See the list below.
+//!
+//! Common types can be found in the `rust-releases-core` crate, and are re-exported in `rust-releases`.
 //!
 //! # Using `rust-releases`
 //!
@@ -24,11 +24,11 @@
 //! implemented source library, or you can add `rust-releases` as a dependency, and enable the
 //! implemented source libraries of your choice as [`features`].
 //!
-//! By default, all four sources are enabled when depending on `rust-releases`. You can disable these
+//! By default, only the `rust-changelog` source is enabled when depending on `rust-releases`. You can disable it
 //! by setting `default-features = false` for `rust-releases` in the `Cargo.toml` manifest, or by
-//! calling cargo with `cargo --no-default-features`. You can then cherry pick sources by adding the `features`
+//! calling cargo with `cargo --no-default-features`. You can cherry pick sources by adding the `features`
 //! key to the `rust-releases` dependency and enabling the features you want, or by calling cargo with
-//! `cargo --features "rust-releases-rust-changelog,rust-releases-rust-dist"` or any other combination of features
+//! `cargo --features "rust-changelog,rust-dist"` or any other combination of features
 //! and sources.
 //!
 //! To use rust-releases, you must add at least one source implementation.
@@ -50,8 +50,8 @@
 //!
 //! ```toml
 //! [dependencies]
-//! rust-releases-core = "0.15.0"
-//! rust-releases-rust-dist = "0.15.0"
+//! rust-releases-core = "0.33.0"
+//! rust-releases-rust-dist = "0.33.0"
 //! ```
 //!
 //!
@@ -65,29 +65,33 @@
 //! [dependencies.rust-releases]
 //! version = "*"
 //! default-features = false
-//! features = ["rust-release-$RUST_RELEASES_SOURCE"]
+//! features = ["$RUST_RELEASES_SOURCE"]
 //! ```
 //!
 //! For example:
 //!
 //! ```toml
 //! [dependencies.rust-releases]
-//! version = "0.15.0"
+//! version = "0.33.0"
 //! default-features = false
-//! features = ["rust-release-rust-dist"]
+//! features = ["rust-dist"]
 //! ```
 //!
 //! # Implemented sources
 //!
-//! `rust-releases` provides four [`Source`] implementations. Three out of four also provide
-//! a [`FetchResources`] implementation. Each implementation requires adding the implementation crate
+//! `rust-releases` provides four source implementations. Three out of four obtain their data over the
+//! network. Each implementation requires adding the implementation crate
 //! as an additional dependency or feature (see <a href="#using-rust-releases">using rust-releases</a>.
 //!
 //! The implementations are:
-//! 1) [`RustChangelog`]: Build an index from the [RELEASES.md](https://raw.githubusercontent.com/rust-lang/rust/master/RELEASES.md) found in the root of the Rust source code repository.
-//!     * Select this implementation by adding `rust-releases-rust-changelog` as a dependency
-//! 2) [`RustDist`]: Build an index from the AWS S3 Rust distribution bucket; input data can be obtained using the [`FetchResources`] trait.
-//!     * Select this implementation by adding `rust-releases-rust-dist` as a dependency
+//! 1) [`RustChangelog`]: Obtain the stable releases from the [RELEASES.md](https://raw.githubusercontent.com/rust-lang/rust/master/RELEASES.md) found in the root of the Rust source code repository.
+//!     * Select this implementation by adding `rust-releases-rust-changelog` as a dependency, or by enabling the `rust-changelog` feature
+//! 2) [`GithubReleases`]: Obtain the stable releases from the GitHub releases API of the Rust source code repository.
+//!     * Select this implementation by adding `rust-releases-github` as a dependency, or by enabling the `github` feature
+//! 3) [`RustDist`]: Obtain the stable, beta and nightly releases from the AWS S3 Rust distribution bucket; the details of a release can additionally be read from its channel manifest.
+//!     * Select this implementation by adding `rust-releases-rust-dist` as a dependency, or by enabling the `rust-dist` feature
+//! 4) [`BundledReleases`]: Read the stable, beta and nightly releases from generated Rust code, which is bundled with the crate; requires no network access, but is only up-to-date up to the moment it was generated.
+//!     * Select this implementation by adding `rust-releases-bundled` as a dependency, or by enabling the `bundled` feature; the beta and nightly channels are enabled with the `bundled-beta` and `bundled-nightly` features
 //!
 //! # Choosing an implementation
 //!
@@ -98,10 +102,10 @@
 //! Feel free to open an issue at our [repository](https://github.com/foresterre/rust-releases/issues)
 //! for questions, feature requests, bug fixes, or other points of feedback 🤗.
 //!
-//! [`FetchResources`]: rust_releases_core::FetchResources
-//! [`Source`]: rust_releases_core::Source
 //! [`RustChangelog`]: rust_releases_rust_changelog::RustChangelog
+//! [`GithubReleases`]: rust_releases_github::GithubReleases
 //! [`RustDist`]: rust_releases_rust_dist::RustDist
+//! [`BundledReleases`]: rust_releases_bundled::BundledReleases
 //! [`features`]: https://doc.rust-lang.org/cargo/reference/features.html#features
 
 // core re-export

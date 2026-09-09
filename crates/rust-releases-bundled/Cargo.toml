@@ -24,13 +24,13 @@ rust-releases-core = { workspace = true }
 yare = { workspace = true }
 
 [[example]]
-name = "list-stable-releases"
+name = "bundled-list-stable-releases"
 required-features = ["stable"]
 
 [[example]]
-name = "list-beta-releases"
+name = "bundled-list-beta-releases"
 required-features = ["beta"]
 
 [[example]]
-name = "list-nightly-releases"
+name = "bundled-list-nightly-releases"
 required-features = ["nightly"]

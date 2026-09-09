@@ -38,27 +38,27 @@ tokio = { version = "1.28.0", features = ["macros", "rt"] }
 yare = { workspace = true }
 
 [[example]]
-name = "list-stable-releases"
+name = "dist-list-stable-releases"
 required-features = ["aws"]
 
 [[example]]
-name = "list-stable-releases-async"
+name = "dist-list-stable-releases-async"
 required-features = ["aws"]
 
 [[example]]
-name = "list-stable-releases-detailed"
+name = "dist-list-stable-releases-detailed"
 required-features = ["aws"]
 
 [[example]]
-name = "list-stable-releases-detailed-async"
+name = "dist-list-stable-releases-detailed-async"
 required-features = ["aws"]
 
 [[example]]
-name = "list-beta-releases"
+name = "dist-list-beta-releases"
 required-features = ["aws"]
 
 [[example]]
-name = "list-nightly-releases"
+name = "dist-list-nightly-releases"
 required-features = ["aws"]
 
 [[example]]

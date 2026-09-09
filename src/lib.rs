@@ -121,6 +121,9 @@ pub use rust_releases_io::ReqwestTransport;
 #[cfg(all(feature = "rust-releases-io", feature = "ureq"))]
 pub use rust_releases_io::UreqTransport;
 
+#[cfg(feature = "bundled")]
+pub use rust_releases_bundled::{self as bundled, BundledReleases};
+
 #[cfg(feature = "github")]
 pub use rust_releases_github::{self as github, GithubReleases, GithubReleasesError};
 
@@ -128,4 +131,4 @@ pub use rust_releases_github::{self as github, GithubReleases, GithubReleasesErr
 pub use rust_releases_rust_changelog::{self as rust_changelog, RustChangelog, RustChangelogError};
 
 #[cfg(feature = "rust-dist")]
-pub use rust_releases_rust_dist::{self as rust_dist, RustDist, RustDistError};
+pub use rust_releases_rust_dist::{self as rust_dist, Detail, RustDist};

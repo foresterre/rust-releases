@@ -1,277 +1,207 @@
-use rust_releases_core::Stable;
-use rust_releases_io::{BoxFuture, Document};
-use rust_releases_rust_dist::{
-    AsyncDistIndexClient, CachedDistIndexClient, CachedDistIndexError, DistIndexClient,
-    DistIndexError, RustDist, RustDistError,
+mod fakes;
+
+use fakes::{DistError, FakeDist, Request, scratch_cache_folder};
+use rust_releases_core::rust_release::date::Date;
+use rust_releases_core::{
+    Beta, BetaReleases, Nightly, NightlyReleases, RustRelease, Stable, StableReleases,
 };
-use std::path::{Path, PathBuf};
-use std::sync::{Arc, Mutex};
+use rust_releases_rust_dist::{CachedDistClient, CachedDistError, RustDist};
 use std::time::Duration;
 
+fn stable() -> StableReleases {
+    StableReleases::new([
+        RustRelease::new(Stable::new(1, 8, 0), None, []),
+        RustRelease::new(Stable::new(1, 53, 0), None, []),
+    ])
+}
+
+fn beta() -> BetaReleases {
+    BetaReleases::new([RustRelease::new(Beta::new(1, 75, 0, Some(1)), None, [])])
+}
+
+fn nightly() -> NightlyReleases {
+    NightlyReleases::new([RustRelease::new(
+        Nightly::new(2016, 3, 8),
+        Some(Date::new(2016, 3, 8)),
+        [],
+    )])
+}
+
 #[test]
-fn fetch_the_stable_releases_of_rust() {
-    let bucket = FakeDistBucket::new();
-    bucket.serve_index("dist_static-rust-lang-org.txt");
+fn fetch_the_releases_of_every_channel() {
+    let dist = FakeDist::new();
+    dist.serve_stable(stable());
+    dist.serve_beta(beta());
+    dist.serve_nightly(nightly());
 
-    let source = RustDist::new(bucket.clone());
+    let source = RustDist::new(dist.clone());
 
-    let releases = source.fetch().unwrap();
+    assert_eq!(source.stable().fetch().unwrap(), stable());
+    assert_eq!(source.beta().fetch().unwrap(), beta());
+    assert_eq!(source.nightly().fetch().unwrap(), nightly());
 
-    // 74 releases including minor releases from 1.0.0 to 1.53.0
-    assert_eq!(releases.len(), 74);
     assert_eq!(
-        releases.iter().next().unwrap().version(),
-        &Stable::new(1, 0, 0)
+        dist.requests(),
+        vec![
+            Request::StableReleases,
+            Request::BetaReleases,
+            Request::NightlyReleases,
+        ]
     );
-    assert_eq!(
-        releases.iter().last().unwrap().version(),
-        &Stable::new(1, 53, 0)
-    );
-
-    assert_eq!(bucket.downloads(), 1);
 }
 
 #[tokio::test]
-async fn fetch_the_stable_releases_of_rust_asynchronously() {
-    let bucket = FakeDistBucket::new();
-    bucket.serve_index("dist_static-rust-lang-org.txt");
+async fn fetch_the_releases_of_every_channel_asynchronously() {
+    let dist = FakeDist::new();
+    dist.serve_stable(stable());
+    dist.serve_beta(beta());
+    dist.serve_nightly(nightly());
 
-    let source = RustDist::new(bucket.clone());
+    let source = RustDist::new(dist.clone());
 
-    let releases = source.fetch_async().await.unwrap();
-
-    assert_eq!(releases.len(), 74);
-    assert_eq!(
-        releases.iter().last().unwrap().version(),
-        &Stable::new(1, 53, 0)
-    );
+    assert_eq!(source.stable().fetch_async().await.unwrap(), stable());
+    assert_eq!(source.beta().fetch_async().await.unwrap(), beta());
+    assert_eq!(source.nightly().fetch_async().await.unwrap(), nightly());
 }
 
 #[test]
-fn fetch_the_stable_releases_of_rust_through_a_cache() {
-    let cache_file = scratch_cache_file("cached-fetch");
+fn fetch_the_releases_of_a_channel_through_a_cache() {
+    let cache_folder = scratch_cache_folder("cached-fetch");
 
-    let bucket = FakeDistBucket::new();
-    bucket.serve_index("dist_static-rust-lang-org.txt");
+    let dist = FakeDist::new();
+    dist.serve_stable(stable());
 
-    let client = CachedDistIndexClient::new(
-        bucket.clone(),
-        cache_file.clone(),
-        Duration::from_secs(86_400),
-    );
+    let client = CachedDistClient::new(dist.clone(), cache_folder.clone());
     let source = RustDist::new(client);
 
-    let first = source.fetch().unwrap();
-    let second = source.fetch().unwrap();
+    let first = source.stable().fetch().unwrap();
+    let second = source.stable().fetch().unwrap();
+
+    assert_eq!(first, stable());
+    assert_eq!(first, second);
+    assert_eq!(dist.requests(), vec![Request::StableReleases]);
+    assert!(cache_folder.join("stable-releases.txt").is_file());
+
+    std::fs::remove_dir_all(&cache_folder).unwrap();
+}
+
+#[test]
+fn a_cached_channel_keeps_the_release_dates_it_carried() {
+    let cache_folder = scratch_cache_folder("cached-dates");
+
+    let dist = FakeDist::new();
+    dist.serve_nightly(nightly());
+
+    let client = CachedDistClient::new(dist.clone(), cache_folder.clone());
+    let source = RustDist::new(client);
+
+    source.nightly().fetch().unwrap();
+    let cached = source.nightly().fetch().unwrap();
+
+    assert_eq!(cached, nightly());
+    assert_eq!(
+        cached.iter().next().unwrap().release_date(),
+        Some(&Date::new(2016, 3, 8))
+    );
+    assert_eq!(dist.requests(), vec![Request::NightlyReleases]);
+
+    std::fs::remove_dir_all(&cache_folder).unwrap();
+}
+
+#[test]
+fn every_channel_is_cached_on_its_own() {
+    let cache_folder = scratch_cache_folder("cached-channels");
+
+    let dist = FakeDist::new();
+    dist.serve_stable(stable());
+    dist.serve_beta(beta());
+
+    let client = CachedDistClient::new(dist.clone(), cache_folder.clone());
+    let source = RustDist::new(client);
+
+    assert_eq!(source.stable().fetch().unwrap(), stable());
+    assert_eq!(source.beta().fetch().unwrap(), beta());
+
+    assert!(cache_folder.join("stable-releases.txt").is_file());
+    assert!(cache_folder.join("beta-releases.txt").is_file());
+
+    std::fs::remove_dir_all(&cache_folder).unwrap();
+}
+
+#[test]
+fn a_stale_cache_is_read_again() {
+    let cache_folder = scratch_cache_folder("stale-cache");
+
+    let dist = FakeDist::new();
+    dist.serve_stable(stable());
+
+    let client = CachedDistClient::new(dist.clone(), cache_folder.clone())
+        .with_releases_timeout(Duration::from_secs(0));
+    let source = RustDist::new(client);
+
+    source.stable().fetch().unwrap();
+    source.stable().fetch().unwrap();
+
+    assert_eq!(
+        dist.requests(),
+        vec![Request::StableReleases, Request::StableReleases]
+    );
+
+    std::fs::remove_dir_all(&cache_folder).unwrap();
+}
+
+#[test]
+fn a_release_manifest_is_cached_as_it_was_received() {
+    let cache_folder = scratch_cache_folder("cached-manifest");
+
+    let dist = FakeDist::new();
+    dist.serve_manifest("stable_2016-04-12.toml");
+
+    let client = CachedDistClient::new(dist.clone(), cache_folder.clone());
+    let source = RustDist::new(client);
+
+    let version = Stable::new(1, 8, 0);
+    let first = source.stable().manifest(&version).unwrap();
+    let second = source.stable().manifest(&version).unwrap();
 
     assert_eq!(first, second);
-    assert_eq!(bucket.downloads(), 1);
-    assert!(cache_file.is_file());
+    assert_eq!(dist.requests(), vec![Request::StableManifest(version)]);
 
-    std::fs::remove_dir_all(cache_file.parent().unwrap()).unwrap();
+    let cache_file = cache_folder.join("manifests/channel-rust-1.8.0.toml");
+
+    assert_eq!(std::fs::read(&cache_file).unwrap(), first.buffer());
+
+    std::fs::remove_dir_all(&cache_folder).unwrap();
 }
 
 #[test]
-fn a_stale_cache_is_downloaded_again() {
-    let cache_file = scratch_cache_file("stale-cache");
+fn faults_are_reported() {
+    let dist = FakeDist::new();
+    dist.serve_fault();
 
-    let bucket = FakeDistBucket::new();
-    bucket.serve_keys("dist/rustc-1.53.0-x86_64-apple-darwin.tar.gz\n");
+    let source = RustDist::new(dist.clone());
 
-    let client =
-        CachedDistIndexClient::new(bucket.clone(), cache_file.clone(), Duration::from_secs(0));
+    let error = source.stable().fetch().unwrap_err();
+
+    assert_eq!(error, DistError);
+    assert_eq!(error.to_string(), "the distribution is unavailable");
+}
+
+#[test]
+fn faults_of_a_cached_client_are_reported() {
+    let cache_folder = scratch_cache_folder("cached-fault");
+
+    let dist = FakeDist::new();
+    dist.serve_fault();
+
+    let client = CachedDistClient::new(dist.clone(), cache_folder);
     let source = RustDist::new(client);
 
-    source.fetch().unwrap();
-    source.fetch().unwrap();
+    let error = source.beta().fetch().unwrap_err();
 
-    assert_eq!(bucket.downloads(), 2);
-
-    std::fs::remove_dir_all(cache_file.parent().unwrap()).unwrap();
-}
-
-#[test]
-fn every_artifact_of_a_release_yields_a_single_release() {
-    let bucket = FakeDistBucket::new();
-    bucket.serve_keys(
-        "dist/rustc-1.53.0-x86_64-apple-darwin.tar.gz\n\
-         dist/rustc-1.53.0-x86_64-apple-darwin.tar.gz.asc\n\
-         dist/rustc-1.53.0-x86_64-unknown-linux-gnu.tar.xz\n",
-    );
-
-    let source = RustDist::new(bucket.clone());
-
-    let releases = source.fetch().unwrap();
-
-    assert_eq!(releases.len(), 1);
-    assert_eq!(
-        releases.iter().next().unwrap().version(),
-        &Stable::new(1, 53, 0)
-    );
-}
-
-#[test]
-fn releases_carry_no_release_date_and_no_toolchains() {
-    let bucket = FakeDistBucket::new();
-    bucket.serve_index("dist_static-rust-lang-org.txt");
-
-    let source = RustDist::new(bucket.clone());
-
-    let releases = source.fetch().unwrap();
-
-    assert!(
-        releases
-            .iter()
-            .all(|release| { release.release_date().is_none() && release.toolchains().is_empty() })
-    );
-}
-
-#[test]
-fn download_faults_are_reported() {
-    let bucket = FakeDistBucket::new();
-    bucket.serve_fault();
-
-    let source = RustDist::new(bucket.clone());
-
-    let error = source.fetch().unwrap_err();
-
-    assert!(matches!(&error, RustDistError::Download(BucketError)));
+    assert!(matches!(&error, CachedDistError::Client(DistError)));
     assert_eq!(
         error.to_string(),
-        "Failed to obtain the Rust distribution index: the distribution bucket is unavailable"
+        "Failed to read the Rust distribution: the distribution is unavailable"
     );
-}
-
-#[test]
-fn download_faults_of_a_cached_client_are_reported() {
-    let cache_file = scratch_cache_file("cached-fault");
-
-    let bucket = FakeDistBucket::new();
-    bucket.serve_fault();
-
-    let client =
-        CachedDistIndexClient::new(bucket.clone(), cache_file, Duration::from_secs(86_400));
-    let source = RustDist::new(client);
-
-    let error = source.fetch().unwrap_err();
-
-    assert!(matches!(
-        &error,
-        RustDistError::Download(CachedDistIndexError::Client(BucketError))
-    ));
-}
-
-#[test]
-fn an_index_which_is_not_utf8_is_reported() {
-    let bucket = FakeDistBucket::new();
-    bucket.serve_bytes(&[0xff, 0xfe]);
-
-    let source = RustDist::new(bucket.clone());
-
-    let error = source.fetch().unwrap_err();
-
-    assert!(matches!(
-        &error,
-        RustDistError::Parse(DistIndexError::UnrecognizedText(_))
-    ));
-}
-
-fn index_path(index: &str) -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("../../resources/rust_dist")
-        .join(index)
-}
-
-fn scratch_cache_file(test: &str) -> PathBuf {
-    let folder = std::env::temp_dir().join(format!(
-        "rust-releases-rust-dist-{}-{}",
-        std::process::id(),
-        test
-    ));
-
-    let _ = std::fs::remove_dir_all(&folder);
-
-    folder.join("dist_static-rust-lang-org.txt")
-}
-
-#[derive(Clone, Default)]
-struct FakeDistBucket {
-    state: Arc<State>,
-}
-
-#[derive(Default)]
-struct State {
-    downloads: Mutex<u32>,
-    reply: Mutex<Option<Reply>>,
-}
-
-enum Reply {
-    Index(Vec<u8>),
-    Fault,
-}
-
-#[derive(Debug, Eq, PartialEq, thiserror::Error)]
-#[error("the distribution bucket is unavailable")]
-struct BucketError;
-
-impl FakeDistBucket {
-    fn new() -> Self {
-        Self::default()
-    }
-
-    fn serve_index(&self, index: &str) {
-        let path = index_path(index);
-
-        let body = std::fs::read(&path)
-            .unwrap_or_else(|error| panic!("unable to read '{}': {error}", path.display()));
-
-        self.reply(Reply::Index(body));
-    }
-
-    fn serve_keys(&self, keys: &str) {
-        self.serve_bytes(keys.as_bytes());
-    }
-
-    fn serve_bytes(&self, index: &[u8]) {
-        self.reply(Reply::Index(index.to_vec()));
-    }
-
-    fn serve_fault(&self) {
-        self.reply(Reply::Fault);
-    }
-
-    fn reply(&self, reply: Reply) {
-        *self.state.reply.lock().unwrap() = Some(reply);
-    }
-
-    fn downloads(&self) -> u32 {
-        *self.state.downloads.lock().unwrap()
-    }
-
-    fn respond(&self) -> Result<Document, BucketError> {
-        *self.state.downloads.lock().unwrap() += 1;
-
-        match self.state.reply.lock().unwrap().as_ref() {
-            Some(Reply::Index(index)) => Ok(Document::new(index.clone())),
-            Some(Reply::Fault) | None => Err(BucketError),
-        }
-    }
-}
-
-impl DistIndexClient for FakeDistBucket {
-    type Error = BucketError;
-
-    fn download(&self) -> Result<Document, Self::Error> {
-        self.respond()
-    }
-}
-
-impl AsyncDistIndexClient for FakeDistBucket {
-    type Error = BucketError;
-
-    fn download(&self) -> BoxFuture<'_, Result<Document, Self::Error>> {
-        let result = self.respond();
-
-        Box::pin(async move { result })
-    }
 }

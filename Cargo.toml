@@ -24,9 +24,12 @@ members = [
     "crates/rust-releases-core",
     "crates/rust-releases-io",
     # sources
+    "crates/rust-releases-bundled",
     "crates/rust-releases-github",
     "crates/rust-releases-rust-changelog",
     "crates/rust-releases-rust-dist",
+    # tooling
+    "crates/rust-releases-bundled-generator",
 ]
 
 [features]
@@ -34,9 +37,14 @@ default = [
     "rust-changelog",
 ]
 
+bundled = ["rust-releases-bundled"]
 github = ["rust-releases-github"]
 rust-changelog = ["rust-releases-rust-changelog"]
 rust-dist = ["rust-releases-rust-dist"]
+
+# Release channels bundled by the rust-releases-bundled source
+bundled-beta = ["bundled", "rust-releases-bundled?/beta"]
+bundled-nightly = ["bundled", "rust-releases-bundled?/nightly"]
 
 # Transports for the rust-releases-io clients
 reqwest = [
@@ -56,6 +64,7 @@ rust-releases-core = { workspace = true }
 rust-releases-io = { workspace = true, optional = true }
 
 # sources
+rust-releases-bundled = { version = "^0.1.0", path = "crates/rust-releases-bundled", optional = true }
 rust-releases-github = { version = "^0.33.0", path = "crates/rust-releases-github", optional = true }
 rust-releases-rust-changelog = { version = "^0.33.0", path = "crates/rust-releases-rust-changelog", optional = true }
 rust-releases-rust-dist = { version = "^0.33.0", path = "crates/rust-releases-rust-dist", optional = true }

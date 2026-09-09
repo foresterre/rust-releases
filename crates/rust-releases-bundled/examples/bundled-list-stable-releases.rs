@@ -1,10 +1,14 @@
-use rust_releases_rust_dist::RustDist;
+use rust_releases_bundled::BundledReleases;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let source = RustDist::new_aws_cached_client()?;
-    let releases = source.fetch()?;
+    let source = BundledReleases::new();
+    let releases = source.stable();
 
-    println!("{} stable releases", releases.len());
+    println!(
+        "{} stable releases, bundled on {}",
+        releases.len(),
+        source.generated_on().ymd()
+    );
 
     for release in releases.iter() {
         match release.release_date() {

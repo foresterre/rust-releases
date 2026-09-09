@@ -1,0 +1,36 @@
+[package]
+name = "rust-releases-bundled"
+description = "Bundled source implementation for rust-releases"
+version = "0.1.0"
+authors = { workspace = true }
+license = { workspace = true }
+edition = { workspace = true }
+repository = { workspace = true }
+rust-version = "1.94.1"
+
+[features]
+default = ["stable"]
+# The releases of the stable channel
+stable = []
+# The releases of the beta channel
+beta = []
+# The releases of the nightly channel
+nightly = []
+
+[dependencies]
+rust-releases-core = { workspace = true }
+
+[dev-dependencies]
+yare = { workspace = true }
+
+[[example]]
+name = "bundled-list-stable-releases"
+required-features = ["stable"]
+
+[[example]]
+name = "bundled-list-beta-releases"
+required-features = ["beta"]
+
+[[example]]
+name = "bundled-list-nightly-releases"
+required-features = ["nightly"]

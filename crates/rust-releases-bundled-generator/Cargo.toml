@@ -1,0 +1,20 @@
+[package]
+name = "rust-releases-bundled-generator"
+description = "Generates the release data which is bundled by rust-releases-bundled"
+version = "0.1.0"
+authors = { workspace = true }
+license = { workspace = true }
+edition = { workspace = true }
+repository = { workspace = true }
+publish = false
+rust-version = "1.94.1"
+
+[dependencies]
+rust-releases-core = { workspace = true }
+rust-releases-rust-dist = { workspace = true }
+rust-releases-bundled = { workspace = true }
+thiserror = { workspace = true }
+time = "0.3.47"
+
+[dev-dependencies]
+yare = { workspace = true }

@@ -15,6 +15,7 @@ msrv-find:
     cargo msrv find --min 1.85 --output-format json -- cargo check -p rust-release --all-features
     cargo msrv find --min 1.85 --output-format json -- cargo check -p rust-releases-core --all-features
     cargo msrv find --min 1.85 --output-format json -- cargo check -p rust-releases-io --all-features
+    cargo msrv find --min 1.85 --output-format json -- cargo check -p rust-releases-bundled --all-features
     cargo msrv find --min 1.85 --output-format json -- cargo check -p rust-releases-github --all-features
     cargo msrv find --min 1.85 --output-format json -- cargo check -p rust-releases-rust-changelog --all-features
     cargo msrv find --min 1.85 --output-format json -- cargo check -p rust-releases-rust-dist --all-features
@@ -25,6 +26,7 @@ msrv-verify:
     cargo msrv verify --output-format json -- cargo check -p rust-release --all-features
     cargo msrv verify --output-format json -- cargo check -p rust-releases-core --all-features
     cargo msrv verify --output-format json -- cargo check -p rust-releases-io --all-features
+    cargo msrv verify --output-format json -- cargo check -p rust-releases-bundled --all-features
     cargo msrv verify --output-format json -- cargo check -p rust-releases-github --all-features
     cargo msrv verify --output-format json -- cargo check -p rust-releases-rust-changelog --all-features
     cargo msrv verify --output-format json -- cargo check -p rust-releases-rust-dist --all-features
@@ -76,6 +78,14 @@ publish-rust-dist version:
 # publish 'rust-releases'
 publish-top version:
     cargo release -p rust-releases {{ cargo_release_args }} {{ version }}
+
+# regenerate the release data bundled by 'rust-releases-bundled'
+bundle-releases:
+    cargo run --release -p rust-releases-bundled-generator
+
+# publish 'rust-releases-bundled' (not included in 'publish-workspace')
+publish-bundled version:
+    cargo release -p rust-releases-bundled {{ cargo_release_args }} {{ version }}
 
 # publish 'rust-release' (not included in 'publish-workspace')
 publish-rust-release version:

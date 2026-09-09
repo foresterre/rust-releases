@@ -24,9 +24,12 @@ members = [
     "crates/rust-releases-core",
     "crates/rust-releases-io",
     # sources
+    "crates/rust-releases-bundled",
     "crates/rust-releases-github",
     "crates/rust-releases-rust-changelog",
     "crates/rust-releases-rust-dist",
+    # tooling
+    "crates/rust-releases-bundled-generator",
 ]
 
 [features]
@@ -34,9 +37,14 @@ default = [
     "rust-changelog",
 ]
 
+bundled = ["rust-releases-bundled"]
 github = ["rust-releases-github"]
 rust-changelog = ["rust-releases-rust-changelog"]
 rust-dist = ["rust-releases-rust-dist"]
+
+# Release channels bundled by the rust-releases-bundled source
+bundled-beta = ["bundled", "rust-releases-bundled?/beta"]
+bundled-nightly = ["bundled", "rust-releases-bundled?/nightly"]
 
 # Transports for the rust-releases-io clients
 reqwest = [
@@ -56,9 +64,10 @@ rust-releases-core = { workspace = true }
 rust-releases-io = { workspace = true, optional = true }
 
 # sources
-rust-releases-github = { version = "^0.33.0", path = "crates/rust-releases-github", optional = true }
-rust-releases-rust-changelog = { version = "^0.33.0", path = "crates/rust-releases-rust-changelog", optional = true }
-rust-releases-rust-dist = { version = "^0.33.0", path = "crates/rust-releases-rust-dist", optional = true }
+rust-releases-bundled = { workspace = true, optional = true }
+rust-releases-github = { workspace = true, optional = true }
+rust-releases-rust-changelog = { workspace = true, optional = true }
+rust-releases-rust-dist = { workspace = true, optional = true }
 
 [dev-dependencies]
 yare = { workspace = true }
@@ -81,3 +90,8 @@ rust-release = { version = "2.0.0", path = "crates/rust-release" }
 rust-toolchain = { version = "2.0.0", path = "crates/rust-toolchain" }
 rust-releases-core = { version = "^0.33.0", path = "crates/rust-releases-core" }
 rust-releases-io = { version = "^0.33.0", path = "crates/rust-releases-io" }
+
+rust-releases-bundled = { version = "^0.1.0", path = "crates/rust-releases-bundled", features = ["stable", "beta", "nightly"] }
+rust-releases-github = { version = "^0.33.0", path = "crates/rust-releases-github" }
+rust-releases-rust-changelog = { version = "^0.33.0", path = "crates/rust-releases-rust-changelog" }
+rust-releases-rust-dist = { version = "^0.33.0", path = "crates/rust-releases-rust-dist" }

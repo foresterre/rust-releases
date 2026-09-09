@@ -4,7 +4,6 @@
 [![Crates.io version shield](https://img.shields.io/crates/v/rust-releases.svg)](https://crates.io/crates/rust-releases)
 [![Docs](https://docs.rs/rust-releases/badge.svg)](https://docs.rs/rust-releases)
 [![Crates.io license shield](https://img.shields.io/crates/l/rust-releases.svg)](https://crates.io/crates/rust-releases)
-[![MSRV shield](https://img.shields.io/badge/MSRV-1.53.0-informational)](https://github.com/foresterre/cargo-msrv)
 
 `*` When unreleased, MSRV subject to change  
 
@@ -19,25 +18,37 @@ and found the following solutions:
   1) Use the AWS index <sup>(<a href="https://github.com/rust-lang/rust/issues/56971#issuecomment-527199391">source</a>)</sup>
   2) Build from individual [release manifests](https://static.rust-lang.org/manifests.txt) <sup>(<a href="https://github.com/rust-lang/rust/issues/56971#issuecomment-527199391">source</a>)</sup>
   3) Parse Rust in-repo [RELEASES.md](https://raw.githubusercontent.com/rust-lang/rust/master/RELEASES.md)
+  4) (new) Query the [GitHub releases](https://api.github.com/repos/rust-lang/rust/releases) of the Rust repository
 
 Each of these options requires additional parsing, which is where this crate comes in: the `rust-releases` crate
-can obtain, parse and build an index from the above resources. This crate also provides methods to iterate over versions 
-in a _linear_ fashion, or by using a _bisect_ binary search strategy.
+can obtain and parse the above resources, and hand you the releases of the stable, beta and nightly channel.
 
-Each data source implements the [Source](https://docs.rs/rust-releases/latest/rust_releases/source/trait.Source.html) trait.  `Source` provides a `build` method, which can be used to
-build a catalog of released Rust versions.
+Each data source lives in its own crate, and can be enabled as a feature of `rust-releases`. Sources which obtain
+their data over the network provide a client with fetch methods for each channel they support. These methods return
+the set of released Rust versions of that channel.
+
+NB: Some sources can have some missing or incorrect data points. This can in some instances be fixed by merging
+two or more data sources (although you may want to consider a more accurate source, if your application needs it).
+For example, the `rust-releases-github` source has some incorrect release dates for early Rust versions, because
+the GitHub releases were created on a much later date, and the client of `rust-releases-github` has no way (without
+combining with other data sources) to get the actual release date, so it takes the release date from the GitHub release,
+which are thus incorrect for the first few because they were created in a batch once the Rust project started using
+the GitHub releases feature (it may even have not been available in 2015 when Rust 1.0.0 was released, not sure anymore).
 
 ## Implemented options
 
 **Which data source should I use?**
 
-Since support for the beta and nightly channels is work-in-progress, I would advise to use the `RustChangelog` data source as it's
-a small download, immediately up-to-date on release and fast to parse. It only supports stable channel releases.
+If you only need stable releases, I would advise to use the `RustChangelog` data source as it's a small download,
+immediately up-to-date on release and fast to parse. `GithubReleases` is an alternative for stable releases, which
+queries the GitHub releases API of the `rust-lang/rust` repository.
 
-Alternatively, the `RustDist` data source can be useful, especially when support for the beta and nightly channel are added.
-They both get their input data from the Rust AWS S3 distribution bucket. When using `RustDist`, the input data can be obtained
-with the `FetchResources` trait implementation. For `RustDistWithCLI`, you have to obtain the input data yourself (by running the
-`aws` cli with the following options `aws --no-sign-request s3 ls static-rust-lang-org/dist/ > dist.txt`<sup>(<a href="https://github.com/rust-lang/rust/issues/56971#issuecomment-527199391">source</a>)</sup>).
+For the beta and nightly channels (it also has stable of course), use the `RustDist` data source. It enumerates the
+Rust AWS S3 distribution bucket, and can additionally provide the details of a release from its channel manifest.
+
+If you rather not do any network requests at all, the `BundledReleases` data source ships the releases of the stable,
+beta and nightly channel as generated Rust code. It's generated using `RustDist`, and since its bundled, it's only
+up-to-date up to the moment it was generated.
 
 ## Applications
 

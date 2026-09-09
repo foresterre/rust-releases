@@ -1,0 +1,48 @@
+name: "ci-bundled-data"
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '00 07 * * *'
+jobs:
+  bundled-data:
+    name: bundled-data
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: checkout_repository
+        uses: actions/checkout@v7
+
+      - name: install_rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: regenerate_bundled_data
+        run: cargo run --release -p rust-releases-bundled-generator
+
+      - name: detect_changes
+        id: detect_changes
+        run: |
+          if git diff --quiet -- crates/rust-releases-bundled/src/generated; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: test_bundled_data
+        if: steps.detect_changes.outputs.changed == 'true'
+        run: cargo test -p rust-releases-bundled --all-features
+
+      - name: create_pull_request
+        if: steps.detect_changes.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: bundled-data
+          delete-branch: true
+          add-paths: crates/rust-releases-bundled/src/generated
+          commit-message: "Update the release data bundled by rust-releases-bundled"
+          title: "Update the release data bundled by rust-releases-bundled"
+          body: |
+            New Rust releases were published since the bundled release data was generated.
+
+            Publish a new version of the crate with `just publish-bundled patch`.

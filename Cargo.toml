@@ -64,10 +64,10 @@ rust-releases-core = { workspace = true }
 rust-releases-io = { workspace = true, optional = true }
 
 # sources
-rust-releases-bundled = { version = "^0.1.0", path = "crates/rust-releases-bundled", optional = true }
-rust-releases-github = { version = "^0.33.0", path = "crates/rust-releases-github", optional = true }
-rust-releases-rust-changelog = { version = "^0.33.0", path = "crates/rust-releases-rust-changelog", optional = true }
-rust-releases-rust-dist = { version = "^0.33.0", path = "crates/rust-releases-rust-dist", optional = true }
+rust-releases-bundled = { workspace = true, optional = true }
+rust-releases-github = { workspace = true, optional = true }
+rust-releases-rust-changelog = { workspace = true, optional = true }
+rust-releases-rust-dist = { workspace = true, optional = true }
 
 [dev-dependencies]
 yare = { workspace = true }
@@ -92,4 +92,6 @@ rust-releases-core = { version = "^0.33.0", path = "crates/rust-releases-core" }
 rust-releases-io = { version = "^0.33.0", path = "crates/rust-releases-io" }
 
 rust-releases-bundled = { version = "^0.1.0", path = "crates/rust-releases-bundled", features = ["stable", "beta", "nightly"] }
+rust-releases-github = { version = "^0.33.0", path = "crates/rust-releases-github" }
+rust-releases-rust-changelog = { version = "^0.33.0", path = "crates/rust-releases-rust-changelog" }
 rust-releases-rust-dist = { version = "^0.33.0", path = "crates/rust-releases-rust-dist" }

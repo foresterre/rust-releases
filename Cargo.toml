@@ -90,3 +90,6 @@ rust-release = { version = "2.0.0", path = "crates/rust-release" }
 rust-toolchain = { version = "2.0.0", path = "crates/rust-toolchain" }
 rust-releases-core = { version = "^0.33.0", path = "crates/rust-releases-core" }
 rust-releases-io = { version = "^0.33.0", path = "crates/rust-releases-io" }
+
+rust-releases-bundled = { version = "^0.1.0", path = "crates/rust-releases-bundled", features = ["stable", "beta", "nightly"] }
+rust-releases-rust-dist = { version = "^0.33.0", path = "crates/rust-releases-rust-dist" }

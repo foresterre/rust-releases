@@ -11,10 +11,8 @@ rust-version = "1.94.1"
 
 [dependencies]
 rust-releases-core = { workspace = true }
-rust-releases-io = { workspace = true, features = ["ureq"] }
-rust-releases-rust-changelog = { version = "^0.33.0", path = "../rust-releases-rust-changelog" }
-rust-releases-rust-dist = { version = "^0.33.0", path = "../rust-releases-rust-dist" }
-rust-releases-bundled = { version = "^0.1.0", path = "../rust-releases-bundled", features = ["stable", "beta", "nightly"] }
+rust-releases-rust-dist = { workspace = true }
+rust-releases-bundled = { workspace = true }
 thiserror = { workspace = true }
 time = "0.3.47"
 

@@ -3,20 +3,15 @@
 
 mod error;
 mod r#gen;
-mod stable;
 
 use crate::error::GeneratorError;
-use crate::stable::Dist;
 use rust_releases_bundled::BundledReleases;
 use rust_releases_core::rust_release::date::Date;
-use rust_releases_core::{BetaReleases, NightlyReleases};
-use rust_releases_io::{HttpClient, UreqTransport};
-use rust_releases_rust_changelog::{RUST_CHANGELOG_URL, RustChangelog};
-use rust_releases_rust_dist::{Detail, RustDist};
+use rust_releases_core::{BetaReleases, NightlyReleases, StableReleases};
+use rust_releases_rust_dist::{BlockingAwsDistClient, CachedDistClient, Detail, RustDist};
 use std::path::{Path, PathBuf};
-use std::time::Duration;
 
-const TIMEOUT: Duration = Duration::from_secs(120);
+type Dist = RustDist<CachedDistClient<BlockingAwsDistClient>>;
 
 fn main() -> std::process::ExitCode {
     match run() {
@@ -38,26 +33,11 @@ fn main() -> std::process::ExitCode {
 fn run() -> Result<(), GeneratorError> {
     let generated = generated_dir();
     let bundled = BundledReleases::new();
-    let client = HttpClient::new(UreqTransport::new()).with_timeout(TIMEOUT);
 
     eprintln!("listing the Rust distribution bucket");
     let dist = RustDist::new_aws_cached_client().map_err(GeneratorError::DistSetup)?;
-    let index = dist
-        .stable()
-        .fetch()
-        .map_err(|source| dist_error("stable", source))?;
 
-    eprintln!("fetching {RUST_CHANGELOG_URL}");
-    let changelog =
-        RustChangelog::new(client)
-            .fetch()
-            .map_err(|source| GeneratorError::Changelog {
-                url: RUST_CHANGELOG_URL.to_string(),
-                source,
-            })?;
-
-    let stable = stable::releases(&index, &changelog, &bundled.stable(), &dist)?;
-
+    let stable = stable_releases(&dist, &bundled)?;
     let beta = beta_releases(&dist, &bundled)?;
     let nightly = nightly_releases(&dist, &bundled)?;
 
@@ -84,10 +64,35 @@ fn run() -> Result<(), GeneratorError> {
     Ok(())
 }
 
-// The beta releases which name their version. The distribution names them without a release date,
-// so the date of a release which is not bundled yet is read from its release manifest. The dates
-// which published a beta manifest without a version in its name are only known from the bundled
-// data.
+// The releases which predate the v2 release manifests are dated by the data which is already
+// bundled, and have no manifest to read thgat from. Every other release is extended from its own
+// manifest.
+fn stable_releases(
+    dist: &Dist,
+    bundled: &BundledReleases,
+) -> Result<StableReleases, GeneratorError> {
+    let published = dist
+        .stable()
+        .fetch()
+        .map_err(|source| dist_error("stable", source))?;
+
+    let (unmanifested, rest): (Vec<_>, Vec<_>) = bundled
+        .stable()
+        .merge(published)
+        .into_iter()
+        .partition(|release| release.release_date().is_some() && release.toolchains().is_empty());
+
+    let extended = dist
+        .stable()
+        .extend_all(rest.into_iter().collect(), Detail::all())
+        .map_err(|source| dist_error("stable", source))?;
+
+    Ok(extended.into_iter().chain(unmanifested).collect())
+}
+
+// The beta dist names them without a release date, so the date of a release which is not bundled
+// yet is read from its release manifest. The dates which published a beta manifest without a
+// version in its name are only known from the bundled data.
 fn beta_releases(dist: &Dist, bundled: &BundledReleases) -> Result<BetaReleases, GeneratorError> {
     let published = dist
         .beta()

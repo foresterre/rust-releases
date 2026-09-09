@@ -8,6 +8,10 @@ use rust_releases_core::NightlyReleases;
 #[cfg(feature = "stable")]
 use rust_releases_core::StableReleases;
 
+/// Offline Rust releases client, which bundles the stable, beta and nightly releases
+/// as generated Rust code.
+///
+/// Make sure to enable the right Cargo features.
 #[derive(Copy, Clone, Debug, Default, Eq, PartialEq)]
 pub struct BundledReleases;
 

@@ -3612,6 +3612,7 @@ pub fn releases() -> NightlyReleases {
     add(&mut releases, Date::new(2026, 9, 7));
     add(&mut releases, Date::new(2026, 9, 8));
     add(&mut releases, Date::new(2026, 9, 9));
+    add(&mut releases, Date::new(2026, 9, 10));
 
     releases
 }

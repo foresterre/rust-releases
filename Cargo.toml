@@ -72,6 +72,18 @@ rust-releases-rust-dist = { workspace = true, optional = true }
 [dev-dependencies]
 yare = { workspace = true }
 
+[[example]]
+name = "list-stable"
+required-features = ["bundled", "github", "rust-changelog", "rust-dist", "ureq"]
+
+[[example]]
+name = "list-beta"
+required-features = ["bundled-beta", "rust-dist"]
+
+[[example]]
+name = "list-nightly"
+required-features = ["bundled-nightly", "rust-dist"]
+
 [workspace.package]
 version = "0.33.0"
 authors = ["Martijn Gribnau <garm@ilumeo.com>"]

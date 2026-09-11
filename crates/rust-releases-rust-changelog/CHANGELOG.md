@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.34.0 - 2026-09-11
+
 ### Changed
 
 - Refactor to transport independent client (like rust-releases-github)

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.1.0 - 2026-09-11
+
 ### Added
 
 - Add crate which bundles the stable, beta and nightly releases of Rust as generated Rust code

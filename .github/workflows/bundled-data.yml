@@ -35,10 +35,8 @@ jobs:
         id: bump_patch_version
         if: steps.detect_changes.outputs.changed == 'true'
         run: |
-          version="$(cargo metadata --format-version 1 --no-deps | jq -r '.packages[] | select(.name == "rust-releases-bundled") | .version')"
-          next="$(echo "$version" | awk -F. '{ print $1 "." $2 "." $3 + 1 }')"
-          sed -i "s|^version = \"${version}\"$|version = \"${next}\"|" crates/rust-releases-bundled/Cargo.toml
-          echo "version=${next}" >> "$GITHUB_OUTPUT"
+          version="$(./.github/scripts/bump-version.py patch rust-releases-bundled)"
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
 
       - name: update_changelog
         if: steps.detect_changes.outputs.changed == 'true'
@@ -55,7 +53,7 @@ jobs:
         run: |
           git config user.name "foresterre[bot]"
           git config user.email "5955761+foresterre@users.noreply.github.com"
-          git add crates/rust-releases-bundled
+          git add Cargo.toml crates/rust-releases-bundled
           git commit -m "Release rust-releases-bundled v${{ steps.bump_patch_version.outputs.version }}"
           git push
 

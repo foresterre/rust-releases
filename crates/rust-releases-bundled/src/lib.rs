@@ -3,5 +3,6 @@
 
 mod generated;
 mod source;
+mod table;
 
 pub use crate::source::BundledReleases;

@@ -224,9 +224,8 @@ mod tests {
     use crate::merge::builder::MergeBuilder;
     use rust_release::{
         date::Date,
-        toolchain::{Channel, RustVersion, Target, Toolchain},
+        toolchain::{Channel, ComponentSet, RustVersion, Target, TargetSet, Toolchain},
     };
-    use std::collections::HashSet;
 
     fn make_release(v: impl Into<RustVersion>, d: Option<Date>) -> RustRelease<Stable> {
         let v = v.into();
@@ -244,8 +243,8 @@ mod tests {
             Channel::stable(v.into()),
             d,
             target,
-            HashSet::new(),
-            HashSet::new(),
+            ComponentSet::default(),
+            TargetSet::default(),
         )
     }
 

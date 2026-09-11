@@ -1,5 +1,4 @@
-use crate::{Channel, Component, Date, Target};
-use std::collections::HashSet;
+use crate::{Channel, ComponentSet, Date, Target, TargetSet};
 
 /// A Rust toolchain
 ///
@@ -15,8 +14,8 @@ pub struct Toolchain {
     date: Option<Date>,
     host: Target,
 
-    components: HashSet<Component>,
-    targets: HashSet<Target>,
+    components: ComponentSet,
+    targets: TargetSet,
 }
 
 impl Toolchain {
@@ -25,8 +24,8 @@ impl Toolchain {
         channel: Channel,
         date: Option<Date>,
         host: Target,
-        components: HashSet<Component>,
-        targets: HashSet<Target>,
+        components: ComponentSet,
+        targets: TargetSet,
     ) -> Self {
         Self {
             channel,
@@ -53,12 +52,12 @@ impl Toolchain {
     }
 
     /// The components associated with the toolchain
-    pub fn components(&self) -> &HashSet<Component> {
+    pub fn components(&self) -> &ComponentSet {
         &self.components
     }
 
     /// The targets associated with the toolchain
-    pub fn targets(&self) -> &HashSet<Target> {
+    pub fn targets(&self) -> &TargetSet {
         &self.targets
     }
 
@@ -78,12 +77,12 @@ impl Toolchain {
     }
 
     /// Update the associated toolchain components
-    pub fn set_components(&mut self, components: HashSet<Component>) {
+    pub fn set_components(&mut self, components: ComponentSet) {
         self.components = components;
     }
 
     /// Update the associated toolchain targets
-    pub fn set_targets(&mut self, targets: HashSet<Target>) {
+    pub fn set_targets(&mut self, targets: TargetSet) {
         self.targets = targets;
     }
 }
@@ -91,7 +90,8 @@ impl Toolchain {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::RustVersion;
+    use crate::{Component, RustVersion};
+    use std::ptr;
 
     #[test]
     fn create_toolchain() {
@@ -101,8 +101,8 @@ mod tests {
             channel,
             None,
             Target::host(),
-            HashSet::new(),
-            HashSet::new(),
+            ComponentSet::default(),
+            TargetSet::default(),
         );
 
         assert!(toolchain.channel().is_stable());
@@ -116,8 +116,8 @@ mod tests {
             channel,
             None,
             Target::host(),
-            HashSet::new(),
-            HashSet::new(),
+            ComponentSet::default(),
+            TargetSet::default(),
         );
 
         assert!(toolchain.channel().is_stable());
@@ -134,8 +134,8 @@ mod tests {
             channel,
             None,
             Target::host(),
-            HashSet::new(),
-            HashSet::new(),
+            ComponentSet::default(),
+            TargetSet::default(),
         );
 
         assert!(toolchain.date().is_none());
@@ -154,8 +154,8 @@ mod tests {
             channel,
             None,
             Target::host(),
-            HashSet::new(),
-            HashSet::new(),
+            ComponentSet::default(),
+            TargetSet::default(),
         );
 
         assert_eq!(toolchain.host(), &Target::host());
@@ -175,15 +175,15 @@ mod tests {
             channel,
             None,
             Target::host(),
-            HashSet::new(),
-            HashSet::new(),
+            ComponentSet::default(),
+            TargetSet::default(),
         );
 
         assert!(toolchain.components().is_empty());
 
-        let mut set = HashSet::new();
-        set.insert(Component::new("hello"));
-        set.insert(Component::new("world"));
+        let set = [Component::new("hello"), Component::new("world")]
+            .into_iter()
+            .collect::<ComponentSet>();
 
         let expected = set.clone();
 
@@ -199,19 +199,42 @@ mod tests {
             channel,
             None,
             Target::host(),
-            HashSet::new(),
-            HashSet::new(),
+            ComponentSet::default(),
+            TargetSet::default(),
         );
 
         assert!(toolchain.targets().is_empty());
 
-        let mut set = HashSet::new();
-        set.insert(Target::from_target_triple_or_unknown("hello"));
+        let set = [Target::from_target_triple_or_unknown("hello")]
+            .into_iter()
+            .collect::<TargetSet>();
 
         let expected = set.clone();
 
         toolchain.set_targets(set);
 
         assert_eq!(toolchain.targets(), &expected);
+    }
+
+    #[test]
+    fn a_clone_shares_the_components_and_targets_of_the_toolchain_it_was_cloned_from() {
+        let toolchain = Toolchain::new(
+            Channel::stable(RustVersion::new(1, 2, 3)),
+            None,
+            Target::host(),
+            [Component::new("cargo")].into_iter().collect(),
+            [Target::host()].into_iter().collect(),
+        );
+
+        let clone = toolchain.clone();
+
+        assert!(ptr::eq(
+            toolchain.components().as_slice(),
+            clone.components().as_slice()
+        ));
+        assert!(ptr::eq(
+            toolchain.targets().as_slice(),
+            clone.targets().as_slice()
+        ));
     }
 }

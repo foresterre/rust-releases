@@ -106,16 +106,17 @@ mod tests {
     use super::*;
     use rust_releases_core::Stable;
     use rust_releases_core::rust_release::date::Date;
-    use rust_releases_core::rust_release::toolchain::{Channel, Target, Toolchain};
-    use std::collections::HashSet;
+    use rust_releases_core::rust_release::toolchain::{
+        Channel, ComponentSet, Target, TargetSet, Toolchain,
+    };
 
     fn toolchain() -> Toolchain {
         Toolchain::new(
             Channel::Stable(Stable::new(1, 53, 0)),
             None,
             Target::from_target_triple_or_unknown("x86_64-apple-darwin"),
-            HashSet::new(),
-            HashSet::new(),
+            ComponentSet::default(),
+            TargetSet::default(),
         )
     }
 

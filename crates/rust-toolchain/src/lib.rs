@@ -36,8 +36,8 @@ mod toolchain;
 mod version;
 
 pub use channel::Channel;
-pub use component::Component;
+pub use component::{Component, ComponentSet};
 pub use date::Date;
-pub use target::Target;
+pub use target::{Target, TargetSet};
 pub use toolchain::Toolchain;
 pub use version::RustVersion;

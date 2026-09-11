@@ -10,7 +10,8 @@ fn the_bundled_data_states_when_it_was_generated() {
 mod stable {
     use super::*;
     use rust_releases_core::Stable;
-    use rust_releases_core::rust_release::toolchain::Channel;
+    use rust_releases_core::rust_release::toolchain::{Channel, Target};
+    use std::ptr;
 
     #[test]
     fn the_bundled_stable_releases() {
@@ -84,14 +85,74 @@ mod stable {
     }
 
     #[test]
-    fn the_toolchains_of_a_stable_release_have_no_components_and_no_targets() {
+    fn the_toolchains_of_a_stable_release_state_their_components_and_targets() {
         let releases = BundledReleases::new().stable();
 
         assert!(releases.iter().all(|release| {
             release.toolchains_iter().all(|toolchain| {
-                toolchain.components().is_empty() && toolchain.targets().is_empty()
+                !toolchain.components().is_empty() && !toolchain.targets().is_empty()
             })
         }));
+    }
+
+    #[test]
+    fn a_toolchain_targets_its_own_host() {
+        let releases = BundledReleases::new().stable();
+
+        assert!(releases.iter().all(|release| {
+            release
+                .toolchains_iter()
+                .all(|toolchain| toolchain.targets().contains(toolchain.host()))
+        }));
+    }
+
+    #[test]
+    fn the_components_and_targets_of_a_bundled_toolchain() {
+        let releases = BundledReleases::new().stable();
+
+        let release = releases
+            .iter()
+            .find(|r| r.version() == &Stable::new(1, 8, 0))
+            .unwrap();
+
+        let host = Target::from_target_triple_or_unknown("x86_64-unknown-linux-gnu");
+        let toolchain = release
+            .toolchains_iter()
+            .find(|toolchain| toolchain.host() == &host)
+            .unwrap();
+
+        let components = toolchain
+            .components()
+            .iter()
+            .map(|component| component.name())
+            .collect::<Vec<_>>();
+
+        assert_eq!(components, ["cargo", "rust-docs", "rust-std", "rustc"]);
+        assert_eq!(toolchain.targets().len(), 31);
+        assert!(toolchain.targets().contains(&host));
+    }
+
+    // What the bundled data is interned for: a set which is shipped by many toolchains is bundled,
+    // and held in memory, once.
+    #[test]
+    fn toolchains_which_ship_the_same_targets_share_a_single_set() {
+        let releases = BundledReleases::new().stable();
+
+        let release = releases
+            .iter()
+            .find(|r| r.version() == &Stable::new(1, 85, 0))
+            .unwrap();
+
+        let mut toolchains = release.toolchains_iter();
+        let first = toolchains.next().unwrap();
+        let shared = toolchains
+            .find(|toolchain| toolchain.targets() == first.targets())
+            .expect("a release ships the same targets from more than one host");
+
+        assert!(ptr::eq(
+            first.targets().as_slice(),
+            shared.targets().as_slice()
+        ));
     }
 
     #[test]

@@ -3,6 +3,7 @@
 
 mod error;
 mod r#gen;
+mod tables;
 
 use crate::error::GeneratorError;
 use rust_releases_bundled::BundledReleases;
@@ -82,9 +83,15 @@ fn stable_releases(
         .into_iter()
         .partition(|release| release.release_date().is_some() && release.toolchains().is_empty());
 
+    // prevent appending
+    let rest = rest
+        .into_iter()
+        .collect::<StableReleases>()
+        .map_toolchains(|_| Vec::new());
+
     let extended = dist
         .stable()
-        .extend_all(rest.into_iter().collect(), Detail::all())
+        .extend_all(rest, Detail::all())
         .map_err(|source| dist_error("stable", source))?;
 
     Ok(extended.into_iter().chain(unmanifested).collect())

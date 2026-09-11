@@ -53,7 +53,7 @@ jobs:
       - name: checkout_repository
         uses: actions/checkout@v7
 
-      - name: add_release_headers
+      - name: update_changelog
         run: ./.github/scripts/release-changelog.py
 
       - name: commit_changelogs

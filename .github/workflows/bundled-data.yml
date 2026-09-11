@@ -43,7 +43,7 @@ jobs:
       - name: update_changelog
         if: steps.detect_changes.outputs.changed == 'true'
         run: |
-          sed -i "s|^## Unreleased$|&\n\n### Changed\n\n- Updated the bundled release data|" crates/rust-releases-bundled/CHANGELOG.md
+          ./.github/scripts/add-changelog-entry.py crates/rust-releases-bundled/CHANGELOG.md Changed "Updated the bundled release data"
           ./.github/scripts/release-changelog.py rust-releases-bundled
 
       - name: test_bundled_data

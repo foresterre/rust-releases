@@ -64,3 +64,12 @@ jobs:
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
         run: cargo publish -p rust-releases-bundled
+
+      - name: tag_bundled_data
+        if: steps.detect_changes.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api "repos/${{ github.repository }}/git/refs" \
+            -f ref="refs/tags/rust-releases-bundled-v${{ steps.bump_patch_version.outputs.version }}" \
+            -f sha="$(git rev-parse HEAD)"

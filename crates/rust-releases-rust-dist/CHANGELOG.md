@@ -6,6 +6,8 @@
 
 ## 0.34.0 - 2026-09-11
 
+## 0.34.0 - 2026-09-11
+
 ### Added
 
 - Add fetching og the beta and nightly release channels

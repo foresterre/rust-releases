@@ -6,6 +6,8 @@
 
 ## 0.34.0 - 2026-09-11
 
+## 0.34.0 - 2026-09-11
+
 ### Added
 
 - Added convenience function `empty` to instantiate an empty `StableReleases`, `BetaReleases`, `NightlyReleases` instance with a context `C = ()`

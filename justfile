@@ -46,6 +46,14 @@ deny:
 bundle-releases:
     cargo run --release -p rust-releases-bundled-generator
 
+# bump the workspace version, and the workspace dependencies
+bump version:
+    ./.github/scripts/bump-version.py {{ version }}
+
+# bump a separately versioned crate, e.g. `just bump-crate rust-toolchain 3.1.0`
+bump-crate package version:
+    ./.github/scripts/bump-version.py {{ version }} {{ package }}
+
 cargo_publish_args := "--locked"
 
 # publish every publishable workspace package, in dependency order

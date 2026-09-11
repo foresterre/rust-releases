@@ -1,10 +1,8 @@
 # Changelog
 
-## [Unreleased]
+## Unreleased
 
-[Unreleased]: https://github.com/foresterre/rust-releases
-
-## [0.33.0] - 2026-03-25
+## 0.33.0 - 2026-03-25
 
 ### Changed
 
@@ -15,18 +13,14 @@
 - Updated `aws-sdk-s3` (fixes various security vulnerabilities)
 - Updated `ureq` (fixes various security vulnerabilities)
 
-[0.33.0]: https://github.com/foresterre/rust-releases/releases/tag/v0.33.0
-
-## [0.32.0] - 2026-03-25
+## 0.32.0 - 2026-03-25
 
 ### Fixed
 
 - Updated `aws-sdk-s3` (fixes various security vulnerabilities)
 - Updated `ureq` (fixes various security vulnerabilities)
 
-[0.32.0]: https://github.com/foresterre/rust-releases/releases/tag/v0.32.0
-
-## [0.31.0] - 2026-03-06
+## 0.31.0 - 2026-03-06
 
 ### Changed
 
@@ -45,9 +39,7 @@
 * **rust-releases-rust-dist** Resolved security advisory `GHSA-hfpc-8r3f-gw53`, `GHSA-vw5v-4f2q-w9xf` and
   `GHSA-65p9-r9h6-22vj` related to `aws-lc`, `aws-lc-fips` and `aws-lc-sys`
 
-[0.31.0]: https://github.com/foresterre/rust-releases/releases/tag/v0.31.0
-
-## [0.30.0] - 2025-03-12
+## 0.30.0 - 2025-03-12
 
 ### Changed
 
@@ -65,9 +57,7 @@
 * **rust-releases-rust-dist** Updated `aws-config` to `1.6.0` (resolves RUSTSEC-2025-0009)
 * **rust-releases-rust-dist** Updated `aws-sdk-s3` to `1.79.0` (resolves RUSTSEC-2025-0009)
 
-[0.30.0]: https://github.com/foresterre/rust-releases/releases/tag/v0.30.0
-
-## [0.29.0] - 2024-11-29
+## 0.29.0 - 2024-11-29
 
 ### Changed
 
@@ -75,9 +65,7 @@
 * **rust-releases** MSRV is now 1.78
 * **rust-releases-rust-dist** MSRV is now 1.78
 
-[0.29.0]: https://github.com/foresterre/rust-releases/releases/tag/v0.29.0
-
-## [0.28.0] - 2024-01-24
+## 0.28.0 - 2024-01-24
 
 ### Removed
 
@@ -89,9 +77,7 @@
 * **rust-releases-rust-dist** Updated `aws-config` to `1.1.3`
 * **rust-releases-rust-dist** Updated `aws-sdk-s3` to `1.13.0`
 
-[0.28.0]: https://github.com/foresterre/rust-releases/releases/tag/v0.28.0
-
-## [0.26.0] - 2023-03-29
+## 0.26.0 - 2023-03-29
 
 ### Changed
 
@@ -106,9 +92,7 @@
 * **rust-releases-rust-dist** Updated `aws-sdk-s3` to `0.25.0`.
 * **rust-releases-rust-dist** Updated `aws-sig-auth` to `0.55.0`.
 
-[0.26.0]: https://github.com/foresterre/rust-releases/releases/tag/v0.26.0
-
-## [0.25.0] - 2023-03-29
+## 0.25.0 - 2023-03-29
 
 ### Changed
 
@@ -123,9 +107,7 @@
 * **rust-releases-rust-dist** Removed `aws-smithy-client`
 * **rust-releases-rust-dist** Removed `aws-smithy-http`
 
-[0.25.0]: https://github.com/foresterre/rust-releases/releases/tag/v0.25.0
-
-## [0.24.0] - 2023-03-19
+## 0.24.0 - 2023-03-19
 
 ### Added
 
@@ -138,9 +120,7 @@
   prior,
   and instead would return an error _"No such file or directory (os error 2)"_.
 
-[0.24.0]: https://github.com/foresterre/rust-releases/releases/tag/v0.24.0
-
-## ~~[0.23.0]~~* - 2023-03-15
+## ~~0.23.0~~* - 2023-03-15
 
 _* yanked on 2023-03-19, because **rust-releases-io** contained a bug where
 the `CachedClient` could not create its cache location, if it didn't exist yet._
@@ -165,5 +145,3 @@ the `CachedClient` could not create its cache location, if it didn't exist yet._
 
 * **rust-releases-io** Removed `download_if_not_stale`
 * **rust-releases-io** Removed `IoError`
-
-[0.23.0]: https://github.com/foresterre/rust-releases/releases/tag/v0.23.0

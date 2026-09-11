@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: publish
@@ -52,6 +52,8 @@ jobs:
     steps:
       - name: checkout_repository
         uses: actions/checkout@v7
+        with:
+          token: ${{ secrets.RELEASE_TOKEN }}
 
       - name: update_changelog
         run: ./.github/scripts/release-changelog.py
@@ -74,6 +76,7 @@ jobs:
       - version
       - changelog
     runs-on: ubuntu-latest
+    environment: crates-io
     steps:
       - name: checkout_repository
         uses: actions/checkout@v7
@@ -95,6 +98,8 @@ jobs:
       - changelog
       - publish
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: checkout_repository
         uses: actions/checkout@v7

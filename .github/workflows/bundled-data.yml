@@ -10,11 +10,14 @@ jobs:
   bundled-data:
     name: bundled-data
     runs-on: ubuntu-latest
+    environment: crates-io
     permissions:
       contents: write
     steps:
       - name: checkout_repository
         uses: actions/checkout@v7
+        with:
+          token: ${{ secrets.RELEASE_TOKEN }}
 
       - name: install_rust
         uses: dtolnay/rust-toolchain@stable

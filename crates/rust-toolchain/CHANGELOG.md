@@ -4,6 +4,8 @@
 
 ## 3.0.0 - 2026-09-11
 
+## 3.0.0 - 2026-09-11
+
 ### Added
 
 - Added `new` constructors for `Beta` and `Nightly`

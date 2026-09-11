@@ -56,7 +56,7 @@ jobs:
           git config user.name "foresterre[bot]"
           git config user.email "5955761+foresterre@users.noreply.github.com"
           git add crates/rust-releases-bundled
-          git commit -m "Release rust-releases-bundled v${{ steps.bump_patch_version.outputs.version }} with updated release data"
+          git commit -m "Release rust-releases-bundled v${{ steps.bump_patch_version.outputs.version }}"
           git push
 
       - name: publish_bundled_data

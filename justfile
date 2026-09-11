@@ -56,9 +56,9 @@ bump-crate package version:
 
 cargo_publish_args := "--locked"
 
-# publish every publishable workspace package, in dependency order
+# publish the workspace packages which are not on crates.io yet, in dependency order
 publish-workspace:
-    cargo publish --workspace {{ cargo_publish_args }}
+    ./.github/scripts/publish-packages.py {{ cargo_publish_args }}
 
 # publish 'rust-releases-core'
 publish-core:

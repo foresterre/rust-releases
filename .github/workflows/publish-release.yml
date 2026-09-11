@@ -89,7 +89,7 @@ jobs:
       - name: publish_workspace
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-        run: cargo publish --workspace
+        run: ./.github/scripts/publish-packages.py
 
   release:
     name: release

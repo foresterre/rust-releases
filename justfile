@@ -6,17 +6,14 @@ default:
 install-development-tools:
     cargo install cargo-msrv
 
-# install tools needed to run publish recipes
-install-publish-tools:
-    cargo install cargo-release
-
 # determine the Minimum Supported Rust Version
 msrv-find:
     cargo msrv find --min 1.85 --output-format json -- cargo check -p rust-release --all-features
-    cargo msrv find --min 1.85 --output-format json -- cargo check -p rust-releases-core --all-features
-    cargo msrv find --min 1.85 --output-format json -- cargo check -p rust-releases-io --all-features
     cargo msrv find --min 1.85 --output-format json -- cargo check -p rust-releases-bundled --all-features
+    cargo msrv find --min 1.85 --output-format json -- cargo check -p rust-releases-bundled-generator --all-features
+    cargo msrv find --min 1.85 --output-format json -- cargo check -p rust-releases-core --all-features
     cargo msrv find --min 1.85 --output-format json -- cargo check -p rust-releases-github --all-features
+    cargo msrv find --min 1.85 --output-format json -- cargo check -p rust-releases-io --all-features
     cargo msrv find --min 1.85 --output-format json -- cargo check -p rust-releases-rust-changelog --all-features
     cargo msrv find --min 1.85 --output-format json -- cargo check -p rust-releases-rust-dist --all-features
     cargo msrv find --min 1.85 --output-format json -- cargo check -p rust-toolchain --all-features
@@ -24,10 +21,11 @@ msrv-find:
 # verify the Minimum Supported Rust Version
 msrv-verify:
     cargo msrv verify --output-format json -- cargo check -p rust-release --all-features
-    cargo msrv verify --output-format json -- cargo check -p rust-releases-core --all-features
-    cargo msrv verify --output-format json -- cargo check -p rust-releases-io --all-features
     cargo msrv verify --output-format json -- cargo check -p rust-releases-bundled --all-features
+    cargo msrv verify --output-format json -- cargo check -p rust-releases-bundled-generator --all-features
+    cargo msrv verify --output-format json -- cargo check -p rust-releases-core --all-features
     cargo msrv verify --output-format json -- cargo check -p rust-releases-github --all-features
+    cargo msrv verify --output-format json -- cargo check -p rust-releases-io --all-features
     cargo msrv verify --output-format json -- cargo check -p rust-releases-rust-changelog --all-features
     cargo msrv verify --output-format json -- cargo check -p rust-releases-rust-dist --all-features
     cargo msrv verify --output-format json -- cargo check -p rust-toolchain --all-features
@@ -44,53 +42,56 @@ test:
 deny:
     cargo deny --all-features check
 
-cargo_release_args := "--dependent-version upgrade  --execute --no-tag --no-push --no-verify"
-
-# publish the rust-releases* workspace, excludes rust-release and rust-toolchain which are to be released separately
-publish-workspace version:
-    just publish-core {{ version }}
-    just publish-io {{ version }}
-    just publish-github {{ version }}
-    just publish-rust-changelog {{ version }}
-    just publish-rust-dist {{ version }}
-    just publish-top {{ version }}
-
-# publish 'rust-releases-core'
-publish-core version:
-    cargo release -p rust-releases-core {{ cargo_release_args }} {{ version }}
-
-# publish 'rust-releases-io'
-publish-io version:
-    cargo release -p rust-releases-io {{ cargo_release_args }} {{ version }}
-
-# publish 'rust-releases-github'
-publish-github version:
-    cargo release -p rust-releases-github {{ cargo_release_args }} {{ version }}
-
-# publish 'rust-releases-rust-changelog'
-publish-rust-changelog version:
-    cargo release -p rust-releases-rust-changelog {{ cargo_release_args }} {{ version }}
-
-# publish 'rust-releases-rust-dist'
-publish-rust-dist version:
-    cargo release -p rust-releases-rust-dist {{ cargo_release_args }} {{ version }}
-
-# publish 'rust-releases'
-publish-top version:
-    cargo release -p rust-releases {{ cargo_release_args }} {{ version }}
-
 # regenerate the release data bundled by 'rust-releases-bundled'
 bundle-releases:
     cargo run --release -p rust-releases-bundled-generator
 
-# publish 'rust-releases-bundled' (not included in 'publish-workspace')
-publish-bundled version:
-    cargo release -p rust-releases-bundled {{ cargo_release_args }} {{ version }}
+# bump the workspace version, and the workspace dependencies
+bump version:
+    ./.github/scripts/bump-version.py {{ version }}
 
-# publish 'rust-release' (not included in 'publish-workspace')
-publish-rust-release version:
-    cargo release -p rust-release {{ cargo_release_args }} {{ version }}
+# bump a separately versioned crate, e.g. `just bump-crate rust-toolchain 3.1.0`
+bump-crate package version:
+    ./.github/scripts/bump-version.py {{ version }} {{ package }}
 
-# publish 'rust-toolchain' (not included in 'publish-workspace')
-publish-rust-toolchain version:
-    cargo release -p rust-toolchain {{ cargo_release_args }} {{ version }}
+cargo_publish_args := "--locked"
+
+# publish every publishable workspace package, in dependency order
+publish-workspace:
+    cargo publish --workspace {{ cargo_publish_args }}
+
+# publish 'rust-releases-core'
+publish-core:
+    cargo publish -p rust-releases-core {{ cargo_publish_args }}
+
+# publish 'rust-releases-io'
+publish-io:
+    cargo publish -p rust-releases-io {{ cargo_publish_args }}
+
+# publish 'rust-releases-github'
+publish-github:
+    cargo publish -p rust-releases-github {{ cargo_publish_args }}
+
+# publish 'rust-releases-rust-changelog'
+publish-rust-changelog:
+    cargo publish -p rust-releases-rust-changelog {{ cargo_publish_args }}
+
+# publish 'rust-releases-rust-dist'
+publish-rust-dist:
+    cargo publish -p rust-releases-rust-dist {{ cargo_publish_args }}
+
+# publish 'rust-releases'
+publish-top:
+    cargo publish -p rust-releases {{ cargo_publish_args }}
+
+# publish 'rust-releases-bundled'
+publish-bundled:
+    cargo publish -p rust-releases-bundled {{ cargo_publish_args }}
+
+# publish 'rust-release'
+publish-rust-release:
+    cargo publish -p rust-release {{ cargo_publish_args }}
+
+# publish 'rust-toolchain'
+publish-rust-toolchain:
+    cargo publish -p rust-toolchain {{ cargo_publish_args }}

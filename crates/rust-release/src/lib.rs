@@ -28,7 +28,9 @@ pub mod date {
 }
 /// Describes toolchains in so far they're relevant to a release
 pub mod toolchain {
-    pub use rust_toolchain::{Channel, Component, RustVersion, Target, Toolchain};
+    pub use rust_toolchain::{
+        Channel, Component, ComponentSet, RustVersion, Target, TargetSet, Toolchain,
+    };
 }
 
 /// Describes the version of a release
@@ -204,7 +206,7 @@ mod tests {
     use super::*;
     use crate::toolchain::Toolchain;
     use rust_toolchain::RustVersion;
-    use std::collections::HashSet;
+    use rust_toolchain::{ComponentSet, TargetSet};
 
     // Create a fake toolchain model
     fn fake_tc(stable: Stable, date: Option<rust_toolchain::Date>) -> Toolchain {
@@ -212,8 +214,8 @@ mod tests {
             rust_toolchain::Channel::Stable(stable),
             date,
             rust_toolchain::Target::host(),
-            HashSet::new(),
-            HashSet::new(),
+            ComponentSet::default(),
+            TargetSet::default(),
         )
     }
 

@@ -6,10 +6,13 @@ pub use crate::manifest::detail::Detail;
 use crate::date;
 use rust_releases_core::RustRelease;
 use rust_releases_core::rust_release::date::Date;
-use rust_releases_core::rust_release::toolchain::{Channel, Component, Target, Toolchain};
+use rust_releases_core::rust_release::toolchain::{
+    Channel, Component, ComponentSet, Target, TargetSet, Toolchain,
+};
 use serde::Deserialize;
-use std::collections::{BTreeMap, HashSet};
+use std::collections::BTreeMap;
 use std::fmt::Debug;
+use std::iter;
 
 const RUST_PACKAGE: &str = "rust";
 
@@ -106,16 +109,15 @@ fn toolchain(channel: &Channel, date: &Date, host: &str, target: &PackageTarget)
 
     let components = packages()
         .map(|package| Component::new(package.pkg.clone()))
-        .collect::<HashSet<_>>();
+        .collect::<ComponentSet>();
 
     let host = Target::from_target_triple_or_unknown(host);
 
-    let mut targets = packages()
+    let targets = packages()
         .filter(|package| package.pkg == RUST_STD_PACKAGE && package.target != ANY_TARGET)
         .map(|package| Target::from_target_triple_or_unknown(&package.target))
-        .collect::<HashSet<_>>();
-
-    targets.insert(host.clone());
+        .chain(iter::once(host.clone()))
+        .collect::<TargetSet>();
 
     Toolchain::new(
         channel.clone(),

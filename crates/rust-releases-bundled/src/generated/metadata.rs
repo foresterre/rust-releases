@@ -3,5 +3,5 @@
 use rust_releases_core::rust_release::date::Date;
 
 pub fn generated_on() -> Date {
-    Date::new(2026, 9, 11)
+    Date::new(2026, 9, 12)
 }

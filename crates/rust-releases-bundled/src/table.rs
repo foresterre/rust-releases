@@ -75,9 +75,11 @@ impl Bundle {
 /// # Bundled release data (approximate generated file sizes)
 ///
 /// Crates.io has a 10MB limit [1] per crate. This isn't a problem yet, because we currently don't
-/// bundle all toolchain and component data for beta and nightly releases, and only in a limitted fashion
-/// for stable (we only bundle the host target currently), but this is something I want to do.
-/// To make it possible, without splitting this crate into multiple crates, I have decided to intern
+/// bundle all toolchain and component data for beta and nightly releases. For stable we do bundle
+/// the host, the targets and the components of every release which published a release manifest
+/// (1.8.0 and up); the releases before it only have a release date, because their artifacts are all
+/// the distribution names them by. Bundling the beta and nightly toolchains is something I want to
+/// do. To make it possible, without splitting this crate into multiple crates, I have decided to intern
 /// certain repeating values (compression would probably also have worked, but I wasn't willing to
 /// include a compressor and decompressor inside the crate :P).
 ///

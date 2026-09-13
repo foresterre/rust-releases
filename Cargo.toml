@@ -103,7 +103,7 @@ rust-toolchain = { version = "3.0.0", path = "crates/rust-toolchain" }
 rust-releases-core = { version = "^0.34.0", path = "crates/rust-releases-core" }
 rust-releases-io = { version = "^0.34.0", path = "crates/rust-releases-io" }
 
-rust-releases-bundled = { version = "^0.1.2", path = "crates/rust-releases-bundled", features = ["stable", "beta", "nightly"] }
+rust-releases-bundled = { version = "^0.1.3", path = "crates/rust-releases-bundled", features = ["stable", "beta", "nightly"] }
 rust-releases-github = { version = "^0.34.0", path = "crates/rust-releases-github" }
 rust-releases-rust-changelog = { version = "^0.34.0", path = "crates/rust-releases-rust-changelog" }
 rust-releases-rust-dist = { version = "^0.34.0", path = "crates/rust-releases-rust-dist" }

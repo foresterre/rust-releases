@@ -42,6 +42,13 @@ pub(in crate::releases) mod impls {
             self.releases.insert(release);
         }
 
+        /// Add release to the collection
+        pub fn add_all(&mut self, releases: impl Iterator<Item = RustRelease<V, C>>) {
+            for release in releases {
+                self.add(release);
+            }
+        }
+
         /// Returns the amount of releases
         pub fn len(&self) -> usize {
             self.releases.len()

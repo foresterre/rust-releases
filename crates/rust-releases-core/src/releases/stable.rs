@@ -20,6 +20,11 @@ impl<C> StableReleases<C> {
         self.0.add(release);
     }
 
+    /// Add all stable releases
+    pub fn add_all(&mut self, releases: impl Iterator<Item = RustRelease<Stable, C>>) {
+        self.0.add_all(releases);
+    }
+
     /// Get the number of releases
     pub fn len(&self) -> usize {
         self.0.len()
@@ -412,5 +417,22 @@ mod tests {
 
         let out = modified.iter().next().unwrap();
         assert_eq!(out.version().version, RustVersion::new(9, 9, 9));
+    }
+
+    #[test]
+    fn add_all() {
+        let mut releases = StableReleases::<()>::default();
+        let iter = [make_release((1, 2, 3), None), make_release((4, 5, 6), None)];
+
+        releases.add_all(iter.into_iter());
+
+        assert_eq!(releases.len(), 2);
+
+        let versions: Vec<_> = releases.iter().map(|r| &r.version).collect();
+        assert!(versions.contains(&&Stable::new(1, 2, 3)));
+        assert!(versions.contains(&&Stable::new(4, 5, 6)));
+
+        let toolchains: Vec<_> = releases.iter().map(|r| r.toolchains.len()).collect();
+        assert_eq!(toolchains, vec![1, 1]);
     }
 }

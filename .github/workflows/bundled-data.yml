@@ -2,7 +2,7 @@ name: "ci-bundled-data"
 on:
   workflow_dispatch:
   schedule:
-    - cron: '00 07 * * *'
+    - cron: '27 05 * * *'
 concurrency:
   group: publish
   cancel-in-progress: false

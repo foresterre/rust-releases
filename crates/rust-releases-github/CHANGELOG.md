@@ -4,12 +4,6 @@
 
 ## 0.34.0 - 2026-09-11
 
-## 0.34.0 - 2026-09-11
-
-## 0.34.0 - 2026-09-11
-
-## 0.34.0 - 2026-09-11
-
 ### Added
 
 - Add transport independent GitHub releases client

@@ -14,9 +14,14 @@ impl<C> NightlyReleases<C> {
         Self(releases.into_iter().collect())
     }
 
-    /// Add a stable release
+    /// Add a nightly release
     pub fn add(&mut self, release: RustRelease<Nightly, C>) {
         self.0.add(release);
+    }
+
+    /// Add all nightly releases
+    pub fn add_all(&mut self, releases: impl Iterator<Item = RustRelease<Nightly, C>>) {
+        self.0.add_all(releases);
     }
 
     /// Get the number of releases
@@ -269,5 +274,22 @@ mod tests {
 
         let out = modified.iter().next().unwrap();
         assert_eq!(out.version().date, Date::new(2024, 9, 9));
+    }
+
+    #[test]
+    fn add_all() {
+        let mut releases = NightlyReleases::<()>::default();
+        let iter = [make_release(1, 2, 3), make_release(4, 5, 6)];
+
+        releases.add_all(iter.into_iter());
+
+        assert_eq!(releases.len(), 2);
+
+        let versions: Vec<_> = releases.iter().map(|r| &r.version).collect();
+        assert!(versions.contains(&&Nightly::new(1, 2, 3)));
+        assert!(versions.contains(&&Nightly::new(4, 5, 6)));
+
+        let toolchains: Vec<_> = releases.iter().map(|r| r.toolchains.len()).collect();
+        assert_eq!(toolchains, vec![0, 0]);
     }
 }

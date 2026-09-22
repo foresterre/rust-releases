@@ -120,7 +120,9 @@ fn nightly_releases(
         .fetch()
         .map_err(|source| dist_error("nightly", source))?;
 
-    Ok(bundled.nightly().merge(published))
+    dist.nightly()
+        .extend_all(bundled.nightly().merge(published), Detail::toolchains())
+        .map_err(|source| dist_error("nightly", source))
 }
 
 fn dist_error(channel: &'static str, source: error::DistError) -> GeneratorError {

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Changed
+
+- `rust-releases-generator` now also fetches release toolchain data for `rust-releases-bundled` (with the nightly feature enabled)
+
 ## 0.1.11 - 2026-09-22
 
 ### Changed

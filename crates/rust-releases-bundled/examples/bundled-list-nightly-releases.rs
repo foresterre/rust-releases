@@ -11,7 +11,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     );
 
     for release in releases.iter() {
-        println!("{}", release.version().date.ymd());
+        let version = release.version().date.ymd();
+        let toolchains = release.toolchains.len();
+        let hosts = release
+            .toolchains
+            .iter()
+            .map(|t| format!("{}", t.host()))
+            .collect::<Vec<String>>()
+            .join(",");
+
+        println!("nightly version: {version} has {toolchains} toolchains\nhosts: {hosts}\n");
     }
 
     Ok(())

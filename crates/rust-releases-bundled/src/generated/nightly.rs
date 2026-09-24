@@ -40,7 +40,7 @@ impl Release {
 }
 
 #[rustfmt::skip]
-static RELEASES: [Release; 3619] = [
+static RELEASES: [Release; 3620] = [
     Release::new(2016, 3, 8, 151),
     Release::new(2016, 3, 9, 151),
     Release::new(2016, 3, 11, 151),
@@ -3660,6 +3660,7 @@ static RELEASES: [Release; 3619] = [
     Release::new(2026, 9, 21, 1),
     Release::new(2026, 9, 22, 1),
     Release::new(2026, 9, 23, 1),
+    Release::new(2026, 9, 24, 1),
 ];
 
 static TABLES: Tables = Tables {

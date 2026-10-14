@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Fixed
+
+- **rust-releases-rust-dist** Updated `aws-sdk-s3` to `1.152.0` and `aws-config` to respectively `1.12.0`, to resolve RUSTSEC-2026-0346
+
 ## 0.34.0 - 2026-09-11
 
 ## 0.33.0 - 2026-03-25

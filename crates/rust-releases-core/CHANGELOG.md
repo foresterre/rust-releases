@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.34.1 - 2026-10-14
+
 ### Added
 
 - Added `add_all` method for `StableReleases`, `BetaReleases` and `NightlyReleases`

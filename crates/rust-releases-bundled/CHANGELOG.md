@@ -4,6 +4,8 @@
 
 ## 0.1.33 - 2026-10-14
 
+## 0.1.33 - 2026-10-14
+
 ### Changed
 
 - Updated the bundled release data

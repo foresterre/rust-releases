@@ -1,6 +1,6 @@
 [package]
 name = "rust-releases"
-version = "0.32.0"
+version = "0.32.1"
 authors = ["Martijn Gribnau <garm@ilumeo.com>"]
 description = "Find, index and obtain all officially available Rust releases"
 license = "MIT OR Apache-2.0"
@@ -41,7 +41,7 @@ io-http = ["rust-releases-io/http_client"]
 rust-releases-core = { version = "^0.31.0", path = "crates/rust-releases-core" }
 rust-releases-io = { version = "^0.32.0", path = "crates/rust-releases-io", optional = true }
 rust-releases-rust-changelog = { version = "^0.31.0", path = "crates/rust-releases-rust-changelog", optional = true }
-rust-releases-rust-dist = { version = "^0.32.0", path = "crates/rust-releases-rust-dist", optional = true }
+rust-releases-rust-dist = { version = "^0.32.1", path = "crates/rust-releases-rust-dist", optional = true }
 
 [dev-dependencies]
 yare = { workspace = true }

@@ -4,6 +4,10 @@
 
 [Unreleased]: https://github.com/foresterre/rust-releases
 
+## 0.32.1 - 2026-10-22
+
+- Update `rustls-webpki` to `0.101.7`, resolving `RUSTSEC-2026-0382` and `CVE-2026-111943`
+
 ## 0.32.0 - 2026-03-25
 
 ### Fixed

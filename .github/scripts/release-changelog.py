@@ -6,6 +6,8 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+from crates_index import published
+
 UNRELEASED = re.compile(r"^## Unreleased$", re.MULTILINE)
 
 def main() -> None:
@@ -22,6 +24,11 @@ def main() -> None:
 
     for package in metadata["packages"]:
         if package["publish"] == [] or (selected and package["name"] not in selected):
+            print(f"skipping not-publishable or not-selected {package.name} {package.version}")
+            continue
+
+        if published(package["name"], package["version"]):
+            print(f"skipping published {package.name} {package.version}")
             continue
 
         changelog = Path(package["manifest_path"]).with_name("CHANGELOG.md")

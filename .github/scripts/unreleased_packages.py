@@ -1,7 +1,5 @@
-#!/usr/bin/env python3
 import json
 import subprocess
-import sys
 import urllib.error
 import urllib.request
 
@@ -25,7 +23,7 @@ def published(name: str, version: str) -> bool:
 
     return any(json.loads(entry)["vers"] == version for entry in entries)
 
-def main() -> None:
+def unreleased_packages(selected: list[str]) -> list[dict]:
     metadata = json.loads(
         subprocess.run(
             ["cargo", "metadata", "--format-version", "1", "--no-deps"],
@@ -35,19 +33,20 @@ def main() -> None:
         ).stdout
     )
 
-    packages = [
-        package["name"]
-        for package in metadata["packages"]
-        if package["publish"] != []
-        and not published(package["name"], package["version"])
-    ]
+    packages = []
+    for package in metadata["packages"]:
+        if selected and package["name"] not in selected:
+            print(f"skipping not-selected {package['name']} {package['version']}", flush=True)
+            continue
 
-    if not packages:
-        print("every workspace package is already published")
-        return
+        if package["publish"] == []:
+            print(f"skipping not-publishable {package['name']} {package['version']}", flush=True)
+            continue
 
-    selection = [argument for package in packages for argument in ("-p", package)]
-    sys.exit(subprocess.run(["cargo", "publish", *selection, *sys.argv[1:]]).returncode)
+        if published(package["name"], package["version"]):
+            print(f"skipping published {package['name']} {package['version']}", flush=True)
+            continue
 
-if __name__ == "__main__":
-    main()
+        packages.append(package)
+
+    return packages

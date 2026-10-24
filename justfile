@@ -48,17 +48,17 @@ bundle-releases:
 
 # bump the workspace version, and the workspace dependencies
 bump version:
-    ./.github/scripts/bump-version.py {{ version }}
+    ./.github/scripts/bump_version.py {{ version }}
 
 # bump a separately versioned crate, e.g. `just bump-crate rust-toolchain 3.1.0`
 bump-crate package version:
-    ./.github/scripts/bump-version.py {{ version }} {{ package }}
+    ./.github/scripts/bump_version.py {{ version }} {{ package }}
 
 cargo_publish_args := "--locked"
 
 # publish the workspace packages which are not on crates.io yet, in dependency order
 publish-workspace:
-    ./.github/scripts/publish-packages.py {{ cargo_publish_args }}
+    ./.github/scripts/publish_packages.py {{ cargo_publish_args }}
 
 # publish 'rust-releases-core'
 publish-core:

@@ -56,7 +56,7 @@ jobs:
           token: ${{ secrets.RELEASE_TOKEN }}
 
       - name: update_changelog
-        run: ./.github/scripts/release-changelog.py
+        run: ./.github/scripts/release_changelog.py
 
       - name: commit_changelogs
         id: commit
@@ -89,7 +89,7 @@ jobs:
       - name: publish_workspace
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-        run: ./.github/scripts/publish-packages.py
+        run: ./.github/scripts/publish_packages.py
 
   release:
     name: release

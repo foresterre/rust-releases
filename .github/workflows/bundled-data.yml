@@ -38,14 +38,14 @@ jobs:
         id: bump_patch_version
         if: steps.detect_changes.outputs.changed == 'true'
         run: |
-          version="$(./.github/scripts/bump-version.py patch rust-releases-bundled)"
+          version="$(./.github/scripts/bump_version.py patch rust-releases-bundled)"
           echo "version=${version}" >> "$GITHUB_OUTPUT"
 
       - name: update_changelog
         if: steps.detect_changes.outputs.changed == 'true'
         run: |
-          ./.github/scripts/add-changelog-entry.py crates/rust-releases-bundled/CHANGELOG.md Changed "Updated the bundled release data"
-          ./.github/scripts/release-changelog.py rust-releases-bundled
+          ./.github/scripts/add_changelog_entry.py crates/rust-releases-bundled/CHANGELOG.md Changed "Updated the bundled release data"
+          ./.github/scripts/release_changelog.py rust-releases-bundled
 
       - name: test_bundled_data
         if: steps.detect_changes.outputs.changed == 'true'

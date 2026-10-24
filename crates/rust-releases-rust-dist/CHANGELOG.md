@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Maintenance
+
+- Updated release scripts to prevent duplicates version headers
+
 ## 0.34.1 - 2026-10-14
 
 ### Maintenance

@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.1.59 - 2026-11-09
+
+### Changed
+
+- Updated the bundled release data
+
 ## 0.1.58 - 2026-11-08
 
 ### Changed

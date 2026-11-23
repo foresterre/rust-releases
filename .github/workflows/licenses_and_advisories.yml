@@ -24,6 +24,6 @@ jobs:
       - run: cargo generate-lockfile
         env:
           CARGO_RESOLVER_INCOMPATIBLE_RUST_VERSIONS: allow
-      - uses: EmbarkStudios/cargo-deny-action@v2.1.1
+      - uses: EmbarkStudios/cargo-deny-action@v2.1.3
         with:
           log-level: error

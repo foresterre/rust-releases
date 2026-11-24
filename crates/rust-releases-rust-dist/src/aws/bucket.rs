@@ -24,7 +24,7 @@ impl RustDistBucket {
     pub async fn new() -> Result<Self, AwsError> {
         let app_name = AppName::new(APP_NAME).map_err(AwsError::InvalidAppName)?;
 
-        let config = aws_config::defaults(BehaviorVersion::v2026_01_12())
+        let config = aws_config::defaults(BehaviorVersion::v2026_11_10())
             .no_credentials()
             .app_name(app_name)
             .region(RUST_DIST_REGION)
